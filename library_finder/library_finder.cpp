@@ -5,62 +5,12 @@
 #include <string.h>
 #include <cstring>
 #include <regex>
+#include <library_finder.h>
 
-#define SLASH '\\' // WINDOWS SLASH
-
-//Classification is determined by analyzing what a folder contains.  At the bottom there are Tracks
-//that are defined as audio files.  A folder that contains one or more audio files and one or no subdirectories
-//is classified as an Album.  A folder that contains one or more Albums is classified as a Collection.
-//A folder that contains one or more Collections is classified as a Library.  The Folder classification 
-//is reserved for folders that do not meet these classifications yet still contains Tracks.
-enum classification { Folder, Library, Collection, Album };
-
-//selector function for scandir (3rd argument)
-static int one(const struct dirent* unused)
-{
-	return 1;
-}
-
-struct Queue_Node {
-	char* name;
-	char* shortname;
-	struct Queue_Node* next;
-};
-
-struct Chain_Node {
-	struct Queue_Node* subdir_list;
-	struct Chain_Node* next;
-};
-
-struct Dir_Tree_Node {
-	char* name;
-	char* shortname;
-	enum classification type;
-	struct Dir_Tree_Node* parent;
-	struct Dir_Tree_Node* subdirs;
-	struct Dir_Tree_Node* next; //linked list of subdirectories
-	int contained_collections_count;
-	int contained_albums_count;
-	int audio_file_count; //current directory only
-	int other_file_count; //current directory only, not including folders
-	int total_audio_file_count;
-	int total_albums_count;
-};
-
-struct Cur_Dir_Info {
-	char* parent_path;
-	char* shortname;
-	struct Queue_Node* subdir;
-	int audio_file_count;
-	int other_file_count;
-	int subdir_count;
-	struct Dir_Tree_Node* cursor;
-};
-
-struct Cur_Dir_Info* list_and_count(char* current_directory, struct Cur_Dir_Info* output) {
+Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
 
 	//directory listing stuff
-	struct dirent** eps;
+	dirent** eps;
 	int n;
 	n = scandir(current_directory, &eps, one, alphasort);
 	//printf("Files in path: %d\n", n);
@@ -70,12 +20,12 @@ struct Cur_Dir_Info* list_and_count(char* current_directory, struct Cur_Dir_Info
 	current_stat = (struct stat*) malloc(sizeof(struct stat));
 
 	//linked list queuing
-	struct Queue_Node* first = (struct Queue_Node*)malloc(sizeof(struct Queue_Node));
+	Queue_Node* first = (Queue_Node*)malloc(sizeof(Queue_Node));
 	if (!first) {
 		fprintf(stderr, "error: first (Queue_Node) allocation failed, exiting.\n");
 		exit(EXIT_FAILURE);
 	}
-	struct Queue_Node* current = first;
+	Queue_Node* current = first;
 
 	output->audio_file_count = 0;
 	output->other_file_count = 0;
@@ -131,7 +81,7 @@ struct Cur_Dir_Info* list_and_count(char* current_directory, struct Cur_Dir_Info
 					}
 					current->shortname = eps[i]->d_name;
 					//printf("%s\n", current->shortname);
-					struct Queue_Node* next = (struct Queue_Node*)malloc(sizeof(struct Queue_Node));
+					Queue_Node* next = (Queue_Node*)malloc(sizeof(Queue_Node));
 					if (!next) {
 						fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
 						exit(EXIT_FAILURE);
@@ -174,7 +124,7 @@ struct Cur_Dir_Info* list_and_count(char* current_directory, struct Cur_Dir_Info
 	return output;
 }
 
-void explore_paths(struct Dir_Tree_Node* current_path, struct Dir_Tree_Node* tree_cursor, int track_count) {
+void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count) {
 
 	if (!current_path->name) {
 		return;
@@ -185,17 +135,19 @@ void explore_paths(struct Dir_Tree_Node* current_path, struct Dir_Tree_Node* tre
 	char* current_directory = current_path->name;
 	char* current_shortname = current_path->shortname;
 
-	struct Queue_Node* current_subdirs = (struct Queue_Node*)malloc(sizeof(struct Queue_Node));
-	current_subdirs->name = current_directory;
-	current_subdirs->next = nullptr;
+	Queue_Node* current_subdirs = (Queue_Node*)malloc(sizeof(Queue_Node));
+    if (current_subdirs) {
+        current_subdirs->name = current_directory;
+        current_subdirs->next = nullptr;
+    }
 
-	struct Cur_Dir_Info* output = (struct Cur_Dir_Info*)malloc(sizeof(struct Cur_Dir_Info));
+	Cur_Dir_Info* output = (Cur_Dir_Info*)malloc(sizeof(Cur_Dir_Info));
 	if (!output) {
 		fprintf(stderr, "error: output (Cur_Dir_Info) allocation failed, exiting.\n");
 		exit(EXIT_FAILURE);
 	}
 
-	struct Queue_Node* cursor = current_subdirs; //initialize to root of path
+	Queue_Node* cursor = current_subdirs; //initialize to root of path
 
 	//printf("Running:  %s\n", current_directory);
 	tree_cursor->name = current_directory;
@@ -211,18 +163,18 @@ void explore_paths(struct Dir_Tree_Node* current_path, struct Dir_Tree_Node* tre
 	track_count += output->audio_file_count;
 	printf("Found %d tracks so far                         \r", track_count);
 
-	struct Dir_Tree_Node* head = (struct Dir_Tree_Node*)malloc(sizeof(struct Dir_Tree_Node));
+	Dir_Tree_Node* head = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
 	if (!head) {
 		fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	if (output->subdir) { //check if there are subdirectories
-		struct Queue_Node* list = output->subdir;
+		Queue_Node* list = output->subdir;
 
 		tree_cursor->subdirs = head;
 
-		struct Dir_Tree_Node* current = (struct Dir_Tree_Node*)malloc(sizeof(struct Dir_Tree_Node));
+		Dir_Tree_Node* current = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
 		if (!current) {
 			fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
 			exit(EXIT_FAILURE);
@@ -230,13 +182,13 @@ void explore_paths(struct Dir_Tree_Node* current_path, struct Dir_Tree_Node* tre
 		current = head;
 
 
-		/*current->next = (struct Dir_Tree_Node*)malloc(sizeof(struct Dir_Tree_Node));
+		/*current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
 		current->next->name = list->name;
 		current = current->next;
 		list = list->next;*/
 
 		while (list) {
-			current->next = (struct Dir_Tree_Node*)malloc(sizeof(struct Dir_Tree_Node));
+			current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
 			current->next->name = list->name;
 			current->next->shortname = list->shortname;
 			current->parent = current_path;
@@ -263,11 +215,11 @@ void explore_paths(struct Dir_Tree_Node* current_path, struct Dir_Tree_Node* tre
 	else {
 		return;
 	}
-	//current_path->next = (struct Dir_Tree_Node*)malloc(sizeof(struct Dir_Tree_Node));
+	//current_path->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
 	explore_paths(current_path, current_path, track_count);
 }
 
-void traverse_paths(struct Dir_Tree_Node* current_path, int track_count, int album_count) {
+void traverse_paths(Dir_Tree_Node* current_path, int track_count, int album_count) {
 	if (!current_path->name) {
 		return;
 	}
@@ -321,7 +273,7 @@ void traverse_paths(struct Dir_Tree_Node* current_path, int track_count, int alb
 	//printf("%s\nAudio: %d\nOther: %d\n", current_path->name, current_path->audio_file_count, current_path->other_file_count);
 }
 
-void make_directory_list(struct Dir_Tree_Node* current_path, int depth) {
+void make_directory_list(Dir_Tree_Node* current_path, int depth) {
 	if (!current_path->name) {
 		return;
 	}
@@ -355,19 +307,19 @@ int main(int argc, char** argv) {
 	}
 
 	printf("\nStarting at ");
-	for (int i = 1; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
 		printf(argv[i]);
 	} printf("\n\n");
 
 	char** path_list = argv;
 	char* current_directory = path_list[1];
 
-	struct Dir_Tree_Node* root = (struct Dir_Tree_Node*)malloc(sizeof(struct Dir_Tree_Node));
+	Dir_Tree_Node* root = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
 	root->name = current_directory;
 	root->shortname = current_directory;
 	root->next = nullptr;
 	root->parent = nullptr;
-	struct Dir_Tree_Node* tree_cursor = root;
+	Dir_Tree_Node* tree_cursor = root;
 
 	explore_paths(root, tree_cursor, 0);
 	traverse_paths(root, 0, 0);
@@ -375,7 +327,7 @@ int main(int argc, char** argv) {
 
 	/*cursor = first;
 	while (cursor != NULL) {
-		struct Queue_Node* next = cursor->next;
+		Queue_Node* next = cursor->next;
 		free(cursor);
 		cursor = next;
 	}*/
