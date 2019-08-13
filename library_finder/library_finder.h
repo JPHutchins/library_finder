@@ -43,3 +43,8 @@ typedef struct Cur_Dir_Info {
     int subdir_count;
     struct Dir_Tree_Node* cursor;
 }Cur_Dir_Info;
+
+Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output);
+void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count);
+void traverse_paths(Dir_Tree_Node* current_path, int track_count, int album_count);
+void make_directory_list(Dir_Tree_Node* current_path, int depth);

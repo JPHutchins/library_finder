@@ -7,6 +7,35 @@
 #include <regex>
 #include <library_finder.h>
 
+int main(int argc, char** argv) {
+
+    if (argc < 2) {
+        printf("Usage: root path to search from: <path> ");
+        return 1;
+    }
+
+    printf("\nStarting at ");
+    for (int i = 1; i < argc; i++) {
+        printf(argv[i]);
+    } printf("\n\n");
+
+    char** path_list = argv;
+    char* current_directory = path_list[1];
+
+    Dir_Tree_Node* root = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+    root->name = current_directory;
+    root->shortname = current_directory;
+    root->next = nullptr;
+    root->parent = nullptr;
+    Dir_Tree_Node* tree_cursor = root;
+
+    explore_paths(root, tree_cursor, 0);
+    traverse_paths(root, 0, 0);
+    make_directory_list(root, 0);
+
+    return 0;
+}
+
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
 
     //directory listing stuff
@@ -299,37 +328,4 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
     }
 }
 
-int main(int argc, char** argv) {
 
-    if (argc < 2) {
-        printf("Usage: One or more root paths to search from <path> <path> <path> ...");
-        return 1;
-    }
-
-    printf("\nStarting at ");
-    for (int i = 1; i < argc; i++) {
-        printf(argv[i]);
-    } printf("\n\n");
-
-    char** path_list = argv;
-    char* current_directory = path_list[1];
-
-    Dir_Tree_Node* root = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
-    root->name = current_directory;
-    root->shortname = current_directory;
-    root->next = nullptr;
-    root->parent = nullptr;
-    Dir_Tree_Node* tree_cursor = root;
-
-    explore_paths(root, tree_cursor, 0);
-    traverse_paths(root, 0, 0);
-    make_directory_list(root, 0);
-
-    /*cursor = first;
-    while (cursor != NULL) {
-        Queue_Node* next = cursor->next;
-        free(cursor);
-        cursor = next;
-    }*/
-    return 0;
-}
