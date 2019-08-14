@@ -14,23 +14,20 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    printf("\nStarting at ");
-    for (int i = 1; i < argc; i++) {
-        printf(argv[i]);
-    } printf("\n\n");
-
-    char** path_list = argv;
-    char* current_directory = path_list[1];
+    printf("\nStarting at %s\n", argv[1]);
+    
+    char* current_directory = argv[1];
 
     Dir_Tree_Node* root = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
     root->name = current_directory;
     root->shortname = current_directory;
     root->next = nullptr;
     root->parent = nullptr;
-    Dir_Tree_Node* tree_cursor = root;
+    Dir_Tree_Node* tree_cursor = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+    tree_cursor = root;
 
     explore_paths(root, tree_cursor, 0);
-    traverse_paths(root, 0, 0);
+    traverse_paths(root);
     make_directory_list(root, 0);
 
     return 0;
@@ -38,17 +35,13 @@ int main(int argc, char** argv) {
 
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
 
-    //directory listing stuff
     dirent** eps;
     int n;
     n = scandir(current_directory, &eps, one, alphasort);
-    //printf("Files in path: %d\n", n);
     size_t path_length = strlen(current_directory);
-    //printf("Length of pathname: %zd\n", path_length);
     struct stat* current_stat;
     current_stat = (struct stat*) malloc(sizeof(struct stat));
 
-    //linked list queuing
     Queue_Node* first = (Queue_Node*)malloc(sizeof(Queue_Node));
     if (!first) {
         fprintf(stderr, "error: first (Queue_Node) allocation failed, exiting.\n");
@@ -63,7 +56,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
     if (n >= 0) {
         char* shortname = (char*)malloc(0);
         for (int i = 0; i < n; i++) {
-            if (eps[i]->d_name[0] != '.') { //temporary hack to avoid hidden directories and current/parent
+            if (eps[i]->d_name[0] != '.') {
 
                 char fullname[1000] = { NULL };
                 int j = 0;
@@ -77,7 +70,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
                     l = 1;
                 }
 
-                shortname = (char*)realloc(shortname, sizeof(eps[i]->d_name)); //need to dynamically allocate this in the future
+                shortname = (char*)realloc(shortname, sizeof(eps[i]->d_name)); 
                 if (!shortname) {
                     fprintf(stderr, "error: shortname (char*) allocation failed, exiting.\n");
                     exit(EXIT_FAILURE);
@@ -92,9 +85,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
                 stat(fullname, current_stat);
 
                 if (current_stat != NULL && S_ISDIR(current_stat->st_mode) != 0) {
-                    //printf("Found directory: %s\n", fullname);
                     output->subdir_count++;
-                    // TO DO: . and .. are not valid directory names
 
                     current->name = (char*)malloc(sizeof(fullname));
                     if (!current->name) {
@@ -109,12 +100,13 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
                         exit(EXIT_FAILURE);
                     }
                     current->shortname = eps[i]->d_name;
-                    //printf("%s\n", current->shortname);
+                    
                     Queue_Node* next = (Queue_Node*)malloc(sizeof(Queue_Node));
                     if (!next) {
                         fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
                         exit(EXIT_FAILURE);
                     }
+                    
                     current->next = next;
                     current = next;
                 }
@@ -133,13 +125,12 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
             }
         }
         current = nullptr;
-        //printf("Completed\n");
     }
+
     else {
         perror("Couldn't open the directory");
         first = nullptr;
     }
-
 
     output->parent_path = current_directory;
     if (output->subdir_count > 0) {
@@ -148,8 +139,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
     else {
         output->subdir = nullptr;
     }
-    //output->audio_file_count = 1;
-    //output->other_file_count = 2;
+    
     return output;
 }
 
@@ -158,8 +148,6 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     if (!current_path->name) {
         return;
     }
-
-
 
     char* current_directory = current_path->name;
     char* current_shortname = current_path->shortname;
@@ -176,9 +164,8 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
         exit(EXIT_FAILURE);
     }
 
-    Queue_Node* cursor = current_subdirs; //initialize to root of path
+    Queue_Node* cursor = current_subdirs; 
 
-    //printf("Running:  %s\n", current_directory);
     tree_cursor->name = current_directory;
     tree_cursor->shortname = current_shortname;
     tree_cursor->contained_albums_count = 0;
@@ -190,7 +177,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
     track_count += output->audio_file_count;
-    printf("Found %d tracks so far                         \r", track_count);
+    printf("Found %d tracks in %s                                           \r", track_count, tree_cursor->shortname);
 
     Dir_Tree_Node* head = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
     if (!head) {
@@ -198,11 +185,9 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
         exit(EXIT_FAILURE);
     }
 
-    if (output->subdir) { //check if there are subdirectories
+    if (output->subdir) {
         Queue_Node* list = output->subdir;
-
         tree_cursor->subdirs = head;
-
         Dir_Tree_Node* current = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
         if (!current) {
             fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
@@ -210,66 +195,52 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
         }
         current = head;
 
-
-        /*current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
-        current->next->name = list->name;
-        current = current->next;
-        list = list->next;*/
-
         while (list) {
             current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
             current->next->name = list->name;
             current->next->shortname = list->shortname;
             current->parent = current_path;
             current->subdirs = nullptr;
-
             list = list->next;
             current = current->next;
             current->next = nullptr;
         }
         current = head->next;
-        while (current->next) { //won't work if there is a single subdirectory
-            //printf("Checking Dir_Tree_Nodes %s\n", current->name);
+        while (current->next) { 
             current = current->next;
         }
-        //printf("finished Dir_Tree_Node write\n");
         head = head->next;
-        explore_paths(head, head, track_count); //recurse downward
+        explore_paths(head, head, track_count);
         current = nullptr;
     }
-    //printf("Success and recursing\n");
     if (current_path->next) {
         current_path = current_path->next;
     }
     else {
         return;
     }
-    //current_path->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
     explore_paths(current_path, current_path, track_count);
 }
 
-void traverse_paths(Dir_Tree_Node* current_path, int track_count, int album_count) {
+void traverse_paths(Dir_Tree_Node* current_path) {
     if (!current_path->name) {
         return;
     }
 
-    if (current_path->subdirs) { //check for subdirectories first
-        traverse_paths(current_path->subdirs->next, track_count, album_count);
+    if (current_path->subdirs) {
+        traverse_paths(current_path->subdirs->next);
         if (current_path->next) {
-            traverse_paths(current_path->next, track_count, album_count);
+            traverse_paths(current_path->next);
         }
     }
-    else if (current_path->next) { //if there are not subdirectories go to next directory
-        traverse_paths(current_path->next, track_count, album_count);
+    else if (current_path->next) {
+        traverse_paths(current_path->next);
     }
-
-    printf("Found %d tracks in %d different albums\r", track_count, album_count);
-    //printf("%s\nAudio: %d\nOther: %d\n", current_path->name, current_path->audio_file_count, current_path->other_file_count);
-    //printf("%s\n", current_path->name);
+    
     if (current_path->contained_collections_count >= 1) {
         current_path->type = Library;
-        if (current_path->parent) { //annoying
-            current_path->parent->total_audio_file_count += current_path->total_audio_file_count; //warning, this ignores tracks at the root of the collection
+        if (current_path->parent) {
+            current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
             current_path->parent->total_albums_count += current_path->total_albums_count;
         }
     }
@@ -277,29 +248,22 @@ void traverse_paths(Dir_Tree_Node* current_path, int track_count, int album_coun
         current_path->type = Collection;
         if (current_path->parent) {
             current_path->parent->contained_collections_count++;
-            current_path->parent->total_audio_file_count += current_path->total_audio_file_count; //warning, this ignores tracks at the root of the collection
+            current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
             current_path->parent->contained_albums_count += current_path->contained_albums_count;
             current_path->parent->total_albums_count += current_path->contained_albums_count;
         }
     }
     else if (current_path->audio_file_count >= 1 && current_path->other_file_count <= 2) {
         current_path->type = Album;
-        track_count += current_path->audio_file_count;
-        album_count++;
         if (current_path->parent) {
             current_path->parent->contained_albums_count++;
             current_path->parent->total_audio_file_count += current_path->audio_file_count;
         }
     }
     else {
-        current_path->parent->total_audio_file_count += current_path->total_audio_file_count; //warning, this ignores tracks at the root of the collection
+        current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
         current_path->parent->total_albums_count += current_path->total_albums_count;
     }
-    /*if (current_path->type == Library) {
-        printf("Found Library at: %s\n"
-               "Containing %d Albums and %d Tracks\n", current_path->name, current_path->total_albums_count, current_path->total_audio_file_count);
-    }*/
-    //printf("%s\nAudio: %d\nOther: %d\n", current_path->name, current_path->audio_file_count, current_path->other_file_count);
 }
 
 void make_directory_list(Dir_Tree_Node* current_path, int depth) {
@@ -316,14 +280,13 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
         printf("\\%s - contains %d tracks in %d albums\n", current_path->shortname, current_path->total_audio_file_count, current_path->total_albums_count);
     }
 
-
-    if (current_path->subdirs) { //check for subdirectories first
+    if (current_path->subdirs) {
         make_directory_list(current_path->subdirs->next, depth + 4);
         if (current_path->next) {
             make_directory_list(current_path->next, depth);
         }
     }
-    else if (current_path->next) { //if there are not subdirectories go to next directory
+    else if (current_path->next) {
         make_directory_list(current_path->next, depth);
     }
 }
