@@ -34,14 +34,16 @@ int main(int argc, char** argv) {
 }
 
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
-
+  
     dirent** eps;
     int n;
     n = scandir(current_directory, &eps, one, alphasort);
-    size_t path_length = strlen(current_directory);
     struct stat* current_stat;
     current_stat = (struct stat*) malloc(sizeof(struct stat));
-
+    if (!current_stat) {
+        fprintf(stderr, "error: current_stat (stat*) allocation failed, exiting.\n");
+        exit(EXIT_FAILURE);
+    }
     Queue_Node* first = (Queue_Node*)malloc(sizeof(Queue_Node));
     if (!first) {
         fprintf(stderr, "error: first (Queue_Node) allocation failed, exiting.\n");
@@ -54,34 +56,26 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
     output->subdir_count = 0;
 
     if (n >= 0) {
-        char* shortname = (char*)malloc(0);
+        char fullname[MAX_PATH_LENGTH] = { NULL };
+        strcpy_s(fullname, current_directory);
+        size_t path_length = strlen(current_directory);
+        int l = 0;
+        if (fullname[path_length] != SLASH) {
+            fullname[path_length] = SLASH;
+            l = 1;
+        }
+
         for (int i = 0; i < n; i++) {
+
             if (eps[i]->d_name[0] != '.') {
-
-                char fullname[1000] = { NULL };
-                int j = 0;
-                while (j < path_length) {
-                    fullname[j] = current_directory[j];
-                    j++;
+                char* shortname = eps[i]->d_name;
+                size_t shortname_length = strlen(shortname);
+                int k = 0;
+                while (k < shortname_length) {
+                    fullname[path_length + k + l] = shortname[k];
+                    k++;
                 }
-                int l = 0;
-                if (fullname[path_length] != SLASH) {
-                    fullname[path_length] = SLASH;
-                    l = 1;
-                }
-
-                shortname = (char*)realloc(shortname, sizeof(eps[i]->d_name)); 
-                if (!shortname) {
-                    fprintf(stderr, "error: shortname (char*) allocation failed, exiting.\n");
-                    exit(EXIT_FAILURE);
-                }
-                memcpy(shortname, eps[i]->d_name, sizeof(eps[i]->d_name));
-
-
-                for (unsigned int k = 0; k < strlen(eps[i]->d_name) / sizeof(char); k++) {
-                    fullname[path_length + k + l] = shortname[k * sizeof(char)];
-                }
-
+                fullname[path_length + k + l] = NULL;
                 stat(fullname, current_stat);
 
                 if (current_stat != NULL && S_ISDIR(current_stat->st_mode) != 0) {
@@ -99,7 +93,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
                         fprintf(stderr, "error: current->name (char*) allocation failed, exiting.\n");
                         exit(EXIT_FAILURE);
                     }
-                    current->shortname = eps[i]->d_name;
+                    current->shortname = shortname;
                     
                     Queue_Node* next = (Queue_Node*)malloc(sizeof(Queue_Node));
                     if (!next) {
@@ -110,7 +104,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
                     current->next = next;
                     current = next;
                 }
-                else if (output->other_file_count < 5) {
+                else if (output->other_file_count < 2) {
                     if (std::regex_match(shortname, std::regex(".+\.(wav|mp3)"))) { //todo define at top and/or use flags
                         output->audio_file_count++;
                     }
@@ -121,7 +115,6 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
                 current->name = nullptr;
                 current->shortname = nullptr;
                 current->next = nullptr;
-
             }
         }
         current = nullptr;
@@ -140,6 +133,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
         output->subdir = nullptr;
     }
     
+    free(current_stat);
     return output;
 }
 
@@ -250,19 +244,22 @@ void traverse_paths(Dir_Tree_Node* current_path) {
             current_path->parent->contained_collections_count++;
             current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
             current_path->parent->contained_albums_count += current_path->contained_albums_count;
-            current_path->parent->total_albums_count += current_path->contained_albums_count;
+            current_path->parent->total_albums_count += current_path->total_albums_count;
         }
     }
     else if (current_path->audio_file_count >= 1 && current_path->other_file_count <= 2) {
         current_path->type = Album;
         if (current_path->parent) {
             current_path->parent->contained_albums_count++;
+            current_path->parent->total_albums_count++;
             current_path->parent->total_audio_file_count += current_path->audio_file_count;
         }
     }
     else {
-        current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
-        current_path->parent->total_albums_count += current_path->total_albums_count;
+        if (current_path->parent) {
+            current_path->parent->total_audio_file_count += current_path->total_audio_file_count;
+            current_path->parent->total_albums_count += current_path->total_albums_count;
+        }
     }
 }
 
@@ -271,7 +268,7 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
         return;
     }
 
-    if (current_path->type == Library | current_path->type == Collection) {
+    if ((current_path->type == Library) | (current_path->type == Collection)) {
         int i = 0;
         while (i < depth) {
             printf(" ");

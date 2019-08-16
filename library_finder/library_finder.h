@@ -1,4 +1,5 @@
 #define SLASH '\\' // WINDOWS SLASH
+#define MAX_PATH_LENGTH 1017
 
 //Classification is determined by analyzing what a folder contains.  At the bottom there are Tracks
 //that are defined as audio files.  A folder that contains one or more audio files and one or no subdirectories
