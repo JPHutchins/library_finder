@@ -126,8 +126,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="library_finder.cpp" />
+    <ClCompile Include="list_and_count.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="list_and_count.h" />
     <ClInclude Include="library_finder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

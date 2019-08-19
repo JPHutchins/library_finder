@@ -18,9 +18,15 @@
     <ClCompile Include="library_finder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="list_and_count.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="library_finder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="list_and_count.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
