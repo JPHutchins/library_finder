@@ -8,6 +8,11 @@
 #include <regex>
 #include <library_finder.h>
 
+/*-------------------------------------------------------------------------------------------------
+    Takes a single argument, the root directory under which to search for libraries.
+    Prints a list of Collections and Libraries under that directory.
+-------------------------------------------------------------------------------------------------*/
+
 int main(int argc, char** argv) {
 
     if (argc < 2) {
@@ -33,6 +38,12 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
+/*-------------------------------------------------------------------------------------------------
+    explore_paths calls list_and_count recursively through the filesystem
+    The struct Queue_Node is a linked list of subdirectories that keeps track of subdirectories of 
+    the current folder and queues them up.
+-------------------------------------------------------------------------------------------------*/
 
 void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count) {
 
@@ -113,6 +124,14 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     explore_paths(current_path, current_path, track_count);
 }
 
+/*-------------------------------------------------------------------------------------------------
+    traverse_paths looks through the representation of the filesystem created by explore_paths and
+    classifies folders according to these rules:
+    Albums contain 2 or more Tracks
+    Collections contain 1 or more Albums or Collections
+    Libraries contain 1 or more Collections
+-------------------------------------------------------------------------------------------------*/
+
 void traverse_paths(Dir_Tree_Node* current_path) {
     if (!current_path->name) {
         return;
@@ -160,6 +179,11 @@ void traverse_paths(Dir_Tree_Node* current_path) {
     }
 }
 
+/*-------------------------------------------------------------------------------------------------
+    make_directory_list prints output to the user.  This list shows the user Libraries and
+    Collections, where to find them in the filesystem, and how many albums are in their subtree.
+-------------------------------------------------------------------------------------------------*/
+
 void make_directory_list(Dir_Tree_Node* current_path, int depth) {
     if (!current_path->name) {
         return;
@@ -184,6 +208,19 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
         make_directory_list(current_path->next, depth);
     }
 }
+
+/*-------------------------------------------------------------------------------------------------
+    list_and_count opens current_directory and looks through its files.  It ignores hidden files
+    and outputs a summary of the folders contents: a linked list of its subdirectories and an
+    estimate* of the number of audio files (Tracks).
+
+    *A compromise is made here.  A regular audio album directory is likely to contain audio files 
+    only.  However, it may contain a few images or even a subfolder of images or text.
+    list_and_count allows for 2 non-audio files before it SKIPS that folder entirely moving to
+    the next.  This compromise is made to reduce time complexity by reducing the problem size given
+    to the regular expression matching from [number of files in the filesystem] to [number of audio
+    files in the filesystem + 2*(number of folders in the filesystem)].
+-------------------------------------------------------------------------------------------------*/
 
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
 
