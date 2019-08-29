@@ -9,15 +9,45 @@
 #include <library_finder.h>
 
 /*-------------------------------------------------------------------------------------------------
-    Takes a single argument, the root directory under which to search for libraries.
+    Argument is the root directory under which to search for libraries.  Optionally include 
+    the flag --type to specify audio, video, or photo.
     Prints a list of Collections and Libraries under that directory.
 -------------------------------------------------------------------------------------------------*/
 
 int main(int argc, char** argv) {
 
     if (argc < 2) {
-        printf("Usage: root path to search from: <path> ");
+        printf("Usage: [path] --type [ audio, video, or photo ]");
         return 1;
+    }
+
+    char target_extensions[150] = { NULL };
+
+    for (int i = 2; i < (argc); i++) {
+        if (!strcmp(argv[i], "--type")) {
+            i++;
+            if (!strcmp(argv[i], "audio")) {
+                strcpy_s(target_extensions, sizeof(AUDIO_EXTENSIONS), AUDIO_EXTENSIONS);
+            }
+            else if (!strcmp(argv[i], "video")) {
+                strcpy_s(target_extensions, sizeof(VIDEO_EXTENSIONS), VIDEO_EXTENSIONS);
+            }
+            else if (!strcmp(argv[i], "photo")) {
+                strcpy_s(target_extensions, sizeof(PHOTO_EXTENSIONS), PHOTO_EXTENSIONS);
+            }
+            else {
+                printf("--type can be audio, video, or photo (case sensitive)");
+                return 1;
+            }
+        }
+        else {
+            printf("Usage: [ path ] --type [ audio, video, or photo ]");
+            return 1;
+        }
+    }
+
+    if (!target_extensions[0]) {
+        strcpy_s(target_extensions, sizeof(AUDIO_EXTENSIONS), AUDIO_EXTENSIONS);
     }
 
     printf("\nStarting at %s\n", argv[1]);
@@ -25,16 +55,26 @@ int main(int argc, char** argv) {
     char* current_directory = argv[1];
 
     Dir_Tree_Node* root = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+    if (!root) {
+        fprintf(stderr, "error: root (Dir_Tree_Node) allocation failed, exiting.\n");
+        exit(EXIT_FAILURE);
+    }
     root->name = current_directory;
     root->shortname = current_directory;
     root->next = nullptr;
     root->parent = nullptr;
     Dir_Tree_Node* tree_cursor = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+    if (!tree_cursor) {
+        fprintf(stderr, "error: root (Dir_Tree_Node) allocation failed, exiting.\n");
+        exit(EXIT_FAILURE);
+    }
     tree_cursor = root;
 
-    explore_paths(root, tree_cursor, 0);
+    explore_paths(root, tree_cursor, 0, target_extensions);
     traverse_paths(root);
     make_directory_list(root, 0);
+
+    free(root);
 
     return 0;
 }
@@ -45,7 +85,8 @@ int main(int argc, char** argv) {
     the current folder and queues them up.
 -------------------------------------------------------------------------------------------------*/
 
-void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count) {
+void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count,
+    char* target_extensions) {
 
     if (!current_path->name) {
         return;
@@ -75,7 +116,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     tree_cursor->total_audio_file_count = 0;
     tree_cursor->total_albums_count = 0;
 
-    output = list_and_count(current_directory, output);
+    output = list_and_count(current_directory, output, target_extensions);
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
     track_count += output->audio_file_count;
@@ -112,7 +153,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
             current = current->next;
         }
         head = head->next;
-        explore_paths(head, head, track_count);
+        explore_paths(head, head, track_count, target_extensions);
         current = nullptr;
     }
     if (current_path->next) {
@@ -121,7 +162,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     else {
         return;
     }
-    explore_paths(current_path, current_path, track_count);
+    explore_paths(current_path, current_path, track_count, target_extensions);
 }
 
 /*-------------------------------------------------------------------------------------------------
@@ -222,7 +263,8 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
     files in the filesystem + 2*(number of folders in the filesystem)].
 -------------------------------------------------------------------------------------------------*/
 
-Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
+Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
+    char* target_extensions) {
 
     dirent** eps;
     int n;
@@ -294,7 +336,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output) {
                     current = next;
                 }
                 else if (output->other_file_count < 2) {
-                    if (std::regex_match(shortname, std::regex(".+\.(wav|mp3)"))) { //todo define at top and/or use flags
+                    if (std::regex_match(shortname, std::regex(target_extensions))) { //todo define at top and/or use flags
                         output->audio_file_count++;
                     }
                     else {

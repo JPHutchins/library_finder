@@ -1,5 +1,9 @@
 #define SLASH '\\' // WINDOWS SLASH
 #define MAX_PATH_LENGTH 1017
+#define AUDIO_EXTENSIONS ".+\.(aa|aac|aax|aiff|alac|flac|m4a|mp3|ogg|wav|wma)"
+#define VIDEO_EXTENSIONS ".+\.(mkv|flv|vob|ogv|avi|MTS|TS|M2TS|mts|ts|m2ts|mov|qt|wmv|mp4|m4p|m4v\
+                         |mpg|mp2|mpeg|mpe|mpv|mpg|m2v|3gp|3g2)"
+#define PHOTO_EXTENSIONS ".+\.(gif|jpg)"
 
 //Classification is determined by analyzing what a folder contains.  At the bottom there are Tracks
 //that are defined as audio files.  A folder that contains one or more audio files and one or no subdirectories
@@ -45,9 +49,11 @@ typedef struct Dir_Tree_Node {
     int total_albums_count;
 }Dir_Tree_Node;
 
-Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output);
+Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
+    char* target_extensions);
 
-void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count);
+void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count,
+    char* target_extensions);
 
 void traverse_paths(Dir_Tree_Node* current_path);
 
