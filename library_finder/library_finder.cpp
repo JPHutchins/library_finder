@@ -120,7 +120,8 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
     track_count += output->audio_file_count;
-    printf("Found %d tracks in %s                                           \r", track_count, tree_cursor->shortname);
+    printf("Found %d tracks in %s                                           \r",
+        track_count, tree_cursor->shortname);
 
     Dir_Tree_Node* head = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
     if (!head) {
@@ -236,7 +237,8 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
             printf(" ");
             i++;
         }
-        printf("\\%s - contains %d tracks in %d albums\n", current_path->shortname, current_path->total_audio_file_count, current_path->total_albums_count);
+        printf("\\%s - contains %d tracks in %d albums\n", current_path->shortname, 
+            current_path->total_audio_file_count, current_path->total_albums_count);
     }
 
     if (current_path->subdirs) {
@@ -336,7 +338,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                     current = next;
                 }
                 else if (output->other_file_count < 2) {
-                    if (std::regex_match(shortname, std::regex(target_extensions))) { //todo define at top and/or use flags
+                    if (std::regex_match(shortname, std::regex(target_extensions))) {
                         output->audio_file_count++;
                     }
                     else {
