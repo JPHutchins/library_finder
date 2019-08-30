@@ -18,6 +18,10 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace test_list_and_count
 {
+/*
+    Simple_counting verifies that the function is counting audio files insimple folders
+    that only contain audio files.
+*/
     TEST_CLASS(Simple_Counting)
     {
     public:
@@ -35,6 +39,11 @@ namespace test_list_and_count
         }
     };
 
+/*
+    Count_2 tests should always answer 2 - the test folders have audio files and text
+    files in differing order.
+
+*/
     TEST_CLASS(Count_2)
     {
     public:
