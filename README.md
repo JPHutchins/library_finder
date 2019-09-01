@@ -1,7 +1,7 @@
 # library_finder
 Find potential file libraries on a file system, such as those created by iTunes or Plex.
 
-Part of my work involves providing "data management" services to private clients.  One of the issues
+Part of my work involves providing data management services to private clients.  One of the issues
 that is often run into is the desire to upgrade to a new computer and perhaps integrate their media
 libraries into a network attached storage solution or cloud backup in the process.  This can be a
 tedious process even with the aid of OS filesystem indexing and command line tools - all too often
