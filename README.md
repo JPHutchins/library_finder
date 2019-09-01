@@ -13,7 +13,7 @@ de-duplication.
 
 Began as a project in C in an effort for it to be cross-platform ready (so far only tested in Windows).
 Became a C++ project when I realized my implementation of regular expression matching was *probably*
-not going to be as good as the C++ &ltregex&gt.  This is particularly relevant because it eats most of the
+not going to be as good as the C++ <&lt>regex<&gt>.  This is particularly relevant because it eats most of the
 CPU time.
 
 Compiles in Visual Studio 2019.
