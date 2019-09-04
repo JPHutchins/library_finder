@@ -363,6 +363,9 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                         output->other_file_count++;
                     }
                 }
+                else {
+                    output->audio_file_count = 0;
+                }
                 current->name = nullptr;
                 current->shortname = nullptr;
                 current->next = nullptr;
