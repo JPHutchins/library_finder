@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
     }
 
     char target_extensions[150] = { NULL };
+    unsigned int tolerance = TOLERANCE;
 
     for (int i = 2; i < (argc); i++) {
         if (!strcmp(argv[i], "--type")) {
@@ -57,6 +58,10 @@ int main(int argc, char** argv) {
                 printf("--type can be audio, video, or photo (case sensitive)");
                 return 1;
             }
+        }
+        else if (!strcmp(argv[i], "--tolerance")) {
+            i++;
+            tolerance = atoi(argv[i]);
         }
         else {
             printf("Usage: [ path ] --type [ audio, video, or photo ]");
@@ -88,7 +93,7 @@ int main(int argc, char** argv) {
     }
     tree_cursor = root;
 
-    explore_paths(root, tree_cursor, 0, target_extensions);
+    explore_paths(root, tree_cursor, 0, target_extensions, tolerance);
     traverse_paths(root);
     make_directory_list(root, 0);
 
@@ -104,7 +109,7 @@ int main(int argc, char** argv) {
 -------------------------------------------------------------------------------------------------*/
 
 void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count,
-    char* target_extensions) {
+    char* target_extensions, unsigned int tolerance) {
 
     if (!current_path->name) {
         return;
@@ -134,7 +139,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     tree_cursor->total_audio_file_count = 0;
     tree_cursor->total_albums_count = 0;
 
-    output = list_and_count(current_directory, output, target_extensions);
+    output = list_and_count(current_directory, output, target_extensions, tolerance);
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
     track_count += output->audio_file_count;
@@ -172,7 +177,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
             current = current->next;
         }
         head = head->next;
-        explore_paths(head, head, track_count, target_extensions);
+        explore_paths(head, head, track_count, target_extensions, tolerance);
         current = nullptr;
     }
     if (current_path->next) {
@@ -181,7 +186,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     else {
         return;
     }
-    explore_paths(current_path, current_path, track_count, target_extensions);
+    explore_paths(current_path, current_path, track_count, target_extensions, tolerance);
 }
 
 /*-------------------------------------------------------------------------------------------------
@@ -284,7 +289,7 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
 -------------------------------------------------------------------------------------------------*/
 
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
-    char* target_extensions) {
+    char* target_extensions, unsigned int tolerance) {
 
     dirent** eps;
     int n;
@@ -355,7 +360,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                     current->next = next;
                     current = next;
                 }
-                else if (output->other_file_count <= 2) {
+                else if (output->other_file_count <= tolerance) {
                     if (std::regex_match(shortname, std::regex(target_extensions))) {
                         output->audio_file_count++;
                     }
@@ -363,7 +368,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                         output->other_file_count++;
                     }
                 }
-               if (output->other_file_count > 2) {
+               if (output->other_file_count > tolerance) {
                     output->audio_file_count = 0;
                 }
                 current->name = nullptr;

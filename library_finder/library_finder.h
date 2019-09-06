@@ -18,6 +18,7 @@
 
 #define SLASH '\\' // WINDOWS SLASH
 #define MAX_PATH_LENGTH 1017
+#define TOLERANCE 2
 #define AUDIO_EXTENSIONS ".+\.(aa|aac|aax|aiff|alac|flac|m4a|mp3|ogg|wav|wma)"
 #define VIDEO_EXTENSIONS ".+\.(mkv|flv|vob|ogv|avi|MTS|TS|M2TS|mts|ts|m2ts|mov|qt|wmv|mp4|m4p|m4v\
                          |mpg|mp2|mpeg|mpe|mpv|mpg|m2v|3gp|3g2)"
@@ -68,10 +69,10 @@ typedef struct Dir_Tree_Node {
 }Dir_Tree_Node;
 
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
-    char* target_extensions);
+    char* target_extensions, unsigned int tolerance);
 
 void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count,
-    char* target_extensions);
+    char* target_extensions, unsigned int tolerance);
 
 void traverse_paths(Dir_Tree_Node* current_path);
 

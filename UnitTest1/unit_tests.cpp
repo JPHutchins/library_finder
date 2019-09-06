@@ -44,16 +44,16 @@ namespace test_list_and_count
     {
     public:
         TEST_METHOD(Simple_Counting_0) {
-            Assert::AreEqual(0, test("simple_counting/0"));
+            Assert::AreEqual(0, test("simple_counting/0", 2));
         }
         TEST_METHOD(Simple_Counting_1) {
-            Assert::AreEqual(1, test("simple_counting/1"));
+            Assert::AreEqual(1, test("simple_counting/1", 2));
         }
         TEST_METHOD(Simple_Counting_2) {
-            Assert::AreEqual(2, test("simple_counting/2"));
+            Assert::AreEqual(2, test("simple_counting/2", 2));
         }
         TEST_METHOD(Simple_Counting_512) {
-            Assert::AreEqual(512, test("simple_counting/512"));
+            Assert::AreEqual(512, test("simple_counting/512", 2));
         }
     };
 
@@ -65,42 +65,63 @@ namespace test_list_and_count
     {
     public:
         TEST_METHOD(test_1_after) {
-            Assert::AreEqual(2, test("2_with_other_files/1_after"));
+            Assert::AreEqual(2, test("2_with_other_files/1_after", 2));
         }
         TEST_METHOD(test_1_before) {
-            Assert::AreEqual(2, test("2_with_other_files/1_before"));
+            Assert::AreEqual(2, test("2_with_other_files/1_before", 2));
         }
         TEST_METHOD(test_2_after) {
-            Assert::AreEqual(2, test("2_with_other_files/2_after"));
+            Assert::AreEqual(2, test("2_with_other_files/2_after", 2));
         }
         TEST_METHOD(test_2_before) {
-            Assert::AreEqual(2, test("2_with_other_files/2_before"));
+            Assert::AreEqual(2, test("2_with_other_files/2_before", 2));
         }
         TEST_METHOD(test_2_interleaved) {
-            Assert::AreEqual(2, test("2_with_other_files/2_interleaved"));
+            Assert::AreEqual(2, test("2_with_other_files/2_interleaved", 2));
         }
         TEST_METHOD(test_3_after) {
-            Assert::AreEqual(0, test("2_with_other_files/3_after"));
+            Assert::AreEqual(0, test("2_with_other_files/3_after", 2));
         }
         TEST_METHOD(test_3_before) {
-            Assert::AreEqual(0, test("2_with_other_files/3_before"));
+            Assert::AreEqual(0, test("2_with_other_files/3_before", 2));
         }
         TEST_METHOD(test_3_interleaved) {
-            Assert::AreEqual(0, test("2_with_other_files/3_interleaved"));
+            Assert::AreEqual(0, test("2_with_other_files/3_interleaved", 2));
         }
         TEST_METHOD(test_4_after) {
-            Assert::AreEqual(0, test("2_with_other_files/4_after"));
+            Assert::AreEqual(0, test("2_with_other_files/4_after", 2));
         }
         TEST_METHOD(test_4_before) {
-            Assert::AreEqual(0, test("2_with_other_files/4_before"));
+            Assert::AreEqual(0, test("2_with_other_files/4_before", 2));
         }
         TEST_METHOD(test_5_after) {
-            Assert::AreEqual(0, test("2_with_other_files/5_after"));
+            Assert::AreEqual(0, test("2_with_other_files/5_after", 2));
         }
         TEST_METHOD(test_5_before) {
-            Assert::AreEqual(0, test("2_with_other_files/5_before"));
+            Assert::AreEqual(0, test("2_with_other_files/5_before", 2));
         }
         
+    };
+    /*
+        Count_2 tests should always answer 2 unless it encounters 2 or more non-target files.
+
+    */
+    TEST_CLASS(Count_tolerance)
+    {
+    public:
+        TEST_METHOD(test_3_before_tolerance_1) {
+            Assert::AreEqual(0, test("2_with_other_files/3_before", 1));
+        }
+        TEST_METHOD(test_3_before_tolerance_2) {
+            Assert::AreEqual(0, test("2_with_other_files/3_before", 2));
+        }
+        TEST_METHOD(test_3_before_tolerance_3) {
+            Assert::AreEqual(2, test("2_with_other_files/3_before", 3));
+        }
+        TEST_METHOD(test_3_before_tolerance_4) {
+            Assert::AreEqual(2, test("2_with_other_files/3_before", 4));
+        }
+    
     };
 }
 /*
@@ -127,9 +148,9 @@ char* set_path(const char* test_path) {
     return full_path;
 }
 
-int test(const char* test_folder) {
+int test(const char* test_folder, unsigned int tolerance) {
     Cur_Dir_Info* output = set_variables();
     char* test_path = set_path(test_folder);
-    output = list_and_count(test_path, output, AUDIO_EXTENSIONS);
+    output = list_and_count(test_path, output, AUDIO_EXTENSIONS, tolerance);
     return output->audio_file_count;
 }
