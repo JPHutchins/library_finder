@@ -24,11 +24,14 @@
                          |mpg|mp2|mpeg|mpe|mpv|mpg|m2v|3gp|3g2)"
 #define PHOTO_EXTENSIONS ".+\.(gif|jpg)"
 
-//Classification is determined by analyzing what a folder contains.  At the bottom there are Tracks
-//that are defined as audio files.  A folder that contains one or more audio files and one or no subdirectories
-//is classified as an Album.  A folder that contains one or more Albums is classified as a Collection.
-//A folder that contains one or more Collections is classified as a Library.  The Folder classification 
-//is reserved for folders that do not meet these classifications yet still contains Tracks.
+/*-------------------------------------------------------------------------------------------------
+Classification is determined by analyzing what a folder contains.  At the bottom there are Tracks
+that are defined as audio files.  A folder that contains one or more audio files and one or no
+subdirectories is classified as an Album.  A folder that contains one or more Albums is classified
+as a Collection.  A folder that contains one or more Collections is classified as a Library.  The
+Folder classification is reserved for folders that do not meet these classifications yet still
+contains Tracks.
+-------------------------------------------------------------------------------------------------*/
 
 enum classification { Folder, Library, Collection, Album };
 
