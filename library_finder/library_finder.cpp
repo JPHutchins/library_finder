@@ -148,7 +148,6 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int*
 
     char trunc_shortname[11];
     strncpy_s(trunc_shortname, tree_cursor->shortname, 10);
-    trunc_shortname[10] = '\0';
 
     printf("Found %d tracks so far, now checking %s...          \r", *track_count, trunc_shortname);
 
