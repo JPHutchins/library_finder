@@ -234,7 +234,7 @@ void traverse_paths(Dir_Tree_Node* current_path) {
             current_path->parent->total_albums_count += current_path->total_albums_count;
         }
     }
-    else if (current_path->audio_file_count >= 1 && current_path->other_file_count <= 2) {
+    else if (current_path->audio_file_count >= 1) {
         current_path->type = Album;
         if (current_path->parent) {
             current_path->parent->contained_albums_count++;
