@@ -361,7 +361,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                     current = next;
                 }
                 else if (output->other_file_count <= tolerance) {
-                    if (std::regex_match(shortname, std::regex(target_extensions))) {
+                    if (std::regex_match(shortname, std::regex(target_extensions, std::regex_constants::icase))) {
                         output->audio_file_count++;
                     }
                     else {
