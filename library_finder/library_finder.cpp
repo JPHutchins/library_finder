@@ -143,8 +143,12 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
     track_count += output->audio_file_count;
-    printf("Found %d tracks in %s                                           \r",
-        track_count, tree_cursor->shortname);
+
+    char trunc_shortname[11];
+    strncpy_s(trunc_shortname, tree_cursor->shortname, 10);
+    trunc_shortname[10] = '\0';
+
+    printf("Found %d tracks so far, now checking %s...          \r", track_count, trunc_shortname);
 
     Dir_Tree_Node* head = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
     if (!head) {
