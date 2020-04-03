@@ -74,7 +74,7 @@ typedef struct Dir_Tree_Node {
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
     char* target_extensions, unsigned int tolerance);
 
-void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count,
+void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int* track_count,
     char* target_extensions, unsigned int tolerance);
 
 void traverse_paths(Dir_Tree_Node* current_path);

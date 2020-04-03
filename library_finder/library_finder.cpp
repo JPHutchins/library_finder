@@ -93,7 +93,9 @@ int main(int argc, char** argv) {
     }
     tree_cursor = root;
 
-    explore_paths(root, tree_cursor, 0, target_extensions, tolerance);
+    int total_count = 0;
+
+    explore_paths(root, tree_cursor, &total_count, target_extensions, tolerance);
     traverse_paths(root);
     make_directory_list(root, 0);
 
@@ -108,7 +110,7 @@ int main(int argc, char** argv) {
     the current folder and queues them up.
 -------------------------------------------------------------------------------------------------*/
 
-void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int track_count,
+void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int* track_count,
     char* target_extensions, unsigned int tolerance) {
 
     if (!current_path->name) {
@@ -142,13 +144,13 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int 
     output = list_and_count(current_directory, output, target_extensions, tolerance);
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
-    track_count += output->audio_file_count;
+    *track_count += output->audio_file_count;
 
     char trunc_shortname[11];
     strncpy_s(trunc_shortname, tree_cursor->shortname, 10);
     trunc_shortname[10] = '\0';
 
-    printf("Found %d tracks so far, now checking %s...          \r", track_count, trunc_shortname);
+    printf("Found %d tracks so far, now checking %s...          \r", *track_count, trunc_shortname);
 
     Dir_Tree_Node* head = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
     if (!head) {
