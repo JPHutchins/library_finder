@@ -3,7 +3,7 @@ Find potential file libraries on a file system, such as those created by iTunes,
 
 ## Quickstart
 
-Compiles in Visual Studio 2019.  Usage:
+Usage:
 ```
 library_finder.exe /parent/path_to_search_under
 ```
@@ -13,6 +13,8 @@ Optional flags:
 `--help`
 
 Try it on root: ```library_finder.exe D:\.```
+
+### Compiles in Visual Studio 2019.  
 
 #### For an .exe:
   From Solution Explorer, drop down library_finder and open library_finder.cpp
