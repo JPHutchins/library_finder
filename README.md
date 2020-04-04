@@ -7,7 +7,10 @@ Compiles in Visual Studio 2019.  Usage:
 ```
 library_finder.exe /parent/path_to_search_under
 ```
-One optional flag --type audio, video, or photo (defaults to audio)
+Optional flags: 
+`--type [ audio, video, or photo (defaults to audio) ]`
+`--tolerance [ number of non-target-type files to allow before skipping the folder ]`
+`--help`
 
 Try it on root: ```library_finder.exe D:\.```
 
