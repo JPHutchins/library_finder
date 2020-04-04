@@ -1,9 +1,11 @@
 # library_finder
-Find potential file libraries on a file system, such as those created by iTunes, Plex or Mac Photos.
+[Download here](https://github.com/JPHutchins/library_finder/releases)
+
 
 ## Quickstart
+Find potential file libraries on a file system, such as those created by iTunes, Plex or Mac Photos.
 
-Usage:
+library_finder is a commandline utility. Open a terminal (like Command Prompt or Terminal) and navigate to the folder that you downloaded library_finder.exe to.
 ```
 library_finder.exe /parent/path_to_search_under
 ```
