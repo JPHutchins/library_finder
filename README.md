@@ -1,5 +1,5 @@
 # library_finder
-Find potential file libraries on a file system, such as those created by iTunes or Plex.
+Find potential file libraries on a file system, such as those created by iTunes, Plex or Mac Photos.
 
 ## Run it
 
