@@ -1,7 +1,7 @@
 # library_finder
 Find potential file libraries on a file system, such as those created by iTunes, Plex or Mac Photos.
 
-## Run it
+## Quickstart
 
 Compiles in Visual Studio 2019.  Usage:
 ```
