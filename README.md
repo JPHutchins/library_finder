@@ -14,14 +14,12 @@ Optional flags:
 
 Try it on root: ```library_finder.exe D:\.```
 
-### Compiles in Visual Studio 2019.  
-
+### Compile in Visual Studio 2019  
 #### For an .exe:
   From Solution Explorer, drop down library_finder and open library_finder.cpp
   Drop down Project and select library_finder Properties
   Under Configuration Properties->General, under Projec Defaults, verify that
     Configuration Type is set to Application (.exe)
-    
 #### For unit testing:
   Complete the steps above but verify that Configuraiton Type is set to
     Static library (.lib)
