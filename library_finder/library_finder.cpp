@@ -168,7 +168,7 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int*
         current = head;
 
         while (list) {
-            current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+            current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));;
             current->next->name = list->name;
             current->next->shortname = list->shortname;
             current->parent = current_path;
@@ -338,23 +338,26 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                 }
                 fullname[path_length + k + l] = NULL;
                 stat(fullname, current_stat);
-
+                
                 if (current_stat != NULL && S_ISDIR(current_stat->st_mode) != 0) {
                     output->subdir_count++;
 
-                    current->name = (char*)malloc(sizeof(fullname));
+                    size_t fullname_length = path_length + k + 2;
+                   
+                    current->name = (char*)malloc(fullname_length);
                     if (!current->name) {
                         fprintf(stderr, "error: current->name (char*) allocation failed, exiting.\n");
                         exit(EXIT_FAILURE);
                     }
-                    memcpy(current->name, fullname, sizeof(fullname));
+                    memcpy(current->name, fullname, fullname_length);
 
-                    current->shortname = (char*)malloc(sizeof(shortname));
-                    if (!current->name) {
-                        fprintf(stderr, "error: current->name (char*) allocation failed, exiting.\n");
+                    current->shortname = (char*)malloc(sizeof(char*) * (shortname_length + 1));
+                    if (!current->shortname) {
+                        fprintf(stderr, "error: current->shortname (char*) allocation failed, exiting.\n");
                         exit(EXIT_FAILURE);
                     }
-                    current->shortname = shortname;
+                    strcpy_s(current->shortname, sizeof(char*) * (shortname_length + 1), shortname);
+                    
 
                     Queue_Node* next = (Queue_Node*)malloc(sizeof(Queue_Node));
                     if (!next) {
@@ -366,11 +369,12 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                     current = next;
                 }
                 else if (output->other_file_count <= tolerance) {
-                    if (std::regex_match(shortname, std::regex(target_extensions, std::regex_constants::icase))) {
+                    if (std::regex_match(shortname,
+                            std::regex(target_extensions, std::regex_constants::icase))) {
                         output->audio_file_count++;
                     }
                     else {
-                        output->other_file_count++;
+                        output->other_file_count++; 
                     }
                 }
                if (output->other_file_count > tolerance) {
@@ -380,7 +384,7 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                 current->shortname = nullptr;
                 current->next = nullptr;
             }
-        }
+        }  
         current = nullptr;
     }
 
@@ -398,5 +402,11 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
     }
 
     free(current_stat);
+
+    for (int i = 0; i < n; i++) {
+        free(eps[i]);
+    }
+    free(eps);
+
     return output;
 }
