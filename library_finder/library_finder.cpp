@@ -35,7 +35,15 @@
 int main(int argc, char** argv) {
 
     if (argc < 2) {
-        printf("Usage: [path] --type [ audio, video, or photo ]");
+        printf("Usage: [path] --type [ string ] --tolerance [ integer ] --help");
+        return 1;
+    }
+
+    if (!strcmp(argv[1], "--help")) {
+        printf("Usage: [ path (required) ] --type [ string ] --tolerance [ integer ]\n"
+            "--type specifies target file types: audio (default), video or photo.\n"
+            "--tolerance specifies how many non-target-type files to allow per folder\n"
+            "before skipping it.  Default is 2.");
         return 1;
     }
 
@@ -64,7 +72,7 @@ int main(int argc, char** argv) {
             tolerance = atoi(argv[i]);
         }
         else {
-            printf("Usage: [ path ] --type [ audio, video, or photo ]");
+            printf("Usage: [path] --type [ string ] --tolerance [ integer ] --help");
             return 1;
         }
     }
@@ -97,6 +105,7 @@ int main(int argc, char** argv) {
 
     explore_paths(root, tree_cursor, &total_count, target_extensions, tolerance);
     traverse_paths(root);
+    printf("\n");
     make_directory_list(root, 0);
 
     free(root);
