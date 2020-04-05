@@ -40,10 +40,10 @@ int main(int argc, char** argv) {
     }
 
     if (!strcmp(argv[1], "--help")) {
-        printf("Usage: [ path (required) ] --type [ string ] --tolerance [ integer ]\n"
+        printf("\nUsage: [ path (required) ] --type [ string ] --tolerance [ integer ]\n"
             "--type specifies target file types: audio (default), video or photo.\n"
             "--tolerance specifies how many non-target-type files to allow per folder\n"
-            "before skipping it.  Default is 2.");
+            "before skipping it.  Default is 2.\n");
         return 1;
     }
 
