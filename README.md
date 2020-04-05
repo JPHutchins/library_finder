@@ -9,16 +9,16 @@ Find potential file libraries on a file system, such as those created by iTunes,
 
 
 ## Quickstart
-library_finder is a commandline utility and does not require any further installation or configuration once downloaded. Open a terminal (like Command Prompt or Terminal) and navigate to the folder that you downloaded library_finder.exe to.
+library_finder is a command line utility and does not require any further installation or configuration once downloaded. Open a terminal (like Command Prompt or Terminal) and navigate to the folder that you downloaded library_finder.exe to.
 ```
-library_finder.exe /parent/path_to_search_under
+library_finder /parent/path_to_search_under
 ```
 Optional flags: 
 `--type [ audio, video, or photo (defaults to audio) ]`
 `--tolerance [ number of non-target-type files to allow before skipping the folder ]`
 `--help`
 
-Try it on root: ```library_finder.exe D:\.```
+Example Windows Usage: ```library_finder D:\Music```
 
 ### Compile in Visual Studio 2019  
 #### For an .exe:
