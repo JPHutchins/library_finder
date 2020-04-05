@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
 
     char target_extensions[150] = { NULL };
     unsigned int tolerance = TOLERANCE;
+    bool html = false;
 
     for (int i = 2; i < (argc); i++) {
         if (!strcmp(argv[i], "--type")) {
@@ -70,6 +71,10 @@ int main(int argc, char** argv) {
         else if (!strcmp(argv[i], "--tolerance")) {
             i++;
             tolerance = atoi(argv[i]);
+        }
+        else if (!strcmp(argv[i], "--html")) {
+            i++;
+            html = true;
         }
         else {
             printf("Usage: [path] --type [ string ] --tolerance [ integer ] --help");
@@ -106,8 +111,12 @@ int main(int argc, char** argv) {
     explore_paths(root, tree_cursor, &total_count, target_extensions, tolerance);
     traverse_paths(root);
     printf("\n");
-    make_directory_list(root, 0);
-
+    if (html == true) {
+        make_html_directory_list(root);
+    }
+    else {
+        make_directory_list(root, 0);
+    }
     free(root);
 
     return 0;
@@ -286,6 +295,17 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
     }
     else if (current_path->next) {
         make_directory_list(current_path->next, depth);
+    }
+}
+
+/*-------------------------------------------------------------------------------------------------
+    make_html_directory_list writes a list to HTML file.  This list shows the user Libraries and
+    Collections, where to find them in the filesystem, and how many albums are in each subtree.
+-------------------------------------------------------------------------------------------------*/
+
+void make_html_directory_list(Dir_Tree_Node* current_path) {
+    if (!current_path->name) {
+        return;
     }
 }
 
