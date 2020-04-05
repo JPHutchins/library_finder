@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
         printf("\nUsage: [ path (required) ] --type [ string ] --tolerance [ integer ]\n"
             "--type specifies target file types: audio (default), video or photo.\n"
             "--tolerance specifies how many non-target-type files to allow per folder\n"
-            "before skipping it.  Default is 2.\n");
+            "    before skipping it.  Default is 2.\n");
         return 1;
     }
 
@@ -112,7 +112,22 @@ int main(int argc, char** argv) {
     traverse_paths(root);
     printf("\n");
     if (html == true) {
-        make_html_directory_list(root);
+        FILE* fp = nullptr;
+        fopen_s(&fp, "output.html", "w+");
+        fprintf(fp, "<!DOCTYPE html>"
+            "<html>"
+            "<head>"
+            "<title>library_finder</title>"
+            "</head>"
+            "<body>"
+
+            "<h1>library_finder</h1>"
+
+            "</body>"
+            "</html>");
+        make_html_directory_list(root, fp);
+        fprintf(fp, "</body></html>");
+        fclose(fp);
     }
     else {
         make_directory_list(root, 0);
@@ -303,7 +318,8 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
     Collections, where to find them in the filesystem, and how many albums are in each subtree.
 -------------------------------------------------------------------------------------------------*/
 
-void make_html_directory_list(Dir_Tree_Node* current_path) {
+void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
+    fprintf(fp, "Writing from the call, asshole.");
     if (!current_path->name) {
         return;
     }
