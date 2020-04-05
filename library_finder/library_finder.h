@@ -80,3 +80,5 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int*
 void traverse_paths(Dir_Tree_Node* current_path);
 
 void make_directory_list(Dir_Tree_Node* current_path, int depth);
+
+void make_html_directory_list(Dir_Tree_Node* current_path);
