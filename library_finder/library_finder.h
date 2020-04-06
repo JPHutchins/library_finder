@@ -81,4 +81,4 @@ void traverse_paths(Dir_Tree_Node* current_path);
 
 void make_directory_list(Dir_Tree_Node* current_path, int depth);
 
-void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp);
+void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp, const char* tag);

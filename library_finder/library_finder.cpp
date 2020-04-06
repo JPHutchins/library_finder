@@ -110,7 +110,9 @@ int main(int argc, char** argv) {
 
     explore_paths(root, tree_cursor, &total_count, target_extensions, tolerance);
     traverse_paths(root);
+
     printf("\n");
+
     if (html == true) {
         FILE* fp = nullptr;
         fopen_s(&fp, "output.html", "w+");
@@ -122,10 +124,8 @@ int main(int argc, char** argv) {
             "<body>"
 
             "<h1>library_finder</h1>"
-
-            "</body>"
-            "</html>");
-        make_html_directory_list(root, fp);
+            );
+        make_html_directory_list(root, fp, "");
         fprintf(fp, "</body></html>");
         fclose(fp);
     }
@@ -253,6 +253,7 @@ void traverse_paths(Dir_Tree_Node* current_path) {
     if (current_path->contained_collections_count >= 1) {
         current_path->type = Library;
         if (current_path->parent) {
+            current_path->parent->type = Library;
             current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
             current_path->parent->total_albums_count += current_path->total_albums_count;
         }
@@ -318,10 +319,34 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
     Collections, where to find them in the filesystem, and how many albums are in each subtree.
 -------------------------------------------------------------------------------------------------*/
 
-void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
-    fprintf(fp, "Writing from the call, asshole.");
+void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp, const char* tag) {
     if (!current_path->name) {
         return;
+    }
+
+    if (current_path->subdirs) {
+        fprintf(fp, "<ul>"); 
+    }
+
+    if ((current_path->type == Library) | (current_path->type == Collection)) {
+        fprintf(fp, "<li>");
+        fprintf(fp, "\\%s - contains %d tracks in %d albums", current_path->shortname,
+            current_path->total_audio_file_count, current_path->total_albums_count);
+        fprintf(fp, "</li>");
+    }
+
+    if (current_path->subdirs) {
+        make_html_directory_list(current_path->subdirs->next, fp, "ul");
+
+        fprintf(fp, "</ul>");
+        
+        if (current_path->next) {
+            make_html_directory_list(current_path->next, fp, "li");
+        }     
+    }
+
+    else if (current_path->next) {
+        make_html_directory_list(current_path->next, fp, "li");
     }
 }
 
