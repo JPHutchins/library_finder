@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 
             "<h1>library_finder</h1>"
             );
-        make_html_directory_list(root, fp, "");
+        make_html_directory_list(root, fp);
         fprintf(fp, "</body></html>");
         fclose(fp);
     }
@@ -319,7 +319,7 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
     Collections, where to find them in the filesystem, and how many albums are in each subtree.
 -------------------------------------------------------------------------------------------------*/
 
-void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp, const char* tag) {
+void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     if (!current_path->name) {
         return;
     }
@@ -336,17 +336,17 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp, const char*
     }
 
     if (current_path->subdirs) {
-        make_html_directory_list(current_path->subdirs->next, fp, "ul");
+        make_html_directory_list(current_path->subdirs->next, fp);
 
         fprintf(fp, "</ul>");
         
         if (current_path->next) {
-            make_html_directory_list(current_path->next, fp, "li");
+            make_html_directory_list(current_path->next, fp);
         }     
     }
 
     else if (current_path->next) {
-        make_html_directory_list(current_path->next, fp, "li");
+        make_html_directory_list(current_path->next, fp);
     }
 }
 
