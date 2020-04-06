@@ -35,7 +35,8 @@
 int main(int argc, char** argv) {
 
     if (argc < 2) {
-        printf("Usage: [path] --type [ string ] --tolerance [ integer ] --help");
+        printf("\nUsage: [path] --type [ string ] --tolerance [ integer ] --html\n"
+               "Type library_finder --help for more information.\n");
         return 1;
     }
 
@@ -43,7 +44,8 @@ int main(int argc, char** argv) {
         printf("\nUsage: [ path (required) ] --type [ string ] --tolerance [ integer ]\n"
             "--type specifies target file types: audio (default), video or photo.\n"
             "--tolerance specifies how many non-target-type files to allow per folder\n"
-            "    before skipping it.  Default is 2.\n");
+            "    before skipping it.  Default is 2.\n"
+            "--html outputs results to a file named output.html, good for large searches\n");
         return 1;
     }
 
@@ -77,7 +79,7 @@ int main(int argc, char** argv) {
             html = true;
         }
         else {
-            printf("Usage: [path] --type [ string ] --tolerance [ integer ] --help");
+            printf("Usage: [path] --type [ string ] --tolerance [ integer ] --html");
             return 1;
         }
     }
@@ -122,12 +124,21 @@ int main(int argc, char** argv) {
             "<title>library_finder</title>"
             "</head>"
             "<body>"
-
             "<h1>library_finder</h1>"
             );
+        Dir_Tree_Node** results = find_largest_libraries(root);
+        fprintf(fp, "<ul>");
+        for (int i = 0; i < 10; i++) {
+            fprintf(fp, "<li>");
+            fprintf(fp, "%d albums contained within %s", results[i]->total_albums_count, results[i]->name);
+            fprintf(fp, "</li>");
+        }
+        fprintf(fp, "</ul>");
+
         make_html_directory_list(root, fp);
         fprintf(fp, "</body></html>");
         fclose(fp);
+        printf("Created output.html, open it with an internet browser like Chrome.\n");
     }
     else {
         make_directory_list(root, 0);
@@ -348,6 +359,57 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     else if (current_path->next) {
         make_html_directory_list(current_path->next, fp);
     }
+}
+
+/*-------------------------------------------------------------------------------------------------
+    insepct_paths is a helper function for find_largest_libraries.
+-------------------------------------------------------------------------------------------------*/
+
+void inspect_paths(Dir_Tree_Node* current_path, Dir_Tree_Node** result) {
+    if (!current_path->name) {
+        return;
+    }
+
+    if ((current_path->type == Library) | (current_path->type == Collection)) {
+        int i = 0;
+        while (i < 10) {
+            if (current_path->total_albums_count > result[i]->total_albums_count) {
+                int j = 9;
+                while (j > i) {
+                    result[j] = result[j-1];
+                    j--;
+                }
+                result[i] = current_path;
+                break;
+            }
+            i++;
+        }
+    }
+
+    if (current_path->subdirs) {
+        inspect_paths(current_path->subdirs->next, result);
+        if (current_path->next) {
+            inspect_paths(current_path->next, result);
+        }
+    }
+    else if (current_path->next) {
+        inspect_paths(current_path->next, result);
+    }
+}
+
+/*-------------------------------------------------------------------------------------------------
+    find_largest_libraries finds the paths to "Libaries" with the most albums.
+-------------------------------------------------------------------------------------------------*/
+
+Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
+
+    Dir_Tree_Node* init = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+    init->total_albums_count = 0;
+    Dir_Tree_Node* result[10] = { init };
+
+    inspect_paths(current_path, result);
+
+    return result;
 }
 
 /*-------------------------------------------------------------------------------------------------

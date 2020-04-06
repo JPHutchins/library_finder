@@ -82,3 +82,7 @@ void traverse_paths(Dir_Tree_Node* current_path);
 void make_directory_list(Dir_Tree_Node* current_path, int depth);
 
 void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp);
+
+Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path);
+
+void inspect_paths(Dir_Tree_Node* current_path, Dir_Tree_Node** result);
