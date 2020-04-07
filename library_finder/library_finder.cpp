@@ -278,11 +278,9 @@ void traverse_paths(Dir_Tree_Node* current_path) {
 
     if (current_path->subdirs) {
         traverse_paths(current_path->subdirs->next);
-        if (current_path->next) {
-            traverse_paths(current_path->next);
-        }
     }
-    else if (current_path->next) {
+
+    if (current_path->next) {
         traverse_paths(current_path->next);
     }
     
@@ -334,7 +332,9 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
         return;
     }
 
-    if ((current_path->type == Library) || (current_path->type == Collection)) {
+    if ((current_path->type == Library) || 
+        (current_path->type == Collection) ||
+        (current_path->type == Path)) {
         int i = 0;
         while (i < depth) {
             printf(" ");
@@ -343,14 +343,12 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
         printf("\\%s - contains %d tracks in %d albums\n", current_path->shortname, 
             current_path->total_audio_file_count, current_path->total_albums_count);
     }
-
+ 
     if (current_path->subdirs) {
         make_directory_list(current_path->subdirs->next, depth + 4);
-        if (current_path->next) {
-            make_directory_list(current_path->next, depth);
-        }
     }
-    else if (current_path->next) {
+
+    if (current_path->next) {
         make_directory_list(current_path->next, depth);
     }
 }
@@ -364,10 +362,6 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     if (!current_path->name) {
         return;
     }
-
-    
-
-    
 
     if ((current_path->type == Library) || (current_path->type == Collection)) {
         fprintf(fp, "<li>");
@@ -387,22 +381,17 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "<li>");
         fprintf(fp, "\\%s", current_path->shortname);
         fprintf(fp, "</li>");
-        
     }
 
     if (current_path->subdirs) {
-      
         make_html_directory_list(current_path->subdirs->next, fp);
         fprintf(fp, "</li>");
         fprintf(fp, "</ul>");  
     }
 
-    
-
     if (current_path->next) {
         make_html_directory_list(current_path->next, fp);
-    }
-    
+    } 
 }
 
 /*-------------------------------------------------------------------------------------------------
@@ -432,11 +421,9 @@ void inspect_paths(Dir_Tree_Node* current_path, Dir_Tree_Node** result) {
 
     if (current_path->subdirs) {
         inspect_paths(current_path->subdirs->next, result);
-        if (current_path->next) {
-            inspect_paths(current_path->next, result);
-        }
     }
-    else if (current_path->next) {
+
+    if (current_path->next) {
         inspect_paths(current_path->next, result);
     }
 }
@@ -448,7 +435,14 @@ void inspect_paths(Dir_Tree_Node* current_path, Dir_Tree_Node** result) {
 Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
 
     Dir_Tree_Node* init = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
-    init->total_albums_count = 0;
+    if (init) {
+        init->total_albums_count = 0;
+    }
+    else {
+        fprintf(stderr, "error: init (Dir_Tree_Node) allocation failed, exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+    
     Dir_Tree_Node* result[10] = { init };
 
     inspect_paths(current_path, result);
