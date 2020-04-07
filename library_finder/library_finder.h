@@ -33,7 +33,7 @@
     classifications yet still contains Tracks.
 -------------------------------------------------------------------------------------------------*/
 
-enum classification { Folder, Library, Collection, Album };
+enum classification { None, Path, Library, Collection, Album };
 
 static int one(const struct dirent* unused)
 {

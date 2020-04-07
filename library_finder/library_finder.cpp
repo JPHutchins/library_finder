@@ -118,9 +118,14 @@ int main(int argc, char** argv) {
     if (html == true) {
         FILE* fp = nullptr;
         fopen_s(&fp, "output.html", "w+");
-        fprintf(fp, "<!DOCTYPE html>"
+        fprintf(fp, 
+            "<!DOCTYPE html>"
             "<html>"
             "<head>"
+            "<style>"
+            "ul>li>ul { display: none;}"
+            "</style>"
+            "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>"
             "<title>library_finder</title>"
             "</head>"
             "<body>"
@@ -136,7 +141,27 @@ int main(int argc, char** argv) {
         fprintf(fp, "</ul>");
 
         make_html_directory_list(root, fp);
-        fprintf(fp, "</body></html>");
+        fprintf(fp,
+            
+            "</body>"
+            "<script>"
+            "$(document).ready("
+            "$(\'ul\').click(function(e){"
+            "  e.stopPropagation();"
+            "const items = this.children[0].children;"
+            "for (const item of items) {"
+
+            "    if (item === undefined) continue;"
+            "    if (item.tagName === \"LI\") continue;"
+            "    if (item.style.display === \"block\")"
+            "        item.style.display = \"none\";"
+            "    else"
+            "        item.style.display = \"block\";"
+            "};"
+            "})); "
+            "</script>"
+            "</html>"
+            );
         fclose(fp);
         printf("Created output.html, open it with an internet browser like Chrome.\n");
     }
@@ -264,17 +289,19 @@ void traverse_paths(Dir_Tree_Node* current_path) {
     if (current_path->contained_collections_count >= 1) {
         current_path->type = Library;
         if (current_path->parent) {
-            current_path->parent->type = Library;
-            current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
-            current_path->parent->total_albums_count += current_path->total_albums_count;
+            current_path->parent->type = Path;
+            current_path->parent->total_audio_file_count +=
+                current_path->total_audio_file_count + current_path->audio_file_count;
+            current_path->parent->total_albums_count +=
+                current_path->total_albums_count + current_path->contained_albums_count;
         }
     }
     else if (current_path->contained_albums_count >= 1) {
         current_path->type = Collection;
         if (current_path->parent) {
             current_path->parent->contained_collections_count++;
-            current_path->parent->total_audio_file_count += current_path->total_audio_file_count; 
-            current_path->parent->contained_albums_count += current_path->contained_albums_count;
+            current_path->parent->total_audio_file_count += 
+                current_path->total_audio_file_count + current_path->audio_file_count;
             current_path->parent->total_albums_count += current_path->total_albums_count;
         }
     }
@@ -288,6 +315,9 @@ void traverse_paths(Dir_Tree_Node* current_path) {
     }
     else {
         if (current_path->parent) {
+            if (current_path->type == Path) {
+                current_path->parent->type = Path;
+            }
             current_path->parent->total_audio_file_count += current_path->total_audio_file_count;
             current_path->parent->total_albums_count += current_path->total_albums_count;
         }
@@ -304,7 +334,7 @@ void make_directory_list(Dir_Tree_Node* current_path, int depth) {
         return;
     }
 
-    if ((current_path->type == Library) | (current_path->type == Collection)) {
+    if ((current_path->type == Library) || (current_path->type == Collection)) {
         int i = 0;
         while (i < depth) {
             printf(" ");
@@ -336,29 +366,41 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     }
 
     if (current_path->subdirs) {
-        fprintf(fp, "<ul>"); 
+        fprintf(fp, "<ul>");
     }
 
-    if ((current_path->type == Library) | (current_path->type == Collection)) {
+    if ((current_path->type == Library) || (current_path->type == Collection)) {
         fprintf(fp, "<li>");
         fprintf(fp, "\\%s - contains %d tracks in %d albums", current_path->shortname,
             current_path->total_audio_file_count, current_path->total_albums_count);
+    }
+    else if (current_path->type == Path) {
+        fprintf(fp, "<li>");
+        fprintf(fp, "\\%s", current_path->shortname);
+    }
+
+    else if (current_path->type == Album) {
+        fprintf(fp, "<li>");
+        fprintf(fp, "\\%s", current_path->shortname);
         fprintf(fp, "</li>");
+        if (!current_path->next->name) {
+            fprintf(fp, "SPLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEN");
+        }
     }
 
     if (current_path->subdirs) {
+        if (current_path->subdirs->next->type == Album) {
+            fprintf(fp, "<ul>");
+        }
         make_html_directory_list(current_path->subdirs->next, fp);
-
-        fprintf(fp, "</ul>");
-        
-        if (current_path->next) {
-            make_html_directory_list(current_path->next, fp);
-        }     
+        fprintf(fp, "</li>");
+        fprintf(fp, "</ul>");  
     }
 
-    else if (current_path->next) {
+    if (current_path->next) {
         make_html_directory_list(current_path->next, fp);
     }
+    
 }
 
 /*-------------------------------------------------------------------------------------------------
@@ -370,7 +412,7 @@ void inspect_paths(Dir_Tree_Node* current_path, Dir_Tree_Node** result) {
         return;
     }
 
-    if ((current_path->type == Library) | (current_path->type == Collection)) {
+    if ((current_path->type == Library) || (current_path->type == Collection)) {
         int i = 0;
         while (i < 10) {
             if (current_path->total_albums_count > result[i]->total_albums_count) {
