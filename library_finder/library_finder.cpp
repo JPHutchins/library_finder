@@ -146,9 +146,9 @@ int main(int argc, char** argv) {
             "</body>"
             "<script>"
             "$(document).ready("
-            "$(\'ul\').click(function(e){"
+            "$(\'li\').click(function(e){"
             "  e.stopPropagation();"
-            "const items = this.children[0].children;"
+            "const items = this.children;"
             "for (const item of items) {"
 
             "    if (item === undefined) continue;"
@@ -365,9 +365,9 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         return;
     }
 
-    if (current_path->subdirs) {
-        fprintf(fp, "<ul>");
-    }
+    
+
+    
 
     if ((current_path->type == Library) || (current_path->type == Collection)) {
         fprintf(fp, "<li>");
@@ -379,23 +379,25 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "\\%s", current_path->shortname);
     }
 
+    if (current_path->subdirs) {
+        fprintf(fp, "<ul>");
+    }
+
     else if (current_path->type == Album) {
         fprintf(fp, "<li>");
         fprintf(fp, "\\%s", current_path->shortname);
         fprintf(fp, "</li>");
-        if (!current_path->next->name) {
-            fprintf(fp, "SPLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEN");
-        }
+        
     }
 
     if (current_path->subdirs) {
-        if (current_path->subdirs->next->type == Album) {
-            fprintf(fp, "<ul>");
-        }
+      
         make_html_directory_list(current_path->subdirs->next, fp);
         fprintf(fp, "</li>");
         fprintf(fp, "</ul>");  
     }
+
+    
 
     if (current_path->next) {
         make_html_directory_list(current_path->next, fp);
