@@ -90,34 +90,40 @@ int main(int argc, char** argv) {
 
     printf("\nStarting at %s\n", argv[1]);
     
-    char* current_directory = argv[1];
+    //  The next six lines have mallocs that are necessary due to the way that
+    //  "name" and "shortname" are malloced in the list_and_count function and later
+    //  freed in the free_paths function.
+    char* current_directory = (char*)malloc(sizeof(char*) * (strlen(argv[1]) + 1));
+    if (current_directory) {
+        strcpy_s(current_directory, sizeof(char*) * (strlen(argv[1]) + 1), argv[1]);
+    }
+    char* current_shortname = (char*)malloc(sizeof(char*) * (strlen(argv[1]) + 1));
+    if (current_shortname) {
+        strcpy_s(current_shortname, sizeof(char*) * (strlen(argv[1]) + 1), argv[1]);
+    }
 
     Dir_Tree_Node* root = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
-    if (!root) {
-        fprintf(stderr, "error: root (Dir_Tree_Node) allocation failed, exiting.\n");
-        exit(EXIT_FAILURE);
+    
+    if (root) {
+        root->name = current_directory;
+        root->shortname = current_shortname;
+        root->next = nullptr;
+        root->parent = nullptr;
     }
-    root->name = current_directory;
-    root->shortname = current_directory;
-    root->next = nullptr;
-    root->parent = nullptr;
-    Dir_Tree_Node* tree_cursor = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
-    if (!tree_cursor) {
-        fprintf(stderr, "error: root (Dir_Tree_Node) allocation failed, exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-    tree_cursor = root;
-
     int total_count = 0;
 
-    explore_paths(root, tree_cursor, &total_count, target_extensions, tolerance);
+    explore_paths(root, &total_count, target_extensions, tolerance);
     traverse_paths(root);
 
     printf("\n");
 
     if (html == true) {
-        FILE* fp = nullptr;
-        fopen_s(&fp, "output.html", "w+");
+        FILE* fp;
+        errno_t errorCode = fopen_s(&fp, "output.html", "w+");
+        if (errorCode != 0) {
+            fprintf(stderr, "error: error opening output html file, exiting.\n");
+            exit(EXIT_FAILURE);
+        }
         fprintf(fp, 
             "<!DOCTYPE html>"
             "<html>"
@@ -141,6 +147,11 @@ int main(int argc, char** argv) {
         fprintf(fp, "</ul>");
 
         make_html_directory_list(root, fp);
+
+        for (int i = 0; i < 10; i++) {
+            free(results[i]);
+        }
+
         fprintf(fp,
             
             "</body>"
@@ -168,8 +179,7 @@ int main(int argc, char** argv) {
     else {
         make_directory_list(root, 0);
     }
-    free(root);
-
+    free_paths(root);
     return 0;
 }
 
@@ -179,7 +189,7 @@ int main(int argc, char** argv) {
     the current folder and queues them up.
 -------------------------------------------------------------------------------------------------*/
 
-void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int* track_count,
+void explore_paths(Dir_Tree_Node* current_path, int* track_count,
     char* target_extensions, unsigned int tolerance) {
 
     if (!current_path->name) {
@@ -189,78 +199,75 @@ void explore_paths(Dir_Tree_Node* current_path, Dir_Tree_Node* tree_cursor, int*
     char* current_directory = current_path->name;
     char* current_shortname = current_path->shortname;
 
-    Queue_Node* current_subdirs = (Queue_Node*)malloc(sizeof(Queue_Node));
-    if (current_subdirs) {
-        current_subdirs->name = current_directory;
-        current_subdirs->next = nullptr;
-    }
-
     Cur_Dir_Info* output = (Cur_Dir_Info*)malloc(sizeof(Cur_Dir_Info));
     if (!output) {
         fprintf(stderr, "error: output (Cur_Dir_Info) allocation failed, exiting.\n");
         exit(EXIT_FAILURE);
     }
 
-    Queue_Node* cursor = current_subdirs; 
-
-    tree_cursor->name = current_directory;
-    tree_cursor->shortname = current_shortname;
-    tree_cursor->contained_albums_count = 0;
-    tree_cursor->contained_collections_count = 0;
-    tree_cursor->total_audio_file_count = 0;
-    tree_cursor->total_albums_count = 0;
-
     output = list_and_count(current_directory, output, target_extensions, tolerance);
+
+    current_path->name = current_directory;
+    current_path->shortname = current_shortname;
+    current_path->contained_albums_count = 0;
+    current_path->contained_collections_count = 0;
+    current_path->total_audio_file_count = 0;
+    current_path->total_albums_count = 0;
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
-    *track_count += output->audio_file_count;
 
     char trunc_shortname[11];
-    strncpy_s(trunc_shortname, tree_cursor->shortname, 10);
-
+    strncpy_s(trunc_shortname, current_path->shortname, 10);
+    *track_count += output->audio_file_count;
     printf("Found %d tracks so far, now checking %s...          \r", *track_count, trunc_shortname);
 
-    Dir_Tree_Node* head = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
-    if (!head) {
-        fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-
     if (output->subdir) {
-        Queue_Node* list = output->subdir;
-        tree_cursor->subdirs = head;
-        Dir_Tree_Node* current = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
-        if (!current) {
+        Dir_Tree_Node* head = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+        if (!head) {
             fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
             exit(EXIT_FAILURE);
         }
-        current = head;
 
+        current_path->subdirs = head;
+        Dir_Tree_Node* current = head;
+
+        Queue_Node* list = output->subdir;
         while (list) {
-            current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));;
-            current->next->name = list->name;
-            current->next->shortname = list->shortname;
-            current->parent = current_path;
-            current->subdirs = nullptr;
+            current->next = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
+            if (current->next) {
+                current->next->name = list->name;
+                current->next->shortname = list->shortname;
+                current->parent = current_path;
+                current->subdirs = nullptr;
+                current = current->next;
+                current->next = nullptr;
+            }
+            else {
+                fprintf(stderr, "error: current->next (Dir_Tree_Node) allocation failed, exiting.\n");
+                exit(EXIT_FAILURE);
+            }
+            Queue_Node* tmp = list;
             list = list->next;
-            current = current->next;
-            current->next = nullptr;
+            free(tmp);
         }
+
         current = head->next;
         while (current->next) { 
             current = current->next;
         }
+
         head = head->next;
-        explore_paths(head, head, track_count, target_extensions, tolerance);
+        explore_paths(head, track_count, target_extensions, tolerance);
         current = nullptr;
     }
+
     if (current_path->next) {
         current_path = current_path->next;
+        explore_paths(current_path, track_count, target_extensions, tolerance);
     }
-    else {
-        return;
-    }
-    explore_paths(current_path, current_path, track_count, target_extensions, tolerance);
+
+    free(output);
+    return;
 }
 
 /*-------------------------------------------------------------------------------------------------
@@ -451,6 +458,29 @@ Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
 }
 
 /*-------------------------------------------------------------------------------------------------
+    free_paths frees the data structure from memory.
+-------------------------------------------------------------------------------------------------*/
+
+void free_paths(Dir_Tree_Node* current_path) {
+    if (!current_path->name) {
+        free(current_path);
+        return;
+    }
+
+    if (current_path->subdirs) {
+        free_paths(current_path->subdirs->next);
+    }
+
+    if (current_path->next) {
+        free_paths(current_path->next);
+    }
+    free(current_path->shortname);
+    free(current_path->name);
+    free(current_path->subdirs);
+    free(current_path);
+}
+
+/*-------------------------------------------------------------------------------------------------
     list_and_count opens current_directory and looks through its files.  It ignores hidden files
     and outputs a summary of the folders contents: a linked list of its subdirectories and an
     estimate* of the number of audio files (Tracks).
@@ -466,7 +496,7 @@ Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
     char* target_extensions, unsigned int tolerance) {
 
-    dirent** eps;
+    struct dirent** eps;
     int n;
     n = scandir(current_directory, &eps, one, alphasort);
     struct stat* current_stat;
@@ -475,13 +505,13 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
         fprintf(stderr, "error: current_stat (stat*) allocation failed, exiting.\n");
         exit(EXIT_FAILURE);
     }
+
     Queue_Node* first = (Queue_Node*)malloc(sizeof(Queue_Node));
     if (!first) {
         fprintf(stderr, "error: first (Queue_Node) allocation failed, exiting.\n");
         exit(EXIT_FAILURE);
     }
-    Queue_Node* current = first;
-
+    
     output->audio_file_count = 0;
     output->other_file_count = 0;
     output->subdir_count = 0;
@@ -495,6 +525,8 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
             fullname[path_length] = SLASH;
             l = 1;
         }
+
+        Queue_Node* current = first;
 
         for (int i = 0; i < n; i++) {
 
@@ -534,7 +566,6 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                         fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
                         exit(EXIT_FAILURE);
                     }
-
                     current->next = next;
                     current = next;
                 }
@@ -559,16 +590,23 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
     }
 
     else {
-        perror("Couldn't open the directory");
-        first = nullptr;
+        perror("Couldn't open the directory                         \r");
+        free(first);
+        free(current_stat);
+        for (int i = 0; i < n; i++) {
+            free(eps[i]);
+        }
+        free(eps);
+        return output;
     }
 
     output->parent_path = current_directory;
+
     if (output->subdir_count > 0) {
         output->subdir = first;
-    }
-    else {
+    } else {
         output->subdir = nullptr;
+        free(first);
     }
 
     free(current_stat);
