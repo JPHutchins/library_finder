@@ -384,7 +384,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "<ul>");
     }
 
-    else if (current_path->type == Album) {
+    if (current_path->type == Album) {
         fprintf(fp, "<li>");
         fprintf(fp, "\\%s", current_path->shortname);
         fprintf(fp, "</li>");
