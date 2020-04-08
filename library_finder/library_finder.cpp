@@ -370,6 +370,8 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         return;
     }
 
+    bool ul = false;
+
     if ((current_path->type == Library) || (current_path->type == Collection)) {
         fprintf(fp, "<li>");
         fprintf(fp, "\\%s - contains %d tracks in %d albums", current_path->shortname,
@@ -381,7 +383,20 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     }
 
     if (current_path->subdirs) {
-        fprintf(fp, "<ul>");
+        Dir_Tree_Node* subdirs = current_path->subdirs;
+        while (subdirs) {
+            if ((subdirs->type == Library) ||
+                (subdirs->type == Collection) ||
+                (subdirs->type == Album) ||
+                (subdirs->type == Path)) {
+                ul = true;
+                break;
+            }
+            subdirs = subdirs->next;
+        }
+        if (ul) {
+            fprintf(fp, "<ul>");
+        }
     }
 
     if (current_path->type == Album) {
@@ -393,7 +408,9 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     if (current_path->subdirs) {
         make_html_directory_list(current_path->subdirs->next, fp);
         fprintf(fp, "</li>");
-        fprintf(fp, "</ul>");  
+        if (ul) {
+            fprintf(fp, "</ul>");
+        }
     }
 
     if (current_path->next) {
