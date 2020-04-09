@@ -372,7 +372,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     bool li = true;
 
     if (current_path->type == Library) {
-        fprintf(fp, "<li "
+        fprintf(fp, "<li class=\"library\" "
             "data-contained-collections=\"%d\" "
             "data-contained-albums=\"%d\" "
             "data-total-albums=\"%d\" "
@@ -384,7 +384,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "\\%s", current_path->shortname);
     }
     else if (current_path->type == Collection) {
-        fprintf(fp, "<li "
+        fprintf(fp, "<li class=\"collection\" "
             "data-contained-albums=\"%d\" "
             "data-total-albums=\"%d\" "
             "data-total-audio-files=\"%d\">",
@@ -394,7 +394,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "\\%s", current_path->shortname);
     }
     else if (current_path->type == Path) {
-        fprintf(fp, "<li "
+        fprintf(fp, "<li class=\"path\" "
             "data-total-albums=\"%d\" "
             "data-total-audio-files=\"%d\">",
             current_path->total_albums_count,
@@ -402,7 +402,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "\\%s", current_path->shortname);
     }
     else if (current_path->type == Album) {
-        fprintf(fp, "<li "
+        fprintf(fp, "<li class=\"album\" "
             "data-contained-audio-files=\"%d\">",
             current_path->audio_file_count);
         fprintf(fp, "\\%s", current_path->shortname);
