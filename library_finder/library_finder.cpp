@@ -128,9 +128,7 @@ int main(int argc, char** argv) {
             "<!DOCTYPE html>"
             "<html>"
             "<head>"
-            "<style>"
-            "ul>li>ul { display: none;}"
-            "</style>"
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">"
             "<title>library_finder</title>"
             "</head>"
             "<body>"
@@ -145,14 +143,15 @@ int main(int argc, char** argv) {
         }
         fprintf(fp, "</ul>");
 
+        fprintf(fp, "<ul>");
         make_html_directory_list(root, fp);
+        fprintf(fp, "</ul>");
 
         for (int i = 0; i < 10; i++) {
             free(results[i]);
         }
 
         fprintf(fp,
-            
             "</body>"
             "<script src=\"output.js\">"
             "</script>"
