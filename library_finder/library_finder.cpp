@@ -357,14 +357,36 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     bool ul = false;
     bool li = false;
 
-    if ((current_path->type == Library) || (current_path->type == Collection)) {
-        fprintf(fp, "<li>");
-        fprintf(fp, "\\%s - contains %d tracks in %d albums", current_path->shortname,
-            current_path->total_audio_file_count, current_path->total_albums_count);
+    if (current_path->type == Library) {
+        fprintf(fp, "<li "
+            "data-contained-collections=\"%d\" "
+            "data-contained-albums=\"%d\" "
+            "data-total-albums=\"%d\" "
+            "data-total-audio-files=\"%d\">",
+            current_path->contained_collections_count,
+            current_path->contained_albums_count,
+            current_path->total_albums_count,
+            current_path->total_audio_file_count);
+        fprintf(fp, "\\%s", current_path->shortname);
+        li = true;
+    }
+    else if (current_path->type == Collection) {
+        fprintf(fp, "<li "
+            "data-contained-albums=\"%d\" "
+            "data-total-albums=\"%d\" "
+            "data-total-audio-files=\"%d\">",
+            current_path->contained_albums_count,
+            current_path->total_albums_count,
+            current_path->total_audio_file_count);
+        fprintf(fp, "\\%s", current_path->shortname);
         li = true;
     }
     else if (current_path->type == Path) {
-        fprintf(fp, "<li>");
+        fprintf(fp, "<li "
+            "data-total-albums=\"%d\" "
+            "data-total-audio-files=\"%d\">",
+            current_path->total_albums_count,
+            current_path->total_audio_file_count);
         fprintf(fp, "\\%s", current_path->shortname);
         li = true;
     }
@@ -387,7 +409,9 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     }
 
     if (current_path->type == Album) {
-        fprintf(fp, "<li>");
+        fprintf(fp, "<li "
+            "data-contained-audio-files=\"%d\">",
+            current_path->audio_file_count);
         fprintf(fp, "\\%s", current_path->shortname);
         li = true;
     }
