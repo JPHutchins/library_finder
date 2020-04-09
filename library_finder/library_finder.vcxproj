@@ -153,6 +153,9 @@
   <ItemGroup>
     <ClInclude Include="library_finder.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="script.js" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
