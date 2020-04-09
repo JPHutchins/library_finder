@@ -355,6 +355,20 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     }
 
     bool ul = false;
+    if (current_path->subdirs) {
+        Dir_Tree_Node* subdirs = current_path->subdirs;
+        while (subdirs) {
+            if ((subdirs->type == Library) ||
+                (subdirs->type == Collection) ||
+                (subdirs->type == Album) ||
+                (subdirs->type == Path)) {
+                ul = true;
+                break;
+            }
+            subdirs = subdirs->next;
+        }
+    }
+
     bool li = false;
 
     if (current_path->type == Library) {
@@ -390,25 +404,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "\\%s", current_path->shortname);
         li = true;
     }
-
-    if (current_path->subdirs) {
-        Dir_Tree_Node* subdirs = current_path->subdirs;
-        while (subdirs) {
-            if ((subdirs->type == Library) ||
-                (subdirs->type == Collection) ||
-                (subdirs->type == Album) ||
-                (subdirs->type == Path)) {
-                ul = true;
-                break;
-            }
-            subdirs = subdirs->next;
-        }
-        if (ul) {
-            fprintf(fp, "<ul>");
-        }
-    }
-
-    if (current_path->type == Album) {
+    else if (current_path->type == Album) {
         fprintf(fp, "<li "
             "data-contained-audio-files=\"%d\">",
             current_path->audio_file_count);
@@ -416,12 +412,14 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         li = true;
     }
 
+    if (ul) {
+        fprintf(fp, "<ul>");
+    }
     if (current_path->subdirs) {
         make_html_directory_list(current_path->subdirs->next, fp);
-
-        if (ul) {
-            fprintf(fp, "</ul>");
-        }
+    }
+    if (ul) {
+        fprintf(fp, "</ul>");
     }
 
     if (li) {
