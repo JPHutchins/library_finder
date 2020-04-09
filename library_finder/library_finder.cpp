@@ -131,7 +131,6 @@ int main(int argc, char** argv) {
             "<style>"
             "ul>li>ul { display: none;}"
             "</style>"
-            "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>"
             "<title>library_finder</title>"
             "</head>"
             "<body>"
@@ -155,21 +154,7 @@ int main(int argc, char** argv) {
         fprintf(fp,
             
             "</body>"
-            "<script>"
-            "$(document).ready("
-            "$(\'li\').click(function(e){"
-            "  e.stopPropagation();"
-            "const items = this.children;"
-            "for (const item of items) {"
-
-            "    if (item === undefined) continue;"
-            "    if (item.tagName === \"LI\") continue;"
-            "    if (item.style.display === \"block\")"
-            "        item.style.display = \"none\";"
-            "    else"
-            "        item.style.display = \"block\";"
-            "};"
-            "})); "
+            "<script src=\"output.js\">"
             "</script>"
             "</html>"
             );
