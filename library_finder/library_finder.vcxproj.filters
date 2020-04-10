@@ -31,5 +31,8 @@
     <None Include="style.css">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="w3-toggle-switch.css">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
