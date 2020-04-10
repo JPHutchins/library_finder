@@ -1,3 +1,69 @@
+@import "w3-toggle-switch.css";
+
+html {
+    font-family: sans-serif;
+}
+
 ul > li > ul {
     display: none;
+}
+
+ul {
+    list-style: none;
+    padding-left: 1em;
+}
+
+li {
+    border-radius: 12px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 8px;
+    padding-right: 25px;
+}
+
+.album:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(album.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 0.5em;
+}
+
+.library {
+    font-weight: bold;
+}
+
+.collection {
+    font-weight: bold;
+}
+
+.album {
+    font-weight: normal;
+}
+
+.collection:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(collection.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 0.5em;
+}
+
+.library:hover {
+    cursor: pointer;
+}
+
+.collection:hover {
+    cursor: pointer;
+}
+
+.album:hover {
+    cursor: default;
+    font-size: medium;
 }
