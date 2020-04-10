@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
         }
         fprintf(fp, "</ul>");
 
-        fprintf(fp, "<ul>");
+        fprintf(fp, "<ul id=\"library-explorer\">");
         make_html_directory_list(root, fp);
         fprintf(fp, "</ul>");
 
