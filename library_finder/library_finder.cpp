@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
             "<h1>library_finder</h1>"
             );
         Dir_Tree_Node** results = find_largest_libraries(root);
-        fprintf(fp, "<ul>");
+        fprintf(fp, "<ul class=\"show-list\">");
         for (int i = 0; i < 10; i++) {
             fprintf(fp, "<li>");
             fprintf(fp, "%d albums contained within %s", results[i]->total_albums_count, results[i]->name);
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
         }
         fprintf(fp, "</ul>");
 
-        fprintf(fp, "<ul id=\"library-explorer\">");
+        fprintf(fp, "<ul id=\"library-explorer\" class=\"show-list\">");
         make_html_directory_list(root, fp);
         fprintf(fp, "</ul>");
 
