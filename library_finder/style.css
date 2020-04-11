@@ -4,22 +4,47 @@ html {
     font-family: sans-serif;
 }
 
-ul > li > ul {
-    display: none;
-}
-
 ul {
     list-style: none;
     padding-left: 1em;
+    height: 0;
+    overflow: hidden;
+    z-index: 1;
 }
 
+    ul.show-list {
+        height: auto;
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+
 li {
+    display: block;
     border-radius: 12px;
     padding-top: 3px;
     padding-bottom: 3px;
     padding-left: 8px;
     padding-right: 25px;
+    border-style: solid;
+    border-width: 1px;
+    z-index: 1;
 }
+
+span {
+    visibility: hidden;
+    text-align: left;
+    position: relative;
+    float: right;
+    right: 0px;
+    font-size: small;
+    font-weight: bold;
+}
+
+li:hover > span {
+    visibility: visible;
+    transition: all .4s ease;
+}
+
 
 .album:before {
     content: '';
@@ -32,6 +57,17 @@ li {
     margin-right: 0.5em;
 }
 
+.album {
+    font-weight: normal;
+}
+
+.hide {
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+}
+
 .library {
     font-weight: bold;
 }
@@ -40,30 +76,44 @@ li {
     font-weight: bold;
 }
 
-.album {
-    font-weight: normal;
-}
 
-.collection:before {
-    content: '';
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-    background-image: url(collection.svg);
-    background-size: contain;
-    background-repeat: no-repeat;
-    margin-right: 0.5em;
-}
 
-.library:hover {
-    cursor: pointer;
-}
+    .collection:before {
+        content: '';
+        display: inline-block;
+        height: 1em;
+        width: 1em;
+        background-image: url(collection.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+        margin-right: 0.5em;
+    }
 
-.collection:hover {
-    cursor: pointer;
-}
+
+
+    .collection:hover, .library:hover, .path:hover {
+        cursor: pointer;
+        border-style: solid;
+        border-color: black !important;
+    }
 
 .album:hover {
     cursor: default;
-    font-size: medium;
+    border-style: solid;
+    border-color: black !important;
+}
+
+
+.fade ul {
+    transition: all .4s ease;
+    height: 0;
+}
+
+    .fade ul.show-list {
+        height: auto;
+    }
+
+text {
+    transition: all .4s ease;
+    z-index: 0;
 }
