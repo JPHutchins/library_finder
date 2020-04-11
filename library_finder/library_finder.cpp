@@ -75,7 +75,6 @@ int main(int argc, char** argv) {
             tolerance = atoi(argv[i]);
         }
         else if (!strcmp(argv[i], "--html")) {
-            i++;
             html = true;
         }
         else {
@@ -372,7 +371,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
     bool li = true;
 
     if (current_path->type == Library) {
-        fprintf(fp, "<li class=\"library\" "
+        fprintf(fp, "<li class=\"library library-item\" "
             "data-contained-collections=\"%d\" "
             "data-contained-albums=\"%d\" "
             "data-total-albums=\"%d\" "
@@ -384,7 +383,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "%s", current_path->shortname);
     }
     else if (current_path->type == Collection) {
-        fprintf(fp, "<li class=\"collection\" "
+        fprintf(fp, "<li class=\"collection library-item\" "
             "data-contained-albums=\"%d\" "
             "data-total-albums=\"%d\" "
             "data-total-audio-files=\"%d\">",
@@ -394,7 +393,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "%s", current_path->shortname);
     }
     else if (current_path->type == Path) {
-        fprintf(fp, "<li class=\"path\" "
+        fprintf(fp, "<li class=\"path library-item\" "
             "data-total-albums=\"%d\" "
             "data-total-audio-files=\"%d\">",
             current_path->total_albums_count,
@@ -402,7 +401,7 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
         fprintf(fp, "%s", current_path->shortname);
     }
     else if (current_path->type == Album) {
-        fprintf(fp, "<li class=\"album\" "
+        fprintf(fp, "<li class=\"album library-item\" "
             "data-contained-audio-files=\"%d\">",
             current_path->audio_file_count);
         fprintf(fp, "%s", current_path->shortname);
