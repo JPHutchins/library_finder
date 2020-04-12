@@ -140,22 +140,33 @@ int main(int argc, char** argv) {
                 "</div>"
             "</div>"
             "<div class=\"main\">"
-            );
+            "<div class = \"insights-and-guide-container\">"
+            "<div class = \"insights\">"
+            "These are the paths with the most albums"
+        );
         Dir_Tree_Node** results = find_largest_libraries(root);
         fprintf(fp, "<ul class=\"show-list\">");
         for (int i = 0; i < 10; i++) {
-            fprintf(fp, "<li "
-                        "class=\"largest-folders\" "
-                        "data-total-albums=\"%d\" "
-                        "data-total-audio-files=\"%d\" "
-                        "data-full-path=\"%s\">", 
-                        results[i]->total_albums_count,
-                        results[i]->total_audio_file_count,
-                        results[i]->name);
+            fprintf(fp, 
+                "<li "
+                "class=\"largest-folders\" "
+                "data-total-albums=\"%d\" "
+                "data-total-audio-files=\"%d\" "
+                "data-full-path=\"%s\">", 
+                results[i]->total_albums_count,
+                results[i]->total_audio_file_count,
+                results[i]->name);
             fprintf(fp, "%s", results[i]->name);
             fprintf(fp, "</li>");
         }
-        fprintf(fp, "</ul>");
+        fprintf(fp, 
+            "</ul>"
+            "</div>"
+            "<div class = \"guide\">"
+            "USER GUIDE"
+            "</div>"
+            "</div>"
+        );
 
         fprintf(fp, "<ul id=\"library-explorer\" class=\"show-list\">");
         make_html_directory_list(root, fp);
