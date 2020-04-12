@@ -131,13 +131,21 @@ int main(int argc, char** argv) {
             "<title>library_finder</title>"
             "</head>"
             "<body>"
+            "<div class=\"navbar\">"
             "<h1>library_finder</h1>"
+            "</div>"
+            "<div class=\"main\">"
             );
         Dir_Tree_Node** results = find_largest_libraries(root);
         fprintf(fp, "<ul class=\"show-list\">");
         for (int i = 0; i < 10; i++) {
-            fprintf(fp, "<li>");
-            fprintf(fp, "%d albums contained within %s", results[i]->total_albums_count, results[i]->name);
+            fprintf(fp, "<li "
+                        "class=\"largest-folders\" "
+                        "data-total-albums=\"%d\" "
+                        "data-total-audio-files=\"%d\">", 
+                        results[i]->total_albums_count,
+                        results[i]->total_audio_file_count);
+            fprintf(fp, "%s", results[i]->name);
             fprintf(fp, "</li>");
         }
         fprintf(fp, "</ul>");
@@ -151,6 +159,7 @@ int main(int argc, char** argv) {
         }
 
         fprintf(fp,
+            "</div>"
             "</body>"
             "<script src=\"output.js\">"
             "</script>"
