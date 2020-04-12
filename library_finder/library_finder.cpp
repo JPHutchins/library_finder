@@ -147,9 +147,11 @@ int main(int argc, char** argv) {
             fprintf(fp, "<li "
                         "class=\"largest-folders\" "
                         "data-total-albums=\"%d\" "
-                        "data-total-audio-files=\"%d\">", 
+                        "data-total-audio-files=\"%d\" "
+                        "data-full-path=\"%s\">", 
                         results[i]->total_albums_count,
-                        results[i]->total_audio_file_count);
+                        results[i]->total_audio_file_count,
+                        results[i]->name);
             fprintf(fp, "%s", results[i]->name);
             fprintf(fp, "</li>");
         }
