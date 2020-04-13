@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
             "<div class=\"navbar\">"
                 "<h1>library_finder</h1>"
                 "<div class=\"search-box\">"
-                    "<input type=\"text\" class=\"search-text\" "
+                    "<input type=\"text\" class=\"search-text\" id=\"search-text\" "
                         "placeholder=\"search for album, artist, or song\">"
                     "<input type=\"button\" class=\"search-button\" value=\"Find\">"
                 "</div>"
