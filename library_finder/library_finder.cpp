@@ -138,10 +138,11 @@ int main(int argc, char** argv) {
                         "placeholder=\"search for album, artist, or song\">"
                     "<input type=\"button\" class=\"search-button\" value=\"Find\">"
                 "</div>"
+                "<div id=\"full-path-display\"></div>"
             "</div>"
             "<div class=\"main\">"
-            "<div class = \"insights-and-guide-container\">"
-            "<div class = \"insights\">"
+            "<div class=\"insights-and-guide-container\">"
+            "<div class=\"insights\">"
             "These are the paths with the most albums"
         );
         Dir_Tree_Node** results = find_largest_libraries(root);
