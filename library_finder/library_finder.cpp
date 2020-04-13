@@ -308,7 +308,7 @@ void traverse_paths(Dir_Tree_Node* current_path) {
             current_path->parent->total_audio_file_count +=
                 current_path->total_audio_file_count + current_path->audio_file_count;
             current_path->parent->total_albums_count +=
-                current_path->total_albums_count + current_path->contained_albums_count;
+                current_path->total_albums_count;
         }
     }
     else if (current_path->contained_albums_count >= 1) {
@@ -328,14 +328,10 @@ void traverse_paths(Dir_Tree_Node* current_path) {
             current_path->parent->total_audio_file_count += current_path->audio_file_count;
         }
     }
-    else {
-        if (current_path->parent) {
-            if (current_path->type == Path) {
-                current_path->parent->type = Path;
-            }
-            current_path->parent->total_audio_file_count += current_path->total_audio_file_count;
-            current_path->parent->total_albums_count += current_path->total_albums_count;
-        }
+    else if ((current_path->type == Path) && (current_path->parent)) {
+        current_path->parent->type = Path;
+        current_path->parent->total_audio_file_count += current_path->total_audio_file_count;
+        current_path->parent->total_albums_count += current_path->total_albums_count; 
     }
 }
 
