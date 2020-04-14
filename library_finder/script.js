@@ -7,37 +7,356 @@ window.onload = () => {
 
     organizeAlbums(libraryExplorer.children[0].children[0]);
 
-    libraryExplorer.getElementsByTagName('UL')[0].classList.add("show-list");
     libraryExplorer.getElementsByTagName('UL')[0].classList.add("fade");
+
+    console.log(document.querySelectorAll('.album').length)
 
     if (document.querySelectorAll) {
         document.querySelectorAll(".library-item").forEach((elem) => {
-            insertHoverDetailsBeforeUL(elem);
-            styleTheListElement(elem, rootInfo)
+            insertHoverDetailsBeforeUL(elem, rootInfo);
+            styleTheListElement(elem, rootInfo);
+        });
+        document.querySelectorAll(".largest-folders").forEach((elem) => {
+            styleTheListElement(elem, rootInfo);
+            elem.appendChild(hoverDetails(elem, rootInfo));
         });
     }
 
-    document.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!e.target) return;
-        if (e.target.classList.contains("library-item")) dropDownDirectory(e);
+    /*-------------------------------------------------------------------------
+        Initialize state.
+    -------------------------------------------------------------------------*/
+    const state = {
+        search: {
+            index: {},
+            query: "",
+            searchResults: [],
+            searchResultText: "",
+            i: 0,
+        },
+        explorer: {
+            hoverPath: "",
+            openFolders: new Set
+        }
+    }
+
+    setTimeout(() => indexForSearch(libraryExplorer, state.search.index), 0);
+
+    /*-------------------------------------------------------------------------
+        Initialize listeners.
+    -------------------------------------------------------------------------*/
+    libraryExplorer.onclick = (e) => {
+        updateState({
+            type: "FOLDER_CLICK",
+            node: e.target
+        });
+    }
+
+    document.getElementById("search-text").onkeyup = (e) => {
+        if (e.target.value !== state.search.query) {
+            updateState({
+                type: "NEW_QUERY",
+                text: e.target.value
+            })
+        };
+    }
+
+    document.addEventListener("mouseover", (e) => {
+        const text = getFullPath(e);
+        updateState({
+            type: "CHANGE_HOVER_PATH",
+            text: text
+        })
     });
+
+    document.getElementById("find-next").onclick = (e) => {
+        updateState({ type: "FIND_NEXT" })
+    };
+
+    document.getElementById("find-previous").onclick = (e) => {
+        updateState({ type: "FIND_PREVIOUS" })
+    }
+
+    document.getElementById("insights").onclick = (e) => {
+        const node = findFolder(e.target.dataset.fullPath)
+        updateUi({
+            type: "JUMP_TO_NODE",
+            node: node
+        })
+    }
+
+    /*-------------------------------------------------------------------------
+        Handle changes to state.
+    -------------------------------------------------------------------------*/
+    const updateState = (action) => {
+        switch (action.type) {
+            case "NEW_QUERY":
+                state.search.query = action.text;
+                updateState({ type: "NEW_SEARCH" });
+                break;
+            case "NEW_SEARCH":
+                state.search.previousResult = (
+                    state.search.results ? state.search.results[state.search.i] : null);
+                state.search.results = findAll(state.search.query);
+                state.search.resultsText = getSearchResultText(state.search.results);
+                state.search.i = 0;
+                updateUi({ type: "SCROLL_SEARCH" });
+                break;
+            case "FIND_NEXT":
+                if (state.search.i < state.search.results.length - 1) {
+                    state.search.previousResult = (
+                        state.search.results ? state.search.results[state.search.i] : null);
+                    state.search.i++;
+                    state.search.resultsText = getSearchResultText(state.search.results);
+                    updateUi({ type: "SCROLL_SEARCH" });
+                }
+                // if == length disable the up button
+                break;
+            case "FIND_PREVIOUS":
+                if (state.search.i > 0) {
+                    state.search.previousResult = (
+                        state.search.results ? state.search.results[state.search.i] : null);
+                    state.search.i--;
+                    state.search.resultsText = getSearchResultText(state.search.results);
+                    updateUi({ type: "SCROLL_SEARCH" });
+                }
+                // if == 0 disable the down button
+                break;
+            case "CHANGE_HOVER_PATH":
+                state.explorer.hoverPath = action.text
+                updateUi({ type: "CHANGE_HOVER_PATH" })
+                break;
+            case "FOLDER_CLICK":
+                updateUi({
+                    type: "FOLDER_CLICK",
+                    node: action.node
+                })
+                break;
+            case "TOGGLE_FOLDER":
+                action.open ?
+                    state.explorer.openFolders.add(action.node) :
+                    state.explorer.openFolders.delete(action.node)
+                break;
+            default:
+                return;
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+        Handle changes to UI state.
+    -------------------------------------------------------------------------*/
+    const updateUi = (action) => {
+        switch (action.type) {
+            case "SCROLL_SEARCH":
+                ui_ScrollSearch();
+                break;
+            case "CHANGE_HOVER_PATH":
+                ui_ChangeHoverPath();
+                break;
+            case "FOLDER_CLICK":
+                const state = ui_ToggleFolder(action.node)
+                updateState({
+                    type: "TOGGLE_FOLDER",
+                    open: state,
+                    node: action.node
+                })
+                break;
+            case "JUMP_TO_NODE":
+                ui_JumpToNode(action.node)
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+        UI functions for interacting with DOM.
+    -------------------------------------------------------------------------*/
+    const ui_ToggleFolder = (node) => {
+        return dropDownDirectory(node);
+    }
+
+
+    const ui_ChangeHoverPath = () => {
+        document.getElementById("full-path-display").innerText = state.explorer.hoverPath
+    }
+
+    const ui_ScrollSearch = () => {
+        const node = state.search.results[state.search.i]
+        nodes = getParentsOfNode(node)
+        hideStaleNodes(nodes);
+        showFreshNodes(nodes);
+        scrollToNode(node);
+        flashNode(node);
+        displaySearchResults();
+        if (state.search.previousResult) state.search.previousResult.classList.remove('current-search-result')
+        if (node) node.classList.add('current-search-result')
+    }
+
+    const ui_JumpToNode = (node) => {
+        nodes = getParentsOfNode(node)
+        hideStaleNodes(nodes);
+        showFreshNodes(nodes);
+        scrollToNode(node);
+        flashNode(node);
+    }
+
+    const displaySearchResults = () => {
+        document.getElementById("search-results").
+            innerText = state.search.resultsText;
+    }
+
+    const getSearchResultText = (results) => {
+        if (!state.search.query) {
+            return "";
+        }
+        else if (results.length <= 0) {
+            return `No results for "${state.search.query}"`
+        }
+        else {
+            return `${state.search.i + 1} / ${results.length}`
+        }
+    }
+
+    const findAll = (query) => {
+        if (query == " ") return [];
+        lower = query.toLowerCase();
+        const words = lower.split(" ")
+            .filter((word) => word !== "")
+            .filter((word) => word !== " ");
+        const searchResults = [];
+        const orderedResults = new Array(words.length + 1)
+        countHits = new Object;
+
+        for (i = 0; i < words.length; i++) {
+            if (!state.search.index[words[i]]) continue;
+            for (const node of state.search.index[words[i]]) {
+                key = node.dataset.fullPath
+                if (!countHits[key]) countHits[key] = 0;
+                countHits[key]++;
+                searchResults.push(node);
+            }
+        }
+
+        for (const node of searchResults) {
+            const hits = countHits[node.dataset.fullPath]
+            if (!orderedResults[hits]) orderedResults[hits] = new Set;
+            orderedResults[hits].add(node)
+        }
+
+        completeResults = [];
+        for (i = words.length + 1; i >= 1; i--) {
+            if (!orderedResults[i]) continue;
+            for (const node of orderedResults[i].values()) {
+                completeResults.push(node);
+            }
+        }
+
+        return completeResults;
+    }
 }
 
 /*-----------------------------------------------------------------------------
     Utility functions.
 -----------------------------------------------------------------------------*/
+const indexForSearch = (node, index) => {
+    const indexNext = (node) => {
+        if (node.dataset.shortname) {
+
+            const keywords = node.dataset.shortname.toLowerCase().split(" ")
+
+            keywords.forEach((keyword) => {
+                if (index[keyword] !== undefined) index[keyword].add(node);
+                else {
+                    index[keyword] = new Set;
+                    index[keyword].add(node)
+                }
+            })
+
+            //console.log(entry)
+        }
+        for (let child of node.children) {
+            indexNext(child)
+        }
+    }
+    indexNext(node)
+    return index;
+}
+
+const findFolder = (fullPath) => {
+    for (const node of document.querySelectorAll(".library-item")) {
+        if (node.dataset.fullPath === fullPath) return node;
+    }
+}
+
+const getParentsOfNode = (node) => {
+    if (!node) return new Set;
+    let nodeCursor = node.parentElement;
+    const nodeParents = new Set;
+
+    while (nodeCursor) {
+        if (nodeCursor.tagName === "UL") nodeParents.add(nodeCursor);
+        nodeCursor = nodeCursor.parentElement;
+    }
+    return nodeParents;
+}
+
+const hideStaleNodes = (setOfNodes) => {
+    const currentShownNodes = new Set;
+    const shownNodes = document.getElementById('library-explorer')
+        .getElementsByClassName('show-list')
+
+    for (const shownNode of shownNodes) {
+        currentShownNodes.add(shownNode);
+    };
+
+    const stale = [...currentShownNodes].filter((node) => {
+        return !setOfNodes.has(node);
+    })
+
+    for (const node of stale) {
+        node.classList.remove('show-list')
+    }
+    return stale;
+}
+
+const showFreshNodes = (setOfNodes) => {
+    for (const node of setOfNodes) {
+        node.classList.add('show-list')
+    }
+    return setOfNodes
+}
+
+const scrollToNode = (node) => {
+    if (!node) return;
+    window.requestAnimationFrame(() => node.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+    }));
+}
+
+const flashNode = (node) => {
+    if (!node) return;
+    setTimeout(
+        () => node.style.background = node.dataset.backgroundColor, 5000)
+    node.style.backgroundColor = node.style.borderColor;
+}
+
+const getFullPath = (e) => {
+    elem = e.target;
+    if (!elem.classList.contains("library-item")) return "";
+    return elem.dataset.fullPath;
+}
 
 /**
- * Toggles visibility of a target <ul> by toggling the class "show-list".
- * @param {Event} e The event.
+ * Add the class "show-list".
+ * @param {Event} e.target The target node.
  */
-const dropDownDirectory = (e) => {
-    const toggleShow = toggleClassName("show-list");
-    for (const child of e.target.children) {
+const dropDownDirectory = (node) => {
+    const toggleShowList = toggleClassName('show-list')
+    let state;
+    for (const child of node.children) {
         if (child === undefined) continue;
-        toggleShow(child);
+        toggleShowList(child);
+        state = child.classList.contains('show-list')
     };
+    return state;
 }
 
 /**
@@ -61,7 +380,6 @@ const styleTheListElement = (elem, rootInfo) => {
         elem.style.borderColor = `rgba(230, 200, 200)`;
         return;
     }
-    else if (!elem.classList.contains("library-item")) return;
 
     const albums = elem.dataset.totalAlbums;
 
@@ -71,9 +389,13 @@ const styleTheListElement = (elem, rootInfo) => {
     const blue = (200 - .5 * green);
     const red = 255;
 
-    elem.style.backgroundColor = `rgba(${red}, ${green}, ${blue}, 1)`;
+    const backgroundColor = `rgba(${red}, ${green}, ${blue}, 1)`
+
+    elem.style.backgroundColor = backgroundColor;
     elem.style.borderColor =
         `rgba(${red - 100}, ${green + 50}, ${blue + 200}, 1)`
+
+    elem.dataset.backgroundColor = backgroundColor;
 }
 
 /**
@@ -90,18 +412,18 @@ const insertHoverDetailsBeforeUL = (elem) => {
  * appended under the <li>.
  * @param {HTMLElement} li The <li> that needs hover details added.
  */
-const hoverDetails = (li) => {
+const hoverDetails = (li, rootInfo) => {
     const newSpan = document.createElement("span");
     let text;
     if (li.classList.contains("library")) {
         text =
-            `${li.dataset.totalAlbums} albums,
-            ${li.dataset.totalAudioFiles} tracks`;
+            `${li.dataset.totalAlbums} albums, ` +
+            `${li.dataset.totalAudioFiles} tracks`;
     }
     else if (li.classList.contains("collection")) {
         text =
-            `${li.dataset.totalAlbums} albums,
-            ${li.dataset.totalAudioFiles} tracks`;
+            `${li.dataset.totalAlbums} albums, ` +
+            `${li.dataset.totalAudioFiles} tracks`;
     }
     else if (li.classList.contains("album")) {
         text =
@@ -109,8 +431,15 @@ const hoverDetails = (li) => {
     }
     else if (li.classList.contains("path")) {
         text =
-            `${li.dataset.totalAlbums} albums,
-            ${li.dataset.totalAudioFiles} tracks`;
+            `${li.dataset.totalAlbums} albums, ` +
+            `${li.dataset.totalAudioFiles} tracks`;
+    }
+    else if (li.classList.contains("largest-folders")) {
+        text =
+            `${li.dataset.totalAlbums} albums ` +
+            `(${Math.floor(li.dataset.totalAlbums / rootInfo.totalAlbums * 100)}%), ` +
+            `${li.dataset.totalAudioFiles} tracks ` +
+            `(${Math.floor(li.dataset.totalAudioFiles / rootInfo.totalAudioFiles * 100)}%)`;
     }
     newSpan.innerText = text;
     newSpan.setAttribute("class", "hover-details");
