@@ -4,22 +4,119 @@ html {
     font-family: sans-serif;
 }
 
+/* The navigation bar */
+.navbar {
+    overflow: hidden;
+    background-color: white;
+    opacity: 1;
+    height: 100px;
+    position: fixed; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    left: 0;
+    width: 100%; /* Full width */
+    z-index: 2;
+    border-bottom: solid;
+}
+
+    .navbar > h1 {
+        display: inline-block;
+        padding-left: 26px;
+    }
+
+#full-path-display {
+    padding-left: 26px;
+}
+
+/* Links inside the navbar */
+.navbar a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+    /* Change background on mouse-over */
+    .navbar a:hover {
+        background: #ddd;
+        color: black;
+    }
+
+.search-box {
+    display: table;
+    float: right;
+    padding-right: 26px;
+}
+
+.search-nav {
+    display: flex;
+    flex-direction: row;
+    padding-top: 30px;
+}
+
+
+.search-text {
+    border-radius: 18px;
+    height: 36px;
+    width: 300px;
+    padding-left: 12px;
+    border: solid;
+    border-width: 1px;
+    outline: none;
+}
+
+.search-button {
+    border-radius: 18px;
+    height: 36px;
+    width: 36px;
+    border: solid;
+    border-width: 1px;
+    outline: none;
+    background-color: white;
+    margin-left: 6px;
+}
+
+    .search-button:hover {
+        cursor: pointer;
+        background-color: lightgrey;
+    }
+
+    .search-button:active {
+        background-color: aqua;
+    }
+
+#search-results {
+    display: table-row;
+    font-size: small;
+    text-align: left;
+    text-indent: 16px;
+}
+
+.main {
+    position: relative;
+    top: 120px;
+    width: 100%
+}
+
 ul {
     list-style: none;
     padding-left: 1em;
     height: 0;
     overflow: hidden;
-    z-index: 1;
+    z-index: 0;
 }
 
     ul.show-list {
         height: auto;
         padding-top: 3px;
         padding-bottom: 3px;
+        padding-left: 18px;
+        padding-right: 3px;
     }
 
 li {
-    display: block;
+    background-color: white;
     border-radius: 12px;
     padding-top: 3px;
     padding-bottom: 3px;
@@ -27,22 +124,20 @@ li {
     padding-right: 25px;
     border-style: solid;
     border-width: 1px;
-    z-index: 1;
+    margin-bottom: 0px;
+    z-index: 0;
 }
 
 span {
     visibility: hidden;
-    text-align: left;
-    position: relative;
     float: right;
-    right: 0px;
     font-size: small;
     font-weight: bold;
+    padding: 1px;
 }
 
 li:hover > span {
     visibility: visible;
-    transition: all .4s ease;
 }
 
 
@@ -76,26 +171,46 @@ li:hover > span {
     font-weight: bold;
 }
 
+.path:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(path.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 0.5em;
+}
+
+.library:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(library.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 0.5em;
+}
+
+.collection:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(collection.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 0.5em;
+}
 
 
-    .collection:before {
-        content: '';
-        display: inline-block;
-        height: 1em;
-        width: 1em;
-        background-image: url(collection.svg);
-        background-size: contain;
-        background-repeat: no-repeat;
-        margin-right: 0.5em;
-    }
 
-
-
-    .collection:hover, .library:hover, .path:hover {
-        cursor: pointer;
-        border-style: solid;
-        border-color: black !important;
-    }
+.collection:hover, .library:hover, .path:hover {
+    cursor: pointer;
+    border-style: solid;
+    border-color: black !important;
+}
 
 .album:hover {
     cursor: default;
@@ -105,7 +220,7 @@ li:hover > span {
 
 
 .fade ul {
-    transition: all .4s ease;
+    transition: all .1s ease-in;
     height: 0;
 }
 
@@ -113,7 +228,113 @@ li:hover > span {
         height: auto;
     }
 
-text {
-    transition: all .4s ease;
-    z-index: 0;
+.library-item {
+    transition: background-color .5s linear;
 }
+
+#library-explorer {
+    top: 120px;
+    padding-right: 18px;
+}
+
+.insights-and-guide-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px;
+}
+
+.insights, .guide {
+    padding: 10px;
+    border: solid;
+    border-width: 1px;
+    border-radius: 12px;
+    width: 48%;
+    background-color: rgb(202, 231, 227);
+}
+
+.largest-folders {
+    transition: background-color 1s linear;
+    font-weight: bold;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 2px;
+}
+
+    .largest-folders:hover {
+        cursor: pointer;
+    }
+
+    .largest-folders > span {
+        visibility: visible;
+        font-weight: normal;
+        margin-left: 20px;
+        float: none;
+        white-space: nowrap;
+    }
+
+.current-search-result {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+#library-item-modal {
+    border-radius: 12px;
+    border: solid;
+    border-width: 2px;
+    position: absolute;
+    z-index: 100;
+    top: 0px;
+    right: 500px;
+    background-color: white;
+    text-align: right;
+    padding-bottom: 35px;
+}
+
+.hide-modal {
+    visibility: hidden;
+    top: 0px;
+    right: 500px;
+}
+
+.show-modal {
+    visibility: visible;
+    height: auto;
+    width: auto;
+}
+
+.modal-menu-item {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 35px;
+    padding-right: 12px;
+}
+
+#library-item-modal > textarea {
+    font-family: sans-serif;
+    border: none;
+    outline: none;
+    resize: none;
+    text-align: right;
+    height: 2em;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.modal-menu-item > a {
+    font-size: small;
+    color: black;
+    text-decoration: none;
+    padding: 3px;
+    border-radius: 8px;
+}
+
+    .modal-menu-item > a:hover {
+        background-color: lightgray;
+        cursor: pointer;
+    }
