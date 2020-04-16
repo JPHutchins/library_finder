@@ -14,6 +14,12 @@ window.onload = () => {
     if (document.querySelectorAll) {
         document.querySelectorAll(".library-item").forEach((elem) => {
             insertHoverDetailsBeforeUL(elem, rootInfo);
+            const menuButton = document.createElement("span");
+            menuButton.innerText = "MENU";
+            menuButton.classList.add("library-item-menu-button");
+            const span = elem.getElementsByTagName("span")[0];
+            elem.insertBefore(menuButton, span)
+
             styleTheListElement(elem, rootInfo);
         });
         document.querySelectorAll(".largest-folders").forEach((elem) => {
@@ -29,8 +35,8 @@ window.onload = () => {
         search: {
             index: {},
             query: "",
-            searchResults: [],
-            searchResultText: "",
+            results: [],
+            resultsText: "",
             i: 0,
         },
         explorer: {
@@ -49,7 +55,115 @@ window.onload = () => {
             type: "FOLDER_CLICK",
             node: e.target
         });
+        //document.querySelector("#library-item-modal").classList.remove("show-modal")
     }
+
+    document.onclick = (e) => {
+        console.log(e.target.closest("#library-item-modal"))
+        if (!e.target.closest("#library-item-modal")) {
+            document.querySelector("#library-item-modal").classList.remove("show-modal")
+            document.querySelector("#library-item-modal").classList.add("hide-modal")
+        }
+        // e.stopPropagation();
+        // if (e.target.id === "library-item-modal") return;
+        // if (e.target.id === "library-item-menu-button") return;
+        
+
+    }
+
+    document.querySelector('#library-item-modal').onmouseenter = (e) => {
+        //console.log(e.target)
+        console.log(state.explorer.openMenu)
+        state.explorer.openMenu.classList.add()  
+    }
+
+    document.querySelector('#library-item-modal').onclick = (e) => {
+        e.stopPropagation() 
+    }
+
+    
+
+    libraryExplorer.querySelectorAll(".library-item-menu-button").forEach((node) =>
+        node.onclick = (e) => {
+            e.stopPropagation();
+
+            updateState({
+                type: "CLICK_ITEM_BUTTON",
+                node: e.target
+            })
+
+            //console.log(e.target.parentElement);
+            const menu = document.querySelector("#library-item-modal")
+            // menu.classList.toggle("hide-modal")
+            // menu.classList.contains("hide-modal") ?
+            //     menu.classList.remove("show-modal") :
+            //     menu.classList.add("show-modal")
+            parentRect = e.target.getBoundingClientRect()
+            const top = parentRect.bottom + window.pageYOffset
+            const right = window.innerWidth - parentRect.right
+
+
+            menu.style.top = top + 8 + "px";
+            //menu.style.height = "90px"
+            menu.style.right = right - 26 + "px";
+            //menu.style.width = "900px";
+
+            const menuItems = menu.getElementsByClassName("modal-menu-item");
+            const parentData = node.parentElement.dataset
+            menuItems[3].children[0].innerText = "Copy full path to clipboard"
+
+            menuItems[0].innerText = parentData.fullPath
+            menuItems[0].style.fontSize = 'small';
+            menuItems[0].style.visibility = 'hidden'
+            menuItems[0].style.display = 'block';
+            menuItems[2].style.display = 'none';
+            console.log(menuItems[0].offsetWidth)
+            menuItems[2].style.width = menuItems[0].offsetWidth + "px";
+            menuItems[2].style.display = 'flex';
+            menuItems[0].style.visibility = 'visible';
+            menuItems[0].style.display = "none";
+            menuItems[1].innerText = parentData.shortname
+            menuItems[1].style.fontWeight = "bold";
+
+
+            menuItems[2].innerText = parentData.fullPath
+
+            
+            menuItems[3].children[0].onclick = () => {
+                menuItems[2].focus();
+                menuItems[2].select();
+                menuItems[2].setSelectionRange(0, 99999);
+                const successful = document.execCommand("copy");
+                menuItems[3].children[0].innerText = successful ?
+                    "Copied!" :
+                    "Copy failed.  Highlight and copy manually."
+                
+            }
+            menuItems[3].children[1].href = "file:///" + parentData.fullPath
+
+
+            menuItems[4].innerText = ((node) => {
+                switch (node.parentElement.classList[0]) {
+                    case "library":
+                        return "Library";
+                    case "collection":
+                        return "Collection";
+                    case "album":
+                        return "Album";
+                    case "path":
+                        return "Path";
+                }
+            })(node);
+            menuItems[5].innerText = parentData.totalAudioFiles ?
+                `${parentData.totalAudioFiles} audio files` :
+                "";
+            menuItems[6].innerText = parentData.totalAlbums ?
+                `${parentData.totalAlbums} albums` :
+                "";
+
+
+        }
+    )
 
     document.getElementById("search-text").onkeyup = (e) => {
         if (e.target.value !== state.search.query) {
@@ -84,6 +198,13 @@ window.onload = () => {
         })
     }
 
+    libraryExplorer.oncontextmenu = (e) => {
+        e.preventDefault();
+
+    }
+
+
+
     /*-------------------------------------------------------------------------
         Handle changes to state.
     -------------------------------------------------------------------------*/
@@ -95,7 +216,8 @@ window.onload = () => {
                 break;
             case "NEW_SEARCH":
                 state.search.previousResult = (
-                    state.search.results ? state.search.results[state.search.i] : null);
+                    state.search.results ?
+                        state.search.results[state.search.i] : null);
                 state.search.results = findAll(state.search.query);
                 state.search.resultsText = getSearchResultText(state.search.results);
                 state.search.i = 0;
@@ -104,7 +226,8 @@ window.onload = () => {
             case "FIND_NEXT":
                 if (state.search.i < state.search.results.length - 1) {
                     state.search.previousResult = (
-                        state.search.results ? state.search.results[state.search.i] : null);
+                        state.search.results ?
+                            state.search.results[state.search.i] : null);
                     state.search.i++;
                     state.search.resultsText = getSearchResultText(state.search.results);
                     updateUi({ type: "SCROLL_SEARCH" });
@@ -136,6 +259,14 @@ window.onload = () => {
                     state.explorer.openFolders.add(action.node) :
                     state.explorer.openFolders.delete(action.node)
                 break;
+            case "CLICK_ITEM_BUTTON":
+                updateUi({
+                    type: "CLICK_ITEM_BUTTON",
+                    node: action.node.parentElement
+                })
+                break;
+            case "CHANGE_ITEM_MENU_OPEN":
+                state.explorer.openMenu = action.node;
             default:
                 return;
         }
@@ -162,6 +293,24 @@ window.onload = () => {
                 break;
             case "JUMP_TO_NODE":
                 ui_JumpToNode(action.node)
+                break;
+            case "CLICK_ITEM_BUTTON":
+                const visible = document.getElementById("library-item-modal").classList.contains("show-modal");
+                if (visible) {
+                    document.getElementById("library-item-modal").classList.add("hide-modal");
+                    document.getElementById("library-item-modal").classList.remove("show-modal");
+                    updateState({
+                        type: "CHANGE_ITEM_MENU_OPEN",
+                        node: null
+                    })
+                } else {
+                    document.getElementById("library-item-modal").classList.remove("hide-modal");
+                    document.getElementById("library-item-modal").classList.add("show-modal");
+                    updateState({
+                        type: "CHANGE_ITEM_MENU_OPEN",
+                        node: action.node
+                    })
+                }
         }
     }
 
@@ -183,7 +332,7 @@ window.onload = () => {
         hideStaleNodes(nodes);
         showFreshNodes(nodes);
         scrollToNode(node);
-        flashNode(node);
+        //flashNode(node);
         displaySearchResults();
         if (state.search.previousResult) state.search.previousResult.classList.remove('current-search-result')
         if (node) node.classList.add('current-search-result')
@@ -214,47 +363,49 @@ window.onload = () => {
         }
     }
 
-    const findAll = (query) => {
-        if (query == " ") return [];
-        lower = query.toLowerCase();
-        const words = lower.split(" ")
-            .filter((word) => word !== "")
-            .filter((word) => word !== " ");
-        const searchResults = [];
-        const orderedResults = new Array(words.length + 1)
-        countHits = new Object;
+    const findAll = searchIndex(state.search.index)
 
-        for (i = 0; i < words.length; i++) {
-            if (!state.search.index[words[i]]) continue;
-            for (const node of state.search.index[words[i]]) {
-                key = node.dataset.fullPath
-                if (!countHits[key]) countHits[key] = 0;
-                countHits[key]++;
-                searchResults.push(node);
-            }
-        }
-
-        for (const node of searchResults) {
-            const hits = countHits[node.dataset.fullPath]
-            if (!orderedResults[hits]) orderedResults[hits] = new Set;
-            orderedResults[hits].add(node)
-        }
-
-        completeResults = [];
-        for (i = words.length + 1; i >= 1; i--) {
-            if (!orderedResults[i]) continue;
-            for (const node of orderedResults[i].values()) {
-                completeResults.push(node);
-            }
-        }
-
-        return completeResults;
-    }
 }
 
 /*-----------------------------------------------------------------------------
     Utility functions.
 -----------------------------------------------------------------------------*/
+const searchIndex = (index) => (query) => {
+    if (query == " ") return [];
+    lower = query.toLowerCase();
+    const words = lower.split(" ")
+        .filter((word) => word !== "")
+        .filter((word) => word !== " ");
+    const searchResults = [];
+    const orderedResults = new Array(words.length + 1)
+    countHits = new Object;
+
+    for (i = 0; i < words.length; i++) {
+        if (!index[words[i]]) continue;
+        for (const node of index[words[i]]) {
+            key = node.dataset.fullPath
+            if (!countHits[key]) countHits[key] = 0;
+            countHits[key]++;
+            searchResults.push(node);
+        }
+    }
+
+    for (const node of searchResults) {
+        const hits = countHits[node.dataset.fullPath]
+        if (!orderedResults[hits]) orderedResults[hits] = new Set;
+        orderedResults[hits].add(node)
+    }
+
+    completeResults = [];
+    for (i = words.length + 1; i >= 1; i--) {
+        if (!orderedResults[i]) continue;
+        for (const node of orderedResults[i].values()) {
+            completeResults.push(node);
+        }
+    }
+    return completeResults;
+}
+
 const indexForSearch = (node, index) => {
     const indexNext = (node) => {
         if (node.dataset.shortname) {
@@ -335,7 +486,14 @@ const flashNode = (node) => {
     if (!node) return;
     setTimeout(
         () => node.style.background = node.dataset.backgroundColor, 5000)
-    node.style.backgroundColor = node.style.borderColor;
+    node.style.backgroundColor = "white";
+}
+
+const highlightNode = (node) => {
+    if (!node) return;
+    let newColor = node.dataset.backgroundColor.slice(0, node.dataset.backgroundColor.length - 2);
+    newColor = newColor + ".1)";
+    node.style.backgroundColor = newColor;
 }
 
 const getFullPath = (e) => {
@@ -375,9 +533,14 @@ const toggleClassName = (className) => (element) => {
  * @param {Object} rootInfo The info about the displayed directories.
  */
 const styleTheListElement = (elem, rootInfo) => {
+
     if (elem.classList.contains("album")) {
-        elem.style.backgroundColor = `rgba(255, 240, 230)`;
+        const backgroundColor = `rgba(255, 240, 230)`
+
+        elem.style.backgroundColor = backgroundColor;
         elem.style.borderColor = `rgba(230, 200, 200)`;
+
+        elem.dataset.backgroundColor = backgroundColor;
         return;
     }
 
