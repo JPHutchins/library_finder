@@ -1,0 +1,48 @@
+R"=====(
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>library_explorer</title>
+</head>
+
+<body>
+    <div id="disabler"></div>
+    <div id="library-item-modal" class="hide-modal">
+        <div class="modal-menu-item always-hidden"></div>
+        <div class="modal-menu-item">Title</div>
+        <hr>
+        <textarea readonly class="modal-menu-item">FULL PATH NAME COPY OPEN</textarea>
+        <div class="modal-menu-item">
+            <a>Copy full path to clipboard</a>
+            |
+            <a target="_blank" href="#">Open folder in new tab</a>
+        </div>
+        <hr>
+        <div class="modal-menu-item">Classification</div>
+        <div class="modal-menu-item">Total albums and %</div>
+        <div class="modal-menu-item">Contained albums and %</div>
+    </div>
+    <div class="navbar">
+        <h1>library_explorer</h1>
+        <div class="search-box">
+            <div class="search-nav">
+                <input type="text" class="search-text" id="search-text"
+                    label="search for album, artist, song, or folder"
+                    placeholder="search for album, artist, song, or folder">
+                <input type="button" id="find-previous" class="search-button" value="&#8896;">
+
+                <input type="button" id="find-next" class="search-button" value="&#8897;">
+            </div>
+
+            <div id="search-results"></div>
+        </div>
+        <div id="full-path-display"></div>
+    </div>
+    <div class="main">
+        <div class="insights-and-guide-container">
+            <div id="insights" class="insights">These are the paths with the most albums<ul class="show-list">
+
+)====="
