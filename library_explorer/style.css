@@ -1,0 +1,359 @@
+html {
+    font-family: sans-serif;
+    background-color: hsl(0, 0%, 20%);
+}
+
+/* The navigation bar */
+.navbar {
+overflow: hidden;
+background-color: white;
+opacity: 1;
+height: 100px;
+position: fixed; /* Set the navbar to fixed position */
+top: 0; /* Position the navbar at the top of the page */
+left: 0;
+width: 100%; /* Full width */
+z-index: 2;
+border-bottom: solid;
+}
+
+.navbar>h1 {
+    display: inline-block;
+    padding-left: 26px;
+}
+
+#full-path-display {
+    padding-left: 26px;
+}
+
+/* Links inside the navbar */
+.navbar a {
+float: left;
+display: block;
+color: #f2f2f2;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+}
+
+/* Change background on mouse-over */
+.navbar a:hover {
+background: #ddd;
+color: black;
+}
+
+.search-box {
+    display: table;
+    float: right;
+    padding-right: 26px;
+}
+
+.search-nav {
+    display: flex;
+    flex-direction: row;
+    padding-top: 30px;
+}
+
+
+.search-text {
+    border-radius: 18px;
+    height: 36px;
+    width: 300px;
+    padding-left: 12px;
+    border: solid;
+    border-width: 1px;
+    outline: none;
+}
+
+.search-button {
+    border-radius: 18px;
+    height: 36px;
+    width: 36px;
+    border: solid;
+    border-width: 1px;
+    outline: none;
+    background-color: white;
+    margin-left: 6px;
+}
+
+.search-button:hover {
+    cursor: pointer;
+    background-color: lightgrey;
+}
+
+.search-button:active {
+    background-color:  hsl(0, 0%, 90%);
+}
+
+#search-results {
+    display: table-row;
+    font-size: small;
+    text-align: left;
+    text-indent: 16px;
+}
+
+.main {
+    position: relative;
+    top: 120px;
+    width: 100%
+}
+
+ul {
+    
+    list-style:none;
+    padding-left: 1em;
+    height: 0;
+    overflow: hidden;
+    z-index: 0;
+
+}
+
+ul.show-list {
+    height: auto;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 18px;
+    padding-right: 3px;
+}
+
+li {
+    background-color: white;
+    border-radius: 12px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 8px;
+    padding-right: 25px;
+    border-width: 1px;
+    margin-top: 3px;
+    z-index: 0;
+}
+
+.library-item-menu-button {
+    margin-left: 20px;
+    float: right;
+    margin-top: 1px;
+}
+
+.hidden {
+    position:absolute;
+    left:-10000px;
+    top:-10000px;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+}
+
+.hover-details {
+    float: right;
+    font-size: small;
+    font-weight: bold;
+    padding: 1px;
+    height: auto;
+    width: auto;
+}
+
+
+.album:before {
+      content: '';
+      display: inline-block;
+      height: 1em;
+    width: 1em;
+      background-image: url(album.svg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      margin-right:0.5em;   
+}
+
+.album {
+    font-weight: normal;
+}
+
+.hide {
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+}
+
+.library {
+    font-weight: bold;
+}
+
+.collection {
+    font-weight: bold;
+}
+
+.path:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(path.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right:0.5em;   
+}  
+
+.library:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(library.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right:0.5em;   
+}  
+  
+.collection:before {
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url(collection.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right:0.5em;   
+}  
+
+
+
+.collection:hover, .library:hover, .path:hover {
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
+}
+
+.album:hover {
+    cursor: default; 
+    box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
+}
+
+
+.fade ul {
+    transition: all .1s ease-in;
+    height: 0;
+   
+  }
+.fade ul.show-list {
+    height: auto;
+}
+
+.library-item {
+    transition: background-color .5s linear;
+}
+
+#library-explorer {
+    top: 120px;
+    padding-right: 18px;
+}
+
+.insights-and-guide-container {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    
+}
+
+.insights, .guide {
+    padding: 3px;
+    border-radius: 12px;
+    background-color: hsl(0, 0%, 80%);
+    margin-top: 12px;
+}
+
+.largest-folders {
+    transition: background-color 1s linear;
+    font-weight: bold;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 3px;
+    margin-bottom:3px;
+}
+
+.largest-folders:hover {
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
+}
+
+.largest-folders>span {
+    visibility: visible;
+    font-weight: normal;
+    margin-left: 20px;
+    float: none;
+    white-space: nowrap;
+}
+
+.current-search-result {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+#library-item-modal {
+    border-radius: 12px;
+    border: solid;
+    border-width: 2px;
+    position: absolute;
+    z-index: 100;
+    background-color: white;
+    text-align: right;
+    padding-bottom: 35px;
+    overflow: hidden;
+    visibility: hidden;
+    background-color: hsl(0, 0%, 90%);
+}
+
+#library-item-modal.show-modal {
+    visibility: visible;
+    height: auto;
+    width: auto;
+}
+
+.modal-menu-item {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 35px;
+    padding-right: 12px;
+
+}
+
+#library-item-modal>textarea {
+    font-family: sans-serif;
+    border: none;
+    outline:none;
+    resize: none;
+    text-align: right;
+    height: 2em;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 12px;
+    padding-right: 12px;
+    background-color: hsl(0, 0%, 90%);
+}
+
+.modal-menu-item>a {
+   font-size: small;
+   color: black;
+   text-decoration: none;
+   padding: 3px;
+   border-radius: 8px;
+}
+
+.modal-menu-item>a:hover {
+    background-color: lightgray;
+    cursor: pointer;
+ }
+
+ #disabler {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+     opacity: .5;
+     visibility: hidden;
+     z-index: 99;
+ }
