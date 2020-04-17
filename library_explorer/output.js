@@ -17,18 +17,11 @@ window.onload = () => {
             .getElementsByClassName('modal-menu-item')
     }
 
-
     const rootInfo = elements.libraryExplorer.children[0].dataset;
 
     organizeAlbums(elements.libraryExplorer.children[0].children[0]);
 
     elements.libraryExplorer.getElementsByTagName('UL')[0].classList.add("fade");
-
-    console.log(document.querySelectorAll('.album').length)
-
-
-
-
 
     const menuIcon = createHamburgerMenu();
 
@@ -49,9 +42,6 @@ window.onload = () => {
             })
         }
     )
-
-
-
 
     /*-------------------------------------------------------------------------
         Initialize state.
@@ -88,12 +78,9 @@ window.onload = () => {
         }
     }
 
-
     const itemMenu = itemMenuMaker(
         elements.libraryItemModal,
         elements.libraryItemModal.getElementsByClassName("modal-menu-item"))
-
-
 
     elements.libraryExplorer.onclick = (e) => {
         updateState({
@@ -137,7 +124,6 @@ window.onload = () => {
             type: "RIGHT_CLICK",
             event: e
         })
-
     }
 
     elements.disabler.onclick = (e) => {
@@ -145,10 +131,7 @@ window.onload = () => {
             type: "CLOSE_ITEM_MENU",
             node: null
         })
-
     }
-
-
 
     /*-------------------------------------------------------------------------
         Handle changes to state.
@@ -291,7 +274,6 @@ window.onload = () => {
         return dropDownDirectory(node);
     }
 
-
     const ui_ChangeHoverPath = () => {
         elements.fullPathDisplay.innerText = state.explorer.hoverPath
     }
@@ -334,7 +316,7 @@ window.onload = () => {
             return `${state.search.i + 1} / ${results.length}`
         }
     }
-
+    
     // provide these functions with context... needs more thought...
     const findAll = searchIndex(state)
     const findFolder = makeFindFolder(elements)
