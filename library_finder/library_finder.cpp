@@ -26,6 +26,10 @@
 #include <regex>
 #include <library_finder.h>
 
+const char* html_source =
+#include "html.txt"
+;
+
 /*-------------------------------------------------------------------------------------------------
     Argument is the root directory under which to search for libraries.  Optionally include 
     the flag --type to specify audio, video, or photo.
@@ -108,6 +112,7 @@ int main(int argc, char** argv) {
         root->shortname = current_shortname;
         root->next = nullptr;
         root->parent = nullptr;
+        root->subdirs = nullptr;
     }
     int total_count = 0;
 
@@ -123,31 +128,10 @@ int main(int argc, char** argv) {
             fprintf(stderr, "error: error opening output html file, exiting.\n");
             exit(EXIT_FAILURE);
         }
-        fprintf(fp, 
-            "<!DOCTYPE html>"
-            "<html>"
-            "<head>"
-                "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">"
-                "<title>library_finder</title>"
-            "</head>"
-            "<body>"
-            "<div class=\"navbar\">"
-                "<h1>library_finder</h1>"
-                "<div class=\"search-box\">"
-                    "<input type=\"text\" class=\"search-text\" id=\"search-text\" "
-                        "placeholder=\"search for album, artist, or song\">"
-                    "<input type=\"button\" class=\"search-button\" value=\"Find\">"
-                "</div>"
-                "<div id=\"full-path-display\"></div>"
-            "</div>"
-            "<div class=\"main\">"
-            "<div class=\"insights-and-guide-container\">"
-            "<div class=\"insights\">"
-            "These are the paths with the most albums"
-        );
+        fprintf(fp, html_source);
         Dir_Tree_Node** results = find_largest_libraries(root);
-        fprintf(fp, "<ul class=\"show-list\">");
-        for (int i = 0; i < 10; i++) {
+        int i = 0;
+        while (i < 10) {
             fprintf(fp, 
                 "<li "
                 "class=\"largest-folders\" "
@@ -159,6 +143,7 @@ int main(int argc, char** argv) {
                 results[i]->name);
             fprintf(fp, "%s", results[i]->name);
             fprintf(fp, "</li>");
+            i++;
         }
         fprintf(fp, 
             "</ul>"
@@ -176,6 +161,13 @@ int main(int argc, char** argv) {
         for (int i = 0; i < 10; i++) {
             free(results[i]);
         }
+        free(results);
+
+        fprintf(fp, "<span id=\"command\" class=\"hidden\" data-command=\"");
+        for (int i = 1; i < (argc); i++) {
+            fprintf(fp, "%s ", argv[i]);
+        }
+        fprintf(fp, "\"></span>");
 
         fprintf(fp,
             "</div>"
@@ -190,7 +182,7 @@ int main(int argc, char** argv) {
     else {
         make_directory_list(root, 0);
     }
-    free_paths(root);
+    //free_paths(root);
     return 0;
 }
 
@@ -518,7 +510,13 @@ Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
         exit(EXIT_FAILURE);
     }
     
-    Dir_Tree_Node* result[10] = { init };
+    Dir_Tree_Node** result = (Dir_Tree_Node**)malloc(10 * sizeof(Dir_Tree_Node*));
+
+    int i = 0;
+    while (i < 10) {
+        result[i] = init;
+        i++;
+    }
 
     inspect_paths(current_path, result);
 
@@ -530,6 +528,7 @@ Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
 -------------------------------------------------------------------------------------------------*/
 
 void free_paths(Dir_Tree_Node* current_path) {
+    printf("\n%s", current_path->name);
     if (!current_path->name) {
         free(current_path);
         return;
@@ -542,6 +541,7 @@ void free_paths(Dir_Tree_Node* current_path) {
     if (current_path->next) {
         free_paths(current_path->next);
     }
+   
     free(current_path->shortname);
     free(current_path->name);
     free(current_path->subdirs);
