@@ -3,8 +3,10 @@ window.onload = () => {
         Add DOM elements and styling, initialize state, and set handlers.
     -------------------------------------------------------------------------*/
     const elements = {
+        command: document.getElementById("command"),
         searchText: document.getElementById("search-text"),
         libraryExplorer: document.getElementById('library-explorer'),
+        navbar: document.getElementsByClassName("navbar")[0],
         findNext: document.getElementById("find-next"),
         findPrevious: document.getElementById("find-previous"),
         insights: document.getElementById("insights"),
@@ -42,6 +44,11 @@ window.onload = () => {
             })
         }
     )
+
+    const commandline = document.createElement("h3");
+    commandline.innerText = "library_finder " + elements.command.dataset.command;
+    elements.navbar.insertBefore(commandline, elements.fullPathDisplay)
+
 
     /*-------------------------------------------------------------------------
         Initialize state.
@@ -178,9 +185,13 @@ window.onload = () => {
                 // if == 0 disable the down button
                 break;
             case "FOLDER_CLICK":
+                let node = action.node;
+                if (node.classList.contains("hover-details")) {
+                    node = node.parentElement; // click was on hover-details
+                }
                 updateUi({
                     type: "FOLDER_CLICK",
-                    node: action.node
+                    node: node
                 })
                 break;
             case "TOGGLE_FOLDER":
