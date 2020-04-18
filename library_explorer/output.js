@@ -128,11 +128,12 @@ window.onload = () => {
 
     elements.insights.onclick = (e) => {
         if (e.target.tagName !== "UL" &&
-        !e.target.classList.contains('largest-folders') &&
+            !e.target.classList.contains('largest-folders') &&
             !e.target.closest("#insights-expander-button")) {
             updateState({ type: "EXPANDER_CLICK" })
             return;
         }
+        if (!e.target.classList.contains('largest-folders')) return;
         updateUi({
             type: "JUMP_TO_NODE",
             node: findFolder(e.target.dataset.fullPath)
@@ -163,6 +164,7 @@ window.onload = () => {
         Handle changes to state.
     -------------------------------------------------------------------------*/
     const updateState = (action) => {
+        console.log(action);
         switch (action.type) {
             case "NEW_QUERY":
                 if (action.text === state.search.query) break;
@@ -264,6 +266,7 @@ window.onload = () => {
         Handle changes to UI state.
     -------------------------------------------------------------------------*/
     const updateUi = (action) => {
+        console.log(action);
         switch (action.type) {
             case "SCROLL_SEARCH":
                 ui_ScrollSearch();
