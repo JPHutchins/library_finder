@@ -127,12 +127,12 @@ window.onload = () => {
     }
 
     elements.insights.onclick = (e) => {
-        if (!state.insights.expanded &&
+        if (e.target.tagName !== "UL" &&
+        !e.target.classList.contains('largest-folders') &&
             !e.target.closest("#insights-expander-button")) {
             updateState({ type: "EXPANDER_CLICK" })
             return;
         }
-        if (!e.target.classList.contains('largest-folders')) return;
         updateUi({
             type: "JUMP_TO_NODE",
             node: findFolder(e.target.dataset.fullPath)
