@@ -49,6 +49,11 @@ window.onload = () => {
     commandline.innerText = "library_finder " + elements.command.dataset.command;
     elements.navbar.insertBefore(commandline, elements.fullPathDisplay)
 
+    const expanderButton = document.createElement("span");
+    expanderButton.appendChild(menuIcon);
+    expanderButton.setAttribute('id', 'insights-expander-button');
+    elements.insights.insertBefore(expanderButton, elements.insights.children[0]);
+
 
     /*-------------------------------------------------------------------------
         Initialize state.
@@ -67,6 +72,9 @@ window.onload = () => {
             hoverSelectedNode: null,
             openMenu: null,
             menuPos: { top: 0, right: 0 }
+        },
+        insights: {
+            expanded: false,
         }
     }
 
@@ -119,6 +127,12 @@ window.onload = () => {
     }
 
     elements.insights.onclick = (e) => {
+        if (!state.insights.expanded &&
+            !e.target.closest("#insights-expander-button")) {
+            updateState({ type: "EXPANDER_CLICK" })
+            return;
+        }
+        if (!e.target.classList.contains('largest-folders')) return;
         updateUi({
             type: "JUMP_TO_NODE",
             node: findFolder(e.target.dataset.fullPath)
@@ -126,11 +140,11 @@ window.onload = () => {
     }
 
     elements.libraryExplorer.oncontextmenu = (e) => {
-        e.preventDefault();
-        updateState({
-            type: "RIGHT_CLICK",
-            event: e
-        })
+        // e.preventDefault();
+        // updateState({
+        //     type: "RIGHT_CLICK",
+        //     event: e
+        // })
     }
 
     elements.disabler.onclick = (e) => {
@@ -139,6 +153,11 @@ window.onload = () => {
             node: null
         })
     }
+
+    document.getElementById(
+        "insights-expander-button").onclick = (e) => {
+            updateState({ type: "EXPANDER_CLICK" })
+        }
 
     /*-------------------------------------------------------------------------
         Handle changes to state.
@@ -209,22 +228,32 @@ window.onload = () => {
                 break;
             case "CLICK_ITEM_BUTTON":
                 state.explorer.menuPos = getMenuButtonClickPos(
-                    state.explorer.hoverSelectedNode)
-                console.log(state.explorer.menuPos)
+                    state.explorer.hoverSelectedNode);
+                console.log(state.explorer.menuPos);
                 updateUi({
                     type: "OPEN_ITEM_MENU",
                     node: state.explorer.hoverSelectedNode
-                })
+                });
                 state.explorer.openMenu = state.explorer.hoverSelectedNode;
                 break;
             case "CHANGE_HOVER_SELECTED_NODE":
                 if (!action.node.classList.contains("library-item")) break;
-                updateUi({ type: "HIDE_HOVER_DETAILS" })
+                updateUi({ type: "HIDE_HOVER_DETAILS" });
                 state.explorer.hoverSelectedNode = action.node;
                 state.explorer.hoverPath = getFullPath(
-                    state.explorer.hoverSelectedNode)
-                updateUi({ type: "CHANGE_HOVER_PATH" })
-                updateUi({ type: "SHOW_HOVER_DETAILS" })
+                    state.explorer.hoverSelectedNode);
+                updateUi({ type: "CHANGE_HOVER_PATH" });
+                updateUi({ type: "SHOW_HOVER_DETAILS" });
+                break;
+            case "EXPANDER_CLICK":
+                if (state.insights.expanded) {
+                    updateUi({ type: "CLOSE_INSIGHTS" });
+                    state.insights.expanded = false;
+                }
+                else {
+                    updateUi({ type: "EXPAND_INSIGHTS" });
+                    state.insights.expanded = true;
+                }
                 break;
             default:
                 return;
@@ -274,6 +303,12 @@ window.onload = () => {
             case "SHOW_HOVER_DETAILS":
                 state.explorer.hoverSelectedNode.querySelector(
                     ".hover-details").classList.remove('hidden');
+                break;
+            case "CLOSE_INSIGHTS":
+                elements.insights.classList.remove("expanded");
+                break;
+            case "EXPAND_INSIGHTS":
+                elements.insights.classList.add("expanded")
                 break;
         }
     }
@@ -327,10 +362,15 @@ window.onload = () => {
             return `${state.search.i + 1} / ${results.length}`
         }
     }
-    
+
     // provide these functions with context... needs more thought...
     const findAll = searchIndex(state)
     const findFolder = makeFindFolder(elements)
+
+    updateState({
+        type: "FOLDER_CLICK",
+        node: elements.libraryExplorer.children[0]
+    });
 }
 
 /*-----------------------------------------------------------------------------

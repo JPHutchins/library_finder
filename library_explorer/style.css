@@ -142,6 +142,7 @@ li {
     float: right;
     margin-top: 1px;
     cursor: pointer;
+    height: 12px;
 }
 
 .hidden {
@@ -260,8 +261,7 @@ li {
 .insights-and-guide-container {
     display: flex;
     flex-direction: column;
-    padding: 18px;
-    
+    padding: 18px;   
 }
 
 .insights, .guide {
@@ -269,6 +269,27 @@ li {
     border-radius: 12px;
     background-color: hsl(0, 0%, 80%);
     margin-top: 12px;
+    height: 20px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.insights:hover, .guide:hover {
+    box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
+}
+
+#insights-expander-button {
+    float: right;
+    margin-right: 12px;
+}
+
+#insights-expander-button:hover {
+    cursor: pointer;
+}
+
+.expanded {
+    height: auto;
+    cursor: default;
 }
 
 .largest-folders {
