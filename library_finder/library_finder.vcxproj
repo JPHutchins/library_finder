@@ -154,7 +154,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="html.txt" />
+    <ClInclude Include="index.html" />
     <ClInclude Include="library_finder.h" />
   </ItemGroup>
   <ItemGroup>

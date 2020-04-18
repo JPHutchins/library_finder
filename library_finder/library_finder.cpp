@@ -27,7 +27,7 @@
 #include <library_finder.h>
 
 const char* html_source =
-#include "html.txt"
+#include "index.html"
 ;
 
 /*-------------------------------------------------------------------------------------------------
