@@ -47,7 +47,7 @@ window.onload = () => {
 
     const commandline = document.createElement("h3");
     commandline.innerText = "library_finder " + elements.command.dataset.command;
-    elements.navbar.insertBefore(commandline, elements.fullPathDisplay)
+    elements.navbar.children[0].appendChild(commandline)
 
     const expanderButton = document.createElement("span");
     expanderButton.appendChild(menuIcon);

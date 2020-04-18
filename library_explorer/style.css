@@ -8,7 +8,8 @@ html {
 overflow: hidden;
 background-color: white;
 opacity: 1;
-height: 100px;
+height: auto;
+min-height: 130px;
 position: fixed; /* Set the navbar to fixed position */
 top: 0; /* Position the navbar at the top of the page */
 left: 0;
@@ -20,19 +21,20 @@ border-bottom: solid;
 .navbar>h1 {
     display: inline-block;
     padding-left: 26px;
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin-bottom: auto;
+    height: 80px;
 }
 
-.navbar>h3 {
+.navbar>h1>h3 {
+    font-size: large;
     font-family: monospace;
     margin-top: 5px;
     margin-bottom: 5px;
-    padding-left: 26px;
 }
 
 #full-path-display {
     padding-left: 26px;
+    padding-bottom: 3px;
 }
 
 /* Links inside the navbar */
@@ -55,6 +57,8 @@ color: black;
     display: table;
     float: right;
     padding-right: 26px;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .search-nav {
