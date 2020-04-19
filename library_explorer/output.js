@@ -9,6 +9,7 @@ window.onload = () => {
         navbar: document.getElementsByClassName("navbar")[0],
         findNext: document.getElementById("find-next"),
         findPrevious: document.getElementById("find-previous"),
+        commandSubtitleContainer: document.getElementById("command-subtitle-container"),
         insights: document.getElementById("insights"),
         about: document.getElementsByClassName("guide")[0],
         disabler: document.getElementById("disabler"),
@@ -47,8 +48,9 @@ window.onload = () => {
     )
 
     const commandline = document.createElement("h3");
+    commandline.setAttribute("id", "command-subtitle");
     commandline.innerText = "library_finder " + elements.command.dataset.command;
-    elements.navbar.children[0].appendChild(commandline)
+    elements.commandSubtitleContainer.appendChild(commandline)
 
     const expanderButton = document.createElement("span");
     expanderButton.appendChild(menuIcon);
@@ -218,7 +220,7 @@ window.onload = () => {
     }
 
     document.getElementById(
-        "insights-expander-button").onclick = (e) => {
+        "insights-button").onclick = (e) => {
             updateState({
                 type: "EXPANDER_CLICK",
                 div: "insights",
@@ -380,10 +382,10 @@ window.onload = () => {
                     ".hover-details").classList.remove('hidden');
                 break;
             case "CLOSE_DIV":
-                action.node.classList.remove("expanded");
+                action.node.classList.add("hidden");
                 break;
             case "EXPAND_DIV":
-                action.node.classList.add("expanded")
+                action.node.classList.remove("hidden")
                 break;
         }
     }
