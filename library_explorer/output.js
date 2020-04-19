@@ -10,6 +10,7 @@ window.onload = () => {
         findNext: document.getElementById("find-next"),
         findPrevious: document.getElementById("find-previous"),
         insights: document.getElementById("insights"),
+        about: document.getElementsByClassName("guide")[0],
         disabler: document.getElementById("disabler"),
         fullPathDisplay: document.getElementById("full-path-display"),
         searchResults: document.getElementById("search-results"),
@@ -54,6 +55,51 @@ window.onload = () => {
     expanderButton.setAttribute('id', 'insights-expander-button');
     elements.insights.insertBefore(expanderButton, elements.insights.children[0]);
 
+    elements.about.innerHTML = "";
+    const aboutTitle = document.createElement("h4");
+    aboutTitle.innerHTML = "About";
+    elements.about.appendChild(aboutTitle);
+    const aboutContent = document.createElement("div");
+    aboutContent.setAttribute("id", "guide-container")
+    aboutContent.innerHTML = `
+        
+        <div id="about-navigation">
+        <h2>Navigation</h2><hr>
+        At the top of the page you will find a navigation bar. Underneath
+         the title is the command that created this file. Below that, 
+        the full pathname of the currently hovered library item will be 
+        displayed. On the right side of the navigation is search.</div>
+        <div id="about-search">
+        <h2>Search</h2><hr>
+        The search at the right is a keyword search that will rank results
+         by the number of words that were matched regardless of order. You
+          can scroll through the results using the previous (^) and next (v) 
+          buttons to the right of the search box.  Usually the top results
+          will be the ones you are looking for.
+        </div>
+        <div id="about-insights">
+        <h2>Insights</h2><hr>
+        Below the navigation bar is a panel labeled "Insights". Click on it
+        to view a list of the ten paths that contain the most albums.  Each
+         entry displays how many albums and tracks it contains and what 
+         percentage of the total this accounts for. You may click on any of
+          these items to reveal them in the Explorer below.
+          </div>
+        <div id="about-explorer">
+        <h2>Explorer</h2><hr>
+        The Library Explorer is a file explorer that contains only the media
+        type that you are looking for.  Each folder is colored on a gradient
+        from light-cold-grey to dark-warm-grey that corresponds to the
+        percentage of albums that folder contains. Every folder 
+        will show details about its contents on hover and is expandable by
+        click. The menu icon (=) at the right is a context menu that gives you
+        the option to copy the full path or open the folder in a new tab for
+        previewing
+        </div>
+        
+        
+        `;
+    elements.about.appendChild(aboutContent);
 
     /*-------------------------------------------------------------------------
         Initialize state.
@@ -74,6 +120,9 @@ window.onload = () => {
             menuPos: { top: 0, right: 0 }
         },
         insights: {
+            expanded: false,
+        },
+        about: {
             expanded: false,
         }
     }
@@ -130,13 +179,25 @@ window.onload = () => {
         if (e.target.tagName !== "UL" &&
             !e.target.classList.contains('largest-folders') &&
             !e.target.closest("#insights-expander-button")) {
-            updateState({ type: "EXPANDER_CLICK" })
+            updateState({
+                type: "EXPANDER_CLICK",
+                div: "insights",
+                node: elements.insights
+            })
             return;
         }
         if (!e.target.classList.contains('largest-folders')) return;
         updateUi({
             type: "JUMP_TO_NODE",
             node: findFolder(e.target.dataset.fullPath)
+        })
+    }
+
+    elements.about.onclick = (e) => {
+        updateState({
+            type: "EXPANDER_CLICK",
+            div: "about",
+            node: elements.about
         })
     }
 
@@ -248,13 +309,19 @@ window.onload = () => {
                 updateUi({ type: "SHOW_HOVER_DETAILS" });
                 break;
             case "EXPANDER_CLICK":
-                if (state.insights.expanded) {
-                    updateUi({ type: "CLOSE_INSIGHTS" });
-                    state.insights.expanded = false;
+                if (state[action.div].expanded) {
+                    updateUi({
+                        type: "CLOSE_DIV",
+                        node: action.node
+                    });
+                    state[action.div].expanded = false;
                 }
                 else {
-                    updateUi({ type: "EXPAND_INSIGHTS" });
-                    state.insights.expanded = true;
+                    updateUi({
+                        type: "EXPAND_DIV",
+                        node: action.node
+                    });
+                    state[action.div].expanded = true;
                 }
                 break;
             default:
@@ -307,11 +374,11 @@ window.onload = () => {
                 state.explorer.hoverSelectedNode.querySelector(
                     ".hover-details").classList.remove('hidden');
                 break;
-            case "CLOSE_INSIGHTS":
-                elements.insights.classList.remove("expanded");
+            case "CLOSE_DIV":
+                action.node.classList.remove("expanded");
                 break;
-            case "EXPAND_INSIGHTS":
-                elements.insights.classList.add("expanded")
+            case "EXPAND_DIV":
+                action.node.classList.add("expanded")
                 break;
         }
     }

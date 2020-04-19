@@ -114,6 +114,15 @@ color: black;
     text-indent: 16px;
 }
 
+#guide-container {
+    display: flex;
+}
+
+#guide-container>div {
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
 .main {
     position: relative;
     top: 120px;
