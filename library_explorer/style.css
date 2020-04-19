@@ -32,6 +32,10 @@ border-bottom: solid;
     margin-bottom: 5px;
 }
 
+h4 {
+    margin: auto;
+}
+
 #full-path-display {
     padding-left: 26px;
     padding-bottom: 3px;
@@ -270,6 +274,7 @@ li {
 
 .insights, .guide {
     padding: 3px;
+    padding-left: 12px;
     border-radius: 12px;
     background-color: hsl(0, 0%, 80%);
     margin-top: 12px;
