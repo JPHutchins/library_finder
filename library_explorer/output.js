@@ -882,39 +882,42 @@ const helpContent = () => {
     <div id="about-navigation">
         <h2>navigation</h2>
         <div class="slide-open-text">
-            <hr>
+            
             At the top of the page you will find a navigation bar. Underneath
             the title is the command that created this file. Below that, 
             the full pathname of the currently hovered library item will be 
-            displayed. On the right side of the navigation is search.</div>
+            displayed. On the right side of the navigation is search.
         </div>
+        <hr>
     </div>
     <div id="about-search">
         <h2>search</h2>
         <div class="slide-open-text">
-            <hr>
+           
             The search at the right is a keyword search that will rank results
             by the number of words that were matched regardless of order. You
             can scroll through the results using the previous (^) and next (v) 
             buttons to the right of the search box.  Usually the top results
             will be the ones you are looking for.
         </div>
+        <hr>
     </div>
     <div id="about-insights">
         <h2>insights</h2>
         <div class="slide-open-text">
-            <hr>
+           
             Below the navigation bar is a panel labeled "Insights". Click on it
             to view a list of the ten paths that contain the most albums.  Each
             entry displays how many albums and tracks it contains and what 
             percentage of the total this accounts for. You may click on any of
             these items to reveal them in the Explorer below.
         </div>
+        <hr>
     </div>
     <div id="about-explorer">
         <h2>explorer</h2>
         <div class="slide-open-text">
-            <hr>
+           
             The Library Explorer is a file explorer that contains only the media
             type that you are looking for.  Each folder is colored on a gradient
             from light-cold-grey to dark-warm-grey that corresponds to the
@@ -924,6 +927,7 @@ const helpContent = () => {
             the option to copy the full path or open the folder in a new tab for
             previewing.
         </div>
+        <hr>
     </div>
     `;
     return helpContent;
