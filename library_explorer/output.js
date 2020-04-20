@@ -1,7 +1,9 @@
 window.onload = () => {
+
     /*-------------------------------------------------------------------------
         Add DOM elements and styling, initialize state, and set handlers.
     -------------------------------------------------------------------------*/
+
     const elements = {
         command: document.getElementById("command"),
         searchText: document.getElementById("search-text"),
@@ -50,78 +52,13 @@ window.onload = () => {
             })
         }
     )
-
-    const commandline = document.createElement("h3");
-    commandline.setAttribute("id", "command-subtitle");
-    commandline.innerText = "library_finder " + elements.command.dataset.command;
-    elements.commandSubtitleContainer.appendChild(commandline)
-
-    elements.help.innerHTML = "";
-    const helpTitle = document.createElement("h4");
-    elements.help.appendChild(helpTitle);
-    const helpContent = document.createElement("div");
-    helpContent.setAttribute("id", "guide-container")
-    helpContent.innerHTML = `
-        
-        <div id="about-navigation">
-        <h2>navigation</h2>
-        <div class="slide-open-text"><hr>
-        
-        At the top of the page you will find a navigation bar. Underneath
-         the title is the command that created this file. Below that, 
-        the full pathname of the currently hovered library item will be 
-        displayed. On the right side of the navigation is search.</div>
-        </div>
-        <div id="about-search">
-        <h2>search</h2>
-        <div class="slide-open-text"><hr>
-        The search at the right is a keyword search that will rank results
-         by the number of words that were matched regardless of order. You
-          can scroll through the results using the previous (^) and next (v) 
-          buttons to the right of the search box.  Usually the top results
-          will be the ones you are looking for.
-        </div>
-        </div>
-        <div id="about-insights">
-        <h2>insights</h2>
-        <div class="slide-open-text"><hr>
-        Below the navigation bar is a panel labeled "Insights". Click on it
-        to view a list of the ten paths that contain the most albums.  Each
-         entry displays how many albums and tracks it contains and what 
-         percentage of the total this accounts for. You may click on any of
-          these items to reveal them in the Explorer below.
-          </div>
-          </div>
-        <div id="about-explorer">
-        <h2>explorer</h2>
-        <div class="slide-open-text"><hr>
-        The Library Explorer is a file explorer that contains only the media
-        type that you are looking for.  Each folder is colored on a gradient
-        from light-cold-grey to dark-warm-grey that corresponds to the
-        percentage of albums that folder contains. Every folder 
-        will show details about its contents on hover and is expandable by
-        click. The menu icon (=) at the right is a context menu that gives you
-        the option to copy the full path or open the folder in a new tab for
-        previewing\
-        </div>
-        </div>
-        
-        
-        
-        `;
-    elements.help.appendChild(helpContent);
-    elements.help.querySelectorAll("h2").forEach((node) => {
-        node.onclick = (e) => {
-            updateState({
-                type: "CLICK_HELP_SECTION_TITLE",
-                node: e.target
-            })
-        }
-    })
+    elements.commandSubtitleContainer.appendChild(commandline(elements));
+    elements.help.appendChild(helpContent());
 
     /*-------------------------------------------------------------------------
         Initialize state.
     -------------------------------------------------------------------------*/
+
     const state = {
         search: {
             index: {},
@@ -148,19 +85,15 @@ window.onload = () => {
     /*-------------------------------------------------------------------------
         Initialize listeners.
     -------------------------------------------------------------------------*/
-    const getMenuButtonClickPos = (node, e) => {
-        parentRect = node.getBoundingClientRect()
-        const top = e.clientY + window.scrollY
-        const left = e.clientX
-        return {
-            top: top + "px",
-            left: left + "px"
-        }
-    }
 
-    const itemMenu = itemMenuMaker(
-        elements.libraryItemModal,
-        elements.libraryItemModal.getElementsByClassName("modal-menu-item"))
+    elements.help.querySelectorAll("h2").forEach((node) => {
+        node.onclick = (e) => {
+            updateState({
+                type: "CLICK_HELP_SECTION_TITLE",
+                node: e.target
+            })
+        }
+    })
 
     elements.libraryExplorer.onclick = (e) => {
         updateState({
@@ -192,32 +125,12 @@ window.onload = () => {
     }
 
     elements.insights.onclick = (e) => {
-        // if (e.target.tagName !== "UL" &&
-        //     !e.target.classList.contains('largest-folders') &&
-        //     !e.target.closest("#insights-expander-button")) {
-        //     updateState({
-        //         type: "EXPANDER_CLICK",
-        //         div: "insights",
-        //         node: elements.insights
-        //     })
-        //     return;
-        // }
         const _node = doesSomeParentBelong(e.target, "largest-folders");
         if (!_node) return;
         updateUi({
             type: "JUMP_TO_NODE",
             node: findFolder(_node.dataset.fullPath)
         })
-    }
-
-
-
-    elements.libraryExplorer.oncontextmenu = (e) => {
-        // e.preventDefault();
-        // updateState({
-        //     type: "RIGHT_CLICK",
-        //     event: e
-        // })
     }
 
     elements.disabler.onclick = (e) => {
@@ -246,8 +159,20 @@ window.onload = () => {
         }
 
     /*-------------------------------------------------------------------------
+        Initialize functions and constants that require context.
+    -------------------------------------------------------------------------*/
+
+    const itemMenu = itemMenuMaker(
+        elements.libraryItemModal,
+        elements.libraryItemModal.getElementsByClassName("modal-menu-item"))
+    // provide these functions with context... needs more thought...
+    const findAll = searchIndex(state)
+    const findFolder = makeFindFolder(elements)
+
+    /*-------------------------------------------------------------------------
         Handle changes to state.
     -------------------------------------------------------------------------*/
+
     const updateState = (action) => {
         switch (action.type) {
             case "NEW_QUERY":
@@ -303,14 +228,6 @@ window.onload = () => {
                 action.open ?
                     state.explorer.openFolders.add(action.node) :
                     state.explorer.openFolders.delete(action.node)
-                break;
-            case "RIGHT_CLICK":
-                // state.explorer.menuPos = getPosition(action.event)
-                // console.log(state.explorer.menuPos)
-                // updateUi({
-                //     type: "OPEN_ITEM_MENU",
-                //     node: state.explorer.hoverSelectedNode
-                // })
                 break;
             case "CLICK_ITEM_BUTTON":
                 state.explorer.menuPos = getMenuButtonClickPos(
@@ -400,24 +317,6 @@ window.onload = () => {
                 })
                 state.sidebar.openHelpSection = helpSection
                 break;
-                
-
-            // case "EXPANDER_CLICK":
-            //     if (state[action.div].expanded) {
-            //         updateUi({
-            //             type: "CLOSE_DIV",
-            //             node: action.node
-            //         });
-            //         state[action.div].expanded = false;
-            //     }
-            //     else {
-            //         updateUi({
-            //             type: "EXPAND_DIV",
-            //             node: action.node
-            //         });
-            //         state[action.div].expanded = true;
-            //     }
-            //     break;
             default:
                 return;
         }
@@ -426,6 +325,7 @@ window.onload = () => {
     /*-------------------------------------------------------------------------
         Handle changes to UI state.
     -------------------------------------------------------------------------*/
+
     const updateUi = (action) => {
         //console.log(action)
         switch (action.type) {
@@ -502,7 +402,7 @@ window.onload = () => {
             case "OPEN_HELP_TEXT":
                 if (!action.node) break;
                 const _openTarget = action.node.querySelector(".slide-open-text");
-                _openTarget.style.transitionDelay = 
+                _openTarget.style.transitionDelay =
                     state.sidebar.openHelpSection ? ".5s" : "0s";
                 _openTarget.style.maxHeight = "400px";
                 break;
@@ -512,6 +412,7 @@ window.onload = () => {
     /*-------------------------------------------------------------------------
         UI functions for interacting with DOM.
     -------------------------------------------------------------------------*/
+
     const ui_ToggleFolder = (node) => {
         return dropDownDirectory(node);
     }
@@ -559,9 +460,9 @@ window.onload = () => {
         }
     }
 
-    // provide these functions with context... needs more thought...
-    const findAll = searchIndex(state)
-    const findFolder = makeFindFolder(elements)
+    /*-------------------------------------------------------------------------
+      Initialize the UI.
+   -------------------------------------------------------------------------*/
 
     updateState({
         type: "FOLDER_CLICK",
@@ -572,6 +473,16 @@ window.onload = () => {
 /*-----------------------------------------------------------------------------
     Utility functions.
 -----------------------------------------------------------------------------*/
+
+const getMenuButtonClickPos = (node, e) => {
+    parentRect = node.getBoundingClientRect()
+    const top = e.clientY + window.scrollY
+    const left = e.clientX
+    return {
+        top: top + "px",
+        left: left + "px"
+    }
+}
 
 const doesSomeParentBelong = (node, className) => {
     if (!node) return false;
@@ -947,5 +858,66 @@ const createHamburgerMenu = () => {
 
     return menuIcon
 };
+
+const commandline = (elements) => {
+    const commandline = document.createElement("h3");
+    commandline.setAttribute("id", "command-subtitle");
+    commandline.innerText = "library_finder " + elements.command.dataset.command;
+    return commandline;
+}
+
+const helpContent = () => {
+    const helpContent = document.createElement("div");
+    helpContent.setAttribute("id", "guide-container")
+    helpContent.innerHTML = `
+    <div id="about-navigation">
+        <h2>navigation</h2>
+        <div class="slide-open-text">
+            <hr>
+            At the top of the page you will find a navigation bar. Underneath
+            the title is the command that created this file. Below that, 
+            the full pathname of the currently hovered library item will be 
+            displayed. On the right side of the navigation is search.</div>
+        </div>
+    </div>
+    <div id="about-search">
+        <h2>search</h2>
+        <div class="slide-open-text">
+            <hr>
+            The search at the right is a keyword search that will rank results
+            by the number of words that were matched regardless of order. You
+            can scroll through the results using the previous (^) and next (v) 
+            buttons to the right of the search box.  Usually the top results
+            will be the ones you are looking for.
+        </div>
+    </div>
+    <div id="about-insights">
+        <h2>insights</h2>
+        <div class="slide-open-text">
+            <hr>
+            Below the navigation bar is a panel labeled "Insights". Click on it
+            to view a list of the ten paths that contain the most albums.  Each
+            entry displays how many albums and tracks it contains and what 
+            percentage of the total this accounts for. You may click on any of
+            these items to reveal them in the Explorer below.
+        </div>
+    </div>
+    <div id="about-explorer">
+        <h2>explorer</h2>
+        <div class="slide-open-text">
+            <hr>
+            The Library Explorer is a file explorer that contains only the media
+            type that you are looking for.  Each folder is colored on a gradient
+            from light-cold-grey to dark-warm-grey that corresponds to the
+            percentage of albums that folder contains. Every folder 
+            will show details about its contents on hover and is expandable by
+            click. The menu icon (=) at the right is a context menu that gives you
+            the option to copy the full path or open the folder in a new tab for
+            previewing.
+        </div>
+    </div>
+    `;
+    return helpContent;
+}
 
 const linkedInIcon = `<svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" class="icon svg-inline--fa fa-linkedin fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg>`
