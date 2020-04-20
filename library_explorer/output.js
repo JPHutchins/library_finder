@@ -10,6 +10,7 @@ window.onload = () => {
         findNext: document.getElementById("find-next"),
         findPrevious: document.getElementById("find-previous"),
         commandSubtitleContainer: document.getElementById("command-subtitle-container"),
+        main: document.getElementsByClassName("main")[0],
         insights: document.getElementById("insights"),
         about: document.getElementsByClassName("guide")[0],
         disabler: document.getElementById("disabler"),
@@ -42,7 +43,8 @@ window.onload = () => {
         node.onclick = (e) => {
             updateState({
                 type: "CLICK_ITEM_BUTTON",
-                node: e.target
+                node: e.target,
+                event: e
             })
         }
     )
@@ -51,11 +53,6 @@ window.onload = () => {
     commandline.setAttribute("id", "command-subtitle");
     commandline.innerText = "library_finder " + elements.command.dataset.command;
     elements.commandSubtitleContainer.appendChild(commandline)
-
-    const expanderButton = document.createElement("span");
-    expanderButton.appendChild(menuIcon);
-    expanderButton.setAttribute('id', 'insights-expander-button');
-    elements.insights.insertBefore(expanderButton, elements.insights.children[0]);
 
     elements.about.innerHTML = "";
     const aboutTitle = document.createElement("h4");
@@ -135,13 +132,13 @@ window.onload = () => {
     /*-------------------------------------------------------------------------
         Initialize listeners.
     -------------------------------------------------------------------------*/
-    const getMenuButtonClickPos = (node) => {
+    const getMenuButtonClickPos = (node, e) => {
         parentRect = node.getBoundingClientRect()
-        const top = parentRect.top + window.pageYOffset
-        const right = window.innerWidth - parentRect.right
+        const top = e.clientY + window.scrollY
+        const left = e.clientX
         return {
-            top: top + 27 + "px",
-            right: right - 20 + "px"
+            top: top + "px",
+            left: left + "px"
         }
     }
 
@@ -163,7 +160,7 @@ window.onload = () => {
         })
     }
 
-    elements.libraryExplorer.onmouseover = (e) => {
+    document.onmouseover = (e) => {
         updateState({
             type: "CHANGE_HOVER_SELECTED_NODE",
             node: e.target
@@ -232,7 +229,6 @@ window.onload = () => {
         Handle changes to state.
     -------------------------------------------------------------------------*/
     const updateState = (action) => {
-        console.log(action);
         switch (action.type) {
             case "NEW_QUERY":
                 if (action.text === state.search.query) break;
@@ -298,8 +294,7 @@ window.onload = () => {
                 break;
             case "CLICK_ITEM_BUTTON":
                 state.explorer.menuPos = getMenuButtonClickPos(
-                    state.explorer.hoverSelectedNode);
-                console.log(state.explorer.menuPos);
+                    state.explorer.hoverSelectedNode, action.event);
                 updateUi({
                     type: "OPEN_ITEM_MENU",
                     node: state.explorer.hoverSelectedNode
@@ -307,14 +302,23 @@ window.onload = () => {
                 state.explorer.openMenu = state.explorer.hoverSelectedNode;
                 break;
             case "CHANGE_HOVER_SELECTED_NODE":
-                if (!action.node.classList.contains("library-item")) break;
-                updateUi({ type: "HIDE_HOVER_DETAILS" });
-                state.explorer.hoverSelectedNode = action.node;
-                state.explorer.hoverPath = getFullPath(
-                    state.explorer.hoverSelectedNode);
-                updateUi({ type: "CHANGE_HOVER_PATH" });
-                updateUi({ type: "SHOW_HOVER_DETAILS" });
-                break;
+                const _node = doesSomeParentBelong(action.node, "library-item");
+                if (!_node) {
+                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    state.explorer.hoverSelectedNode = null;
+                    state.explorer.hoverPath = "";
+                    updateUi({ type: "CHANGE_HOVER_PATH" });
+                    break;
+                }
+                else {
+                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    state.explorer.hoverSelectedNode = _node;
+                    state.explorer.hoverPath = getFullPath(
+                        state.explorer.hoverSelectedNode);
+                    updateUi({ type: "CHANGE_HOVER_PATH" });
+                    updateUi({ type: "SHOW_HOVER_DETAILS" });
+                    break;
+                }
             case "EXPANDER_CLICK":
                 if (state[action.div].expanded) {
                     updateUi({
@@ -340,7 +344,6 @@ window.onload = () => {
         Handle changes to UI state.
     -------------------------------------------------------------------------*/
     const updateUi = (action) => {
-        console.log(action);
         switch (action.type) {
             case "SCROLL_SEARCH":
                 ui_ScrollSearch();
@@ -362,7 +365,7 @@ window.onload = () => {
             case "OPEN_ITEM_MENU":
                 itemMenu(action.node);
                 elements.libraryItemModal.style.top = state.explorer.menuPos.top;
-                elements.libraryItemModal.style.right = state.explorer.menuPos.right;
+                elements.libraryItemModal.style.left = state.explorer.menuPos.left;
                 elements.libraryItemModal.classList.add("show-modal");
                 elements.disabler.style.visibility = 'visible';
                 // TODO: scroll into view if needed
@@ -372,20 +375,33 @@ window.onload = () => {
                 elements.disabler.style.visibility = 'hidden';
                 break;
             case "HIDE_HOVER_DETAILS":
-                if (state.explorer.hoverSelectedNode) {
-                    state.explorer.hoverSelectedNode.querySelector(
-                        ".hover-details").classList.add('hidden');
+                if (!state.explorer.hoverSelectedNode) break;
+                if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
+                    state.explorer.hoverSelectedNode.querySelector(".hover-details").classList.add('hidden');
                 }
                 break;
             case "SHOW_HOVER_DETAILS":
-                state.explorer.hoverSelectedNode.querySelector(
-                    ".hover-details").classList.remove('hidden');
+                if (!state.explorer.hoverSelectedNode) break;
+                if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
+                    state.explorer.hoverSelectedNode.querySelector(
+                        ".hover-details").classList.remove('hidden');
+                }
                 break;
             case "CLOSE_DIV":
-                action.node.classList.add("hidden");
+                action.node.classList.add("height-zero");
+                action.node.style.transitionDelay = '0.5s';
+                action.node.style.visibility = 'hidden';
+                action.node.style.height = "0px";
+                elements.navbar.style.height = '130px';
+                elements.main.style.marginTop = '130px';
                 break;
             case "EXPAND_DIV":
-                action.node.classList.remove("hidden")
+                action.node.classList.remove("height-zero")
+                action.node.style.transitionDelay = '.2s';
+                action.node.style.visibility = 'visible';
+                action.node.style.height = "auto";
+                elements.navbar.style.height = '480px';
+                elements.main.style.marginTop = '480px';
                 break;
         }
     }
@@ -453,6 +469,13 @@ window.onload = () => {
 /*-----------------------------------------------------------------------------
     Utility functions.
 -----------------------------------------------------------------------------*/
+
+const doesSomeParentBelong = (node, className) => {
+    if (!node) return false;
+    if (node.classList.contains(className)) return node;
+    return node.parentElement &&
+        doesSomeParentBelong(node.parentElement, className);
+}
 
 const searchIndex = (state) => (query) => {
     const index = state.search.index;
@@ -573,7 +596,6 @@ const flashNode = (node) => {
     const colorEdit = node.dataset.backgroundColor.slice(
         0, node.dataset.backgroundColor.indexOf(","))
     node.style.backgroundColor = colorEdit + ", 75%, 75%)"
-    console.log(colorEdit)
 }
 
 const highlightNode = (node) => {
@@ -772,8 +794,6 @@ const itemMenuMaker = (menu, menuItems) => (node) => {
 // helper function to get an element's exact position
 function getPosition(event) {
     let el = event.target
-
-    console.log(event.clientX)
 
     var xPosition = 0;
     var yPosition = 0;

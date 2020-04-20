@@ -1,20 +1,25 @@
 html {
     font-family: sans-serif;
     background-color: hsl(0, 0%, 20%);
+    margin: 0;
+}
+
+body {
+    margin: 0;
 }
 
 /* The navigation bar */
 .navbar {
-overflow: hidden;
 background-color: white;
+overflow: hidden;
 opacity: 1;
-height: auto;
-min-height: 130px;
+height: 70px;
 position: fixed; /* Set the navbar to fixed position */
 top: 0; /* Position the navbar at the top of the page */
 left: 0;
 width: 100%; /* Full width */
-z-index: 2;
+z-index: 101;
+transition: height .5s;
 }
 
 #nav-header {
@@ -68,6 +73,7 @@ h4 {
 }
 
 #full-path-display {
+    height: 20px;
     padding-left: 26px;
     padding-bottom: 3px;
 }
@@ -150,9 +156,9 @@ color: black;
 }
 
 .main {
-    position: relative;
     top: 120px;
-    width: 100%
+    width: 100%;
+    transition: margin-top .5s;
 }
 
 ul {
@@ -206,14 +212,12 @@ li {
 }
 
 .hover-details {
-    float: right;
+    margin-left: 26px;
     font-size: small;
-    font-weight: bold;
     padding: 1px;
     height: auto;
     width: auto;
 }
-
 
 .album:before {
       content: '';
@@ -305,33 +309,32 @@ li {
 }
 
 #library-explorer {
-    top: 120px;
+    top: auto;
+    position: relative;
     padding-right: 18px;
     margin: auto;
+    z-index: 1;
 }
 
 .insights-and-guide-container {
     display: flex;
-    flex-direction: column;
-    padding-bottom: 6px;  
-    padding-left: 18px;
-    padding-right: 18px; 
+    flex-direction: column; 
 }
+
+
 
 .insights, .guide {
-    padding: 3px;
     padding-left: 12px;
-    border-radius: 12px;
-    background-color: hsl(0, 0%, 80%);
-    margin-top: 12px;
-    height: 20px;
+    background-color:white;
     overflow: hidden;
     cursor: pointer;
+    z-index: 3;
+    visibility: hidden;
+    transition: visibility .5s;
+    transition: height .5s;
+    transition-delay: .5s;
 }
 
-.insights:hover, .guide:hover {
-    box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
-}
 
 #insights-expander-button {
     float: right;
@@ -348,8 +351,7 @@ li {
 }
 
 .largest-folders {
-    transition: background-color 1s linear;
-    font-weight: bold;
+    font-weight: normal;
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 3px;
