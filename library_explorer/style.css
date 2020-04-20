@@ -13,13 +13,12 @@ body {
 background-color: white;
 overflow: hidden;
 opacity: 1;
-height: 70px;
+height: 130px;
 position: fixed; /* Set the navbar to fixed position */
 top: 0; /* Position the navbar at the top of the page */
 left: 0;
 width: 100%; /* Full width */
 z-index: 101;
-transition: height .5s;
 }
 
 #nav-header {
@@ -42,9 +41,14 @@ transition: height .5s;
     margin-bottom: 5px;
     color: white;
     padding: 4px;
+    padding-bottom: 12px;
     padding-left: 26px;
     background-color: hsl(0, 0%, 20%);
+    transition: padding-left .5s;
+    border-radius: 0 12px 0 0;
+
 }
+
 
 #nav-menu {
     display: flex;
@@ -143,6 +147,7 @@ color: black;
 
 #guide-container {
     display: flex;
+    flex-direction: column;
 }
 
 #guide-container>div {
@@ -156,9 +161,11 @@ color: black;
 }
 
 .main {
-    top: 120px;
+    display: flex;
+    flex-direction: column;
+    top: 130px;
     width: 100%;
-    transition: margin-top .5s;
+    transition: margin-left .5s;
 }
 
 ul {
@@ -213,6 +220,7 @@ li {
 
 .hover-details {
     margin-left: 26px;
+    font-weight: bold;
     font-size: small;
     padding: 1px;
     height: auto;
@@ -312,11 +320,15 @@ li {
     top: auto;
     position: relative;
     padding-right: 18px;
-    margin: auto;
+    width: 100%;
+    margin-top: 130px;
+    margin-left:0px;
+    margin-right:0px;
     z-index: 1;
+    transition: margin-left .5s;
 }
 
-.insights-and-guide-container {
+.insights-and-guide-container {  
     display: flex;
     flex-direction: column; 
 }
@@ -324,15 +336,23 @@ li {
 
 
 .insights, .guide {
-    padding-left: 12px;
+    border-radius: 0 12px 12px 0;
+    padding-top: 3px;
+    font-size: small;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
     background-color:white;
     overflow: hidden;
-    cursor: pointer;
+    word-wrap: none;
     z-index: 3;
+    width: 400px;
     visibility: hidden;
-    transition: visibility .5s;
-    transition: height .5s;
-    transition-delay: .5s;
+    transition: width .5s;
+    transition: visibility 0s;
+    margin-top: 136px;
+    height: 100vh;
 }
 
 
@@ -351,11 +371,9 @@ li {
 }
 
 .largest-folders {
-    font-weight: normal;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 3px;
-    margin-bottom:3px;
+    display: block;
+    font-weight: bold;
+   
 }
 
 .largest-folders:hover {
@@ -364,11 +382,8 @@ li {
 }
 
 .largest-folders>span {
-    visibility: visible;
     font-weight: normal;
-    margin-left: 20px;
-    float: right;
-    white-space: nowrap;
+    overflow: hidden;
 }
 
 .current-search-result {

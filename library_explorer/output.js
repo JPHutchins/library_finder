@@ -12,7 +12,7 @@ window.onload = () => {
         commandSubtitleContainer: document.getElementById("command-subtitle-container"),
         main: document.getElementsByClassName("main")[0],
         insights: document.getElementById("insights"),
-        about: document.getElementsByClassName("guide")[0],
+        help: document.getElementsByClassName("guide")[0],
         disabler: document.getElementById("disabler"),
         fullPathDisplay: document.getElementById("full-path-display"),
         searchResults: document.getElementById("search-results"),
@@ -37,6 +37,8 @@ window.onload = () => {
     document.querySelectorAll(".largest-folders").forEach((elem) => {
         styleTheListElement(elem, rootInfo);
         const details = hoverDetails(elem, menuIcon, rootInfo)
+        newBr = document.createElement("br");
+        elem.appendChild(newBr)
         elem.appendChild(details);
     });
     elements.libraryExplorer.querySelectorAll(".library-item-menu-button").forEach((node) =>
@@ -54,13 +56,13 @@ window.onload = () => {
     commandline.innerText = "library_finder " + elements.command.dataset.command;
     elements.commandSubtitleContainer.appendChild(commandline)
 
-    elements.about.innerHTML = "";
-    const aboutTitle = document.createElement("h4");
-    aboutTitle.innerHTML = "About";
-    elements.about.appendChild(aboutTitle);
-    const aboutContent = document.createElement("div");
-    aboutContent.setAttribute("id", "guide-container")
-    aboutContent.innerHTML = `
+    elements.help.innerHTML = "";
+    const helpTitle = document.createElement("h4");
+    helpTitle.innerHTML = "Help";
+    elements.help.appendChild(helpTitle);
+    const helpContent = document.createElement("div");
+    helpContent.setAttribute("id", "guide-container")
+    helpContent.innerHTML = `
         
         <div id="about-navigation">
         <h2>Navigation</h2><hr>
@@ -99,7 +101,7 @@ window.onload = () => {
         
         
         `;
-    elements.about.appendChild(aboutContent);
+    elements.help.appendChild(helpContent);
 
     /*-------------------------------------------------------------------------
         Initialize state.
@@ -119,12 +121,10 @@ window.onload = () => {
             openMenu: null,
             menuPos: { top: 0, right: 0 }
         },
-        insights: {
+        sidebar: {
             expanded: false,
+            content: null
         },
-        about: {
-            expanded: false,
-        }
     }
 
     setTimeout(() => indexForSearch(elements.libraryExplorer, state.search.index), 0);
@@ -176,30 +176,25 @@ window.onload = () => {
     }
 
     elements.insights.onclick = (e) => {
-        if (e.target.tagName !== "UL" &&
-            !e.target.classList.contains('largest-folders') &&
-            !e.target.closest("#insights-expander-button")) {
-            updateState({
-                type: "EXPANDER_CLICK",
-                div: "insights",
-                node: elements.insights
-            })
-            return;
-        }
-        if (!e.target.classList.contains('largest-folders')) return;
+        // if (e.target.tagName !== "UL" &&
+        //     !e.target.classList.contains('largest-folders') &&
+        //     !e.target.closest("#insights-expander-button")) {
+        //     updateState({
+        //         type: "EXPANDER_CLICK",
+        //         div: "insights",
+        //         node: elements.insights
+        //     })
+        //     return;
+        // }
+        const _node = doesSomeParentBelong(e.target, "largest-folders");
+        if (!_node) return;
         updateUi({
             type: "JUMP_TO_NODE",
-            node: findFolder(e.target.dataset.fullPath)
+            node: findFolder(_node.dataset.fullPath)
         })
     }
 
-    elements.about.onclick = (e) => {
-        updateState({
-            type: "EXPANDER_CLICK",
-            div: "about",
-            node: elements.about
-        })
-    }
+
 
     elements.libraryExplorer.oncontextmenu = (e) => {
         // e.preventDefault();
@@ -219,9 +214,18 @@ window.onload = () => {
     document.getElementById(
         "insights-button").onclick = (e) => {
             updateState({
-                type: "EXPANDER_CLICK",
-                div: "insights",
+                type: "CHANGE_SIDEBAR_CONTENT",
+                div: "sidebar",
                 node: elements.insights
+            })
+        }
+
+    document.getElementById(
+        "help-button").onclick = (e) => {
+            updateState({
+                type: "CHANGE_SIDEBAR_CONTENT",
+                div: "sidebar",
+                node: elements.help
             })
         }
 
@@ -319,6 +323,48 @@ window.onload = () => {
                     updateUi({ type: "SHOW_HOVER_DETAILS" });
                     break;
                 }
+            case "CHANGE_SIDEBAR_CONTENT":
+                if (action.node == state.sidebar.content) {
+                    if (state[action.div].expanded) {
+                        updateUi({
+                            type: "CLOSE_DIV",
+                            node: action.node
+                        });
+                        state[action.div].expanded = false;
+                        state.sidebar.content = action.node;
+                        break;
+                    }
+                    else {
+                        updateUi({
+                            type: "EXPAND_DIV",
+                            node: action.node
+                        });
+                        state[action.div].expanded = true;
+                        state.sidebar.content = action.node;
+                        break;
+                    }
+                }
+
+                else if (state[action.div].expanded) {
+                    updateUi({
+                        type: "CHANGE_CONTENT",
+                        old: state.sidebar.content,
+                        node: action.node
+                    });
+                    state.sidebar.content = action.node;
+                    state[action.div].expanded = true;
+                    break;
+                }
+                else {
+                    updateUi({
+                        type: "EXPAND_DIV",
+                        node: action.node
+                    });
+                    state[action.div].expanded = true;
+                    state.sidebar.content = action.node;
+                    break;
+                }
+
             case "EXPANDER_CLICK":
                 if (state[action.div].expanded) {
                     updateUi({
@@ -344,6 +390,7 @@ window.onload = () => {
         Handle changes to UI state.
     -------------------------------------------------------------------------*/
     const updateUi = (action) => {
+        console.log(action)
         switch (action.type) {
             case "SCROLL_SEARCH":
                 ui_ScrollSearch();
@@ -388,20 +435,26 @@ window.onload = () => {
                 }
                 break;
             case "CLOSE_DIV":
-                action.node.classList.add("height-zero");
-                action.node.style.transitionDelay = '0.5s';
+
+                elements.main.style.marginLeft = '0px';
+                //elements.commandSubtitleContainer.children[0].style.paddingLeft = '26px';
+                elements.libraryExplorer.style.marginLeft = "0px";
+                action.node.style.transitionDelay = '0s'
                 action.node.style.visibility = 'hidden';
-                action.node.style.height = "0px";
-                elements.navbar.style.height = '130px';
-                elements.main.style.marginTop = '130px';
                 break;
             case "EXPAND_DIV":
-                action.node.classList.remove("height-zero")
-                action.node.style.transitionDelay = '.2s';
+                action.node.style.transitionDelay = '.5s'
                 action.node.style.visibility = 'visible';
-                action.node.style.height = "auto";
-                elements.navbar.style.height = '480px';
-                elements.main.style.marginTop = '480px';
+                //elements.commandSubtitleContainer.children[0].style.paddingLeft = '426px';
+                elements.libraryExplorer.style.marginLeft = "400px";
+                break;
+            case "CHANGE_CONTENT":
+                if (action.old) {
+                    action.old.style.transitionDelay = '0s';
+                    action.old.style.visibility = "hidden";
+                }
+                action.node.style.transitionDelay = '0s';
+                action.node.style.visibility = 'visible';
                 break;
         }
     }
