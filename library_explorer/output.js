@@ -14,7 +14,7 @@ window.onload = () => {
         commandSubtitleContainer: document.getElementById("command-subtitle-container"),
         main: document.getElementsByClassName("main")[0],
         insights: document.getElementById("insights"),
-        help: document.getElementsByClassName("guide")[0],
+        help: document.getElementById("help"),
         disabler: document.getElementById("disabler"),
         fullPathDisplay: document.getElementById("full-path-display"),
         searchResults: document.getElementById("search-results"),
@@ -155,6 +155,15 @@ window.onload = () => {
                 type: "CHANGE_SIDEBAR_CONTENT",
                 div: "sidebar",
                 node: elements.help
+            })
+        }
+
+    document.getElementById(
+        "about-button").onclick = (e) => {
+            updateState({
+                type: "CHANGE_SIDEBAR_CONTENT",
+                div: "sidebar",
+                node: elements.about
             })
         }
 
