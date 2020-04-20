@@ -13,7 +13,7 @@ body {
 background-color: white;
 overflow: hidden;
 opacity: 1;
-height: 130px;
+height: 120px;
 position: fixed; /* Set the navbar to fixed position */
 top: 0; /* Position the navbar at the top of the page */
 left: 0;
@@ -26,11 +26,14 @@ z-index: 101;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin-top: 12px;
+    margin-bottom: 6px;
 }
 
 #title {
     letter-spacing: .117em;
     padding-left: 26px;
+    margin: 0;
 }
 
 #command-subtitle {
@@ -194,7 +197,7 @@ li {
     padding-left: 8px;
     padding-right: 25px;
     border-width: 1px;
-    margin-top: 3px;
+    margin-bottom: 3px;
     z-index: 0;
 }
 
@@ -320,7 +323,7 @@ li {
     top: auto;
     position: relative;
     padding-right: 18px;
-    margin-top: 130px;
+    margin-top: 120px;
     margin-left:0px;
     z-index: 1;
     transition: margin-left .5s;
@@ -349,7 +352,7 @@ li {
     visibility: hidden;
     transition: width .5s;
     transition: visibility 0s;
-    margin-top: 136px;
+    margin-top: 126px;
     height: 100vh;
 }
 
