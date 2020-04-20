@@ -320,10 +320,8 @@ li {
     top: auto;
     position: relative;
     padding-right: 18px;
-    width: 100%;
     margin-top: 130px;
     margin-left:0px;
-    margin-right:0px;
     z-index: 1;
     transition: margin-left .5s;
 }
