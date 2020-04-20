@@ -58,36 +58,43 @@ window.onload = () => {
 
     elements.help.innerHTML = "";
     const helpTitle = document.createElement("h4");
-    helpTitle.innerHTML = "Help";
     elements.help.appendChild(helpTitle);
     const helpContent = document.createElement("div");
     helpContent.setAttribute("id", "guide-container")
     helpContent.innerHTML = `
         
         <div id="about-navigation">
-        <h2>Navigation</h2><hr>
+        <h2>navigation</h2>
+        <div class="slide-open-text"><hr>
+        
         At the top of the page you will find a navigation bar. Underneath
          the title is the command that created this file. Below that, 
         the full pathname of the currently hovered library item will be 
         displayed. On the right side of the navigation is search.</div>
+        </div>
         <div id="about-search">
-        <h2>Search</h2><hr>
+        <h2>search</h2>
+        <div class="slide-open-text"><hr>
         The search at the right is a keyword search that will rank results
          by the number of words that were matched regardless of order. You
           can scroll through the results using the previous (^) and next (v) 
           buttons to the right of the search box.  Usually the top results
           will be the ones you are looking for.
         </div>
+        </div>
         <div id="about-insights">
-        <h2>Insights</h2><hr>
+        <h2>insights</h2>
+        <div class="slide-open-text"><hr>
         Below the navigation bar is a panel labeled "Insights". Click on it
         to view a list of the ten paths that contain the most albums.  Each
          entry displays how many albums and tracks it contains and what 
          percentage of the total this accounts for. You may click on any of
           these items to reveal them in the Explorer below.
           </div>
+          </div>
         <div id="about-explorer">
-        <h2>Explorer</h2><hr>
+        <h2>explorer</h2>
+        <div class="slide-open-text"><hr>
         The Library Explorer is a file explorer that contains only the media
         type that you are looking for.  Each folder is colored on a gradient
         from light-cold-grey to dark-warm-grey that corresponds to the
@@ -95,13 +102,22 @@ window.onload = () => {
         will show details about its contents on hover and is expandable by
         click. The menu icon (=) at the right is a context menu that gives you
         the option to copy the full path or open the folder in a new tab for
-        previewing
+        previewing\
+        </div>
         </div>
         
         
         
         `;
     elements.help.appendChild(helpContent);
+    elements.help.querySelectorAll("h2").forEach((node) => {
+        node.onclick = (e) => {
+            updateState({
+                type: "CLICK_HELP_SECTION_TITLE",
+                node: e.target
+            })
+        }
+    })
 
     /*-------------------------------------------------------------------------
         Initialize state.
@@ -364,23 +380,44 @@ window.onload = () => {
                     state.sidebar.content = action.node;
                     break;
                 }
-
-            case "EXPANDER_CLICK":
-                if (state[action.div].expanded) {
+            case "CLICK_HELP_SECTION_TITLE":
+                const helpSection = action.node.parentElement;
+                if (helpSection == state.sidebar.openHelpSection) {
                     updateUi({
-                        type: "CLOSE_DIV",
-                        node: action.node
-                    });
-                    state[action.div].expanded = false;
+                        type: "CLOSE_HELP_TEXT",
+                        node: helpSection
+                    })
+                    state.sidebar.openHelpSection = null;
+                    break;
                 }
-                else {
-                    updateUi({
-                        type: "EXPAND_DIV",
-                        node: action.node
-                    });
-                    state[action.div].expanded = true;
-                }
+                updateUi({
+                    type: "CLOSE_HELP_TEXT",
+                    node: state.sidebar.openHelpSection
+                })
+                updateUi({
+                    type: "OPEN_HELP_TEXT",
+                    node: helpSection
+                })
+                state.sidebar.openHelpSection = helpSection
                 break;
+                
+
+            // case "EXPANDER_CLICK":
+            //     if (state[action.div].expanded) {
+            //         updateUi({
+            //             type: "CLOSE_DIV",
+            //             node: action.node
+            //         });
+            //         state[action.div].expanded = false;
+            //     }
+            //     else {
+            //         updateUi({
+            //             type: "EXPAND_DIV",
+            //             node: action.node
+            //         });
+            //         state[action.div].expanded = true;
+            //     }
+            //     break;
             default:
                 return;
         }
@@ -390,7 +427,7 @@ window.onload = () => {
         Handle changes to UI state.
     -------------------------------------------------------------------------*/
     const updateUi = (action) => {
-        console.log(action)
+        //console.log(action)
         switch (action.type) {
             case "SCROLL_SEARCH":
                 ui_ScrollSearch();
@@ -455,6 +492,19 @@ window.onload = () => {
                 }
                 action.node.style.transitionDelay = '0s';
                 action.node.style.visibility = 'visible';
+                break;
+            case "CLOSE_HELP_TEXT":
+                if (!action.node) break;
+                const _closeTarget = action.node.querySelector(".slide-open-text");
+                _closeTarget.style.transitionDelay = "0s"
+                _closeTarget.style.maxHeight = "0px";
+                break;
+            case "OPEN_HELP_TEXT":
+                if (!action.node) break;
+                const _openTarget = action.node.querySelector(".slide-open-text");
+                _openTarget.style.transitionDelay = 
+                    state.sidebar.openHelpSection ? ".5s" : "0s";
+                _openTarget.style.maxHeight = "400px";
                 break;
         }
     }

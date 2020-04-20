@@ -60,7 +60,8 @@ z-index: 101;
     align-items: center;
 }
 
-.nav-menu-button {
+.nav-menu-button,  #guide-container>div>h2{
+    font-weight: normal;
     font-size: large;
     letter-spacing: .1em;
     padding: 12px;
@@ -69,9 +70,14 @@ z-index: 101;
     -webkit-user-select: none;
 }
 
-.nav-menu-button:hover {
+.nav-menu-button:hover, #guide-container>div>h2:hover {
     cursor: pointer;
     background-color: hsl(0, 0%, 80%);
+
+}
+
+#guide-container>div>h2{
+    margin: 0px;
 
 }
 
@@ -210,6 +216,13 @@ li {
 .library-item-menu-button:hover {
     background-color: rgba(105, 105, 105, 0.507);
     box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
+}
+
+.slide-open-text {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .5s;
+    transition-delay: 0s;
 }
 
 .hidden {
