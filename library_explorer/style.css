@@ -60,7 +60,7 @@ z-index: 101;
     align-items: center;
 }
 
-.nav-menu-button,  #guide-container>div>h2{
+.nav-menu-button,  #guide-container>div>h2, #help-container>div>h2{
     font-weight: normal;
     font-size: large;
     letter-spacing: .1em;
@@ -157,16 +157,18 @@ color: black;
 #guide-container {
     display: flex;
     flex-direction: column;
+   
 }
 
-#guide-container>div {
+#guide-container>div, #help-container>div {
     padding-left: 18px;
     padding-right: 18px;
+   
 }
 
 .icon {
-    height: 280px;
-    width: 280px;
+    height: 30px;
+    width: 30px;
 }
 
 .main {
@@ -358,7 +360,7 @@ li {
     top: 0;
     left: 0;
     background-color:white;
-    overflow: hidden;
+    overflow:auto;
     word-wrap: none;
     z-index: 3;
     width: 400px;
@@ -475,3 +477,18 @@ li {
      visibility: hidden;
      z-index: 99;
  }
+
+ #icon-container {
+     padding-top: 20px;
+ }
+
+ footer {
+     color: white;
+     text-align: center;
+     position: relative;
+     bottom: 0;
+     width: 100%;
+ }
+
+ 
+ 
