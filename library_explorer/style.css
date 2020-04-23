@@ -357,6 +357,14 @@ li {
     flex-direction: column; 
 }
 
+#insights>ul {
+    padding: 6px;
+}
+
+#insights>p {
+    text-align: center;
+}
+
 
 
 .insights, .guide {
