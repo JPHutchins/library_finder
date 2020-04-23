@@ -87,10 +87,14 @@ z-index: 101;
     margin: 0px;
 }
 
-#about-container>div
+#about-container>div:last-of-type {
+    color: black;
+    text-align: center;
+}
 
 #about-container>div>a {
     color: black;
+    text-align: center;
 }
 
 h4 {
