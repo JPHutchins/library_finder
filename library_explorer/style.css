@@ -3,6 +3,8 @@ html {
     background-color: hsl(0, 0%, 20%);
     margin: 0;
     height: 100%;
+    overflow: -moz-scrollbars-vertical; 
+    overflow-y: scroll;
 }
 
 body {
