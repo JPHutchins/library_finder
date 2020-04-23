@@ -338,7 +338,7 @@ li {
 
 
 .fade ul {
-    transition: all .1s ease-in;
+    /* transition: height .1s ease-in; */
     height: 0;
    
   }
@@ -357,7 +357,6 @@ li {
     margin-top: 120px;
     margin-left:0px;
     z-index: 1;
-    transition: margin-left .5s;
 }
 
 .insights-and-guide-container {  
@@ -389,8 +388,6 @@ li {
     z-index: 3;
     width: 400px;
     visibility: hidden;
-    transition: width .5s;
-    transition: visibility 0s;
     margin-top: 126px;
     height: 100vh;
 }

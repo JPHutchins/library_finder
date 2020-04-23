@@ -385,25 +385,18 @@ window.onload = () => {
                 }
                 break;
             case "CLOSE_DIV":
-
                 elements.main.style.marginLeft = '0px';
-                //elements.commandSubtitleContainer.children[0].style.paddingLeft = '26px';
                 elements.libraryExplorer.style.marginLeft = "0px";
-                action.node.style.transitionDelay = '0s'
                 action.node.style.visibility = 'hidden';
                 break;
             case "EXPAND_DIV":
-                action.node.style.transitionDelay = '.5s'
                 action.node.style.visibility = 'visible';
-                //elements.commandSubtitleContainer.children[0].style.paddingLeft = '426px';
                 elements.libraryExplorer.style.marginLeft = "400px";
                 break;
             case "CHANGE_CONTENT":
                 if (action.old) {
-                    action.old.style.transitionDelay = '0s';
                     action.old.style.visibility = "hidden";
                 }
-                action.node.style.transitionDelay = '0s';
                 action.node.style.visibility = 'visible';
                 break;
             case "CLOSE_HELP_TEXT":
