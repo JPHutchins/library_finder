@@ -13,6 +13,7 @@ window.onload = () => {
         findPrevious: document.getElementById("find-previous"),
         commandSubtitleContainer: document.getElementById("command-subtitle-container"),
         main: document.getElementsByClassName("main")[0],
+        explorerContainer: document.getElementById("explorer-container"),
         insights: document.getElementById("insights"),
         help: document.getElementById("help"),
         about: document.getElementById("about"),
@@ -416,12 +417,12 @@ window.onload = () => {
                 break;
             case "CLOSE_DIV":
                 elements.main.style.marginLeft = '0px';
-                elements.libraryExplorer.style.marginLeft = "0px";
+                elements.explorerContainer.style.marginLeft = "0px";
                 action.node.style.visibility = 'hidden';
                 break;
             case "EXPAND_DIV":
                 action.node.style.visibility = 'visible';
-                elements.libraryExplorer.style.marginLeft = "400px";
+                elements.explorerContainer.style.marginLeft = "400px";
                 break;
             case "CHANGE_CONTENT":
                 if (action.old) {

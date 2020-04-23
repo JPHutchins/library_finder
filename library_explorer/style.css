@@ -194,7 +194,14 @@ code {
     flex-direction: column;
     top: 130px;
     width: 100%;
-    transition: margin-left .5s;
+}
+
+#explorer-container {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin-left: 0px;
 }
 
 ul {
