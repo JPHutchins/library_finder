@@ -619,7 +619,7 @@ const scrollToNode = (node) => {
 const flashNode = (node) => {
     if (!node) return;
     setTimeout(
-        () => node.style.background = node.dataset.backgroundColor, 5000)
+        () => node.style.background = node.dataset.backgroundColor, 2000)
     const colorEdit = node.dataset.backgroundColor.slice(
         0, node.dataset.backgroundColor.indexOf(","))
     node.style.backgroundColor = colorEdit + ", 75%, 75%)"
