@@ -42,20 +42,23 @@ z-index: 101;
     margin: 0;
 }
 
-#command-subtitle {
+#command-subtitle-container {
+    position: fixed;
+    top: 99px;
     letter-spacing: .01em;
-    font-size: large;
     font-family: monospace;
-    margin-top: 5px;
-    margin-bottom: 5px;
     color: white;
     padding: 4px;
-    padding-bottom: 12px;
     padding-left: 26px;
     background-color: hsl(0, 0%, 20%);
-    transition: padding-left .5s;
     border-radius: 0 12px 0 0;
+    z-index: 102;
+    width: 100%;
+    margin: 0;
+}
 
+#command-subtitle {
+    margin: 0;
 }
 
 
@@ -84,6 +87,7 @@ z-index: 101;
     background-color: hsl(0, 0%, 80%);
 
 }
+
 
 #guide-container>div>h2, #about-container>div>h2 {
     margin: 0px;
@@ -200,8 +204,8 @@ code {
     flex: 1 0 auto;
     display: flex;
     flex-direction: column;
-    height: 100%;
     margin-left: 0px;
+    margin-top: 126px;
 }
 
 ul {
@@ -368,14 +372,14 @@ li {
     top: auto;
     position: relative;
     padding-right: 18px;
-    margin-top: 120px;
+    margin-top: 0;
     margin-left:0px;
     z-index: 1;
 }
 
 .insights-and-guide-container {  
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
 
 #insights>ul {
@@ -404,6 +408,9 @@ li {
     visibility: hidden;
     margin-top: 126px;
     height: 100vh;
+    border: solid;
+    border-width: 3px;
+    border-color:  hsl(0, 0%, 20%);
 }
 
 
