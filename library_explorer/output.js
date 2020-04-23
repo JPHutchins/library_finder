@@ -70,6 +70,8 @@ window.onload = () => {
             results: [],
             resultsText: "",
             i: 0,
+            enableNext: false,
+            enablePrevious: false
         },
         explorer: {
             hoverPath: "",
@@ -202,6 +204,7 @@ window.onload = () => {
                     state.search.results);
                 state.search.i = 0;
                 updateUi({ type: "SCROLL_SEARCH" });
+                updateState({ type: "UPDATE_BUTTON_STATES" });
                 break;
             case "FIND_NEXT":
                 if (state.search.i < state.search.results.length - 1) {
@@ -213,7 +216,7 @@ window.onload = () => {
                         state.search.results);
                     updateUi({ type: "SCROLL_SEARCH" });
                 }
-                // if == length disable the up button
+                updateState({ type: "UPDATE_BUTTON_STATES" });
                 break;
             case "FIND_PREVIOUS":
                 if (state.search.i > 0) {
@@ -225,7 +228,34 @@ window.onload = () => {
                         state.search.results);
                     updateUi({ type: "SCROLL_SEARCH" });
                 }
-                // if == 0 disable the down button
+                updateState({ type: "UPDATE_BUTTON_STATES" });
+                break;
+            case "UPDATE_BUTTON_STATES":
+                updateButtonState(state);
+                if (state.search.enableNext) {
+                    updateUi({
+                        type: "ENABLE_BUTTON",
+                        node: elements.findNext
+                    })
+                }
+                else {
+                    updateUi({
+                        type: "DISABLE_BUTTON",
+                        node: elements.findNext
+                    })
+                }
+                if (state.search.enablePrevious) {
+                    updateUi({
+                        type: "ENABLE_BUTTON",
+                        node: elements.findPrevious
+                    })
+                }
+                else {
+                    updateUi({
+                        type: "DISABLE_BUTTON",
+                        node: elements.findPrevious
+                    })
+                }
                 break;
             case "FOLDER_CLICK":
                 let node = action.node;
@@ -412,6 +442,18 @@ window.onload = () => {
                     state.sidebar.openHelpSection ? ".5s" : "0s";
                 _openTarget.style.maxHeight = "400px";
                 break;
+            case "DISABLE_BUTTON":
+                action.node.classList.remove("hover-button");
+                action.node.classList.remove("click-button");
+                action.node.style.borderColor = "hsl(0, 0%, 90%)";
+                action.node.disabled = true;
+                break;
+            case "ENABLE_BUTTON":
+                action.node.classList.add("hover-button");
+                action.node.classList.add("click-button");
+                action.node.style.borderColor = "black";
+                action.node.disabled = false;
+                break;
         }
     }
 
@@ -474,11 +516,37 @@ window.onload = () => {
         type: "FOLDER_CLICK",
         node: elements.libraryExplorer.children[0]
     });
+    updateState({ type: "UPDATE_BUTTON_STATES" });
 }
 
 /*-----------------------------------------------------------------------------
     Utility functions.
 -----------------------------------------------------------------------------*/
+
+const updateButtonState = (state) => {
+    buttonEnabled(state, "next") ?
+        state.search.enableNext = true :
+        state.search.enableNext = false;
+    buttonEnabled(state, "previous") ?
+        state.search.enablePrevious = true :
+        state.search.enablePrevious = false;
+}
+
+const buttonEnabled = (state, button) => {
+    switch (button) {
+        case "next":
+            if (state.search.i >= state.search.results.length - 1) {
+                return false;
+            }
+            return true;
+        case "previous":
+            if (state.search.i <= 0) {
+                return false;
+            }
+            return true;
+    }
+}
+
 
 const getMenuButtonClickPos = (node, e) => {
     parentRect = node.getBoundingClientRect()

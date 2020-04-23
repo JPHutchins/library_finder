@@ -149,14 +149,15 @@ code {
     margin-left: 6px;
 }
 
-.search-button:hover {
+.hover-button:hover {
     cursor: pointer;
     background-color: rgba(105, 105, 105, 0.507)
 }
 
-.search-button:active {
+.click-button:active {
     background-color:  hsl(0, 0%, 90%);
 }
+
 
 #search-results {
     display: table-row;
