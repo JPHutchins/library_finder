@@ -257,6 +257,25 @@ li {
     margin-left: 12px;
 }
 
+.close-sidebar-button {
+    text-align: center;
+    float: right;
+    margin: 6px;
+    font-size: small;
+    padding: 12px;
+    padding-top: 8px;
+    height: 10px;
+    width: 10px;
+    overflow: visible;
+    color: hsl(0, 0%, 20%);
+    border-radius: 12px;
+}
+
+.close-sidebar-button:hover {
+    background-color: hsl(0, 0%, 80%);
+    cursor: pointer;
+}
+
 #about-container>div>p {
     margin-left: 12px;
 }
