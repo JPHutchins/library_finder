@@ -69,6 +69,8 @@ z-index: 101;
     font-size: large;
     letter-spacing: .1em;
     padding: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     margin-left: 26px;
     border-radius: 22px;
     -webkit-user-select: none;
@@ -83,6 +85,12 @@ z-index: 101;
 
 #guide-container>div>h2, #about-container>div>h2 {
     margin: 0px;
+}
+
+#about-container>div
+
+#about-container>div>a {
+    color: black;
 }
 
 h4 {
