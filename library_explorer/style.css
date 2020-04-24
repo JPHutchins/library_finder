@@ -473,8 +473,6 @@ li {
 
 #library-item-modal {
     border-radius: 12px;
-    border: solid;
-    border-width: 2px;
     position: absolute;
     z-index: 100;
     background-color: white;
