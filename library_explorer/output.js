@@ -418,6 +418,8 @@ const updateUi = (action) => {
         case "CLOSE_ITEM_MENU":
             elements.libraryItemModal.classList.remove("show-modal");
             elements.disabler.style.visibility = 'hidden';
+            elements.libraryItemModal.style.top = "0px";
+            elements.libraryItemModal.style.left = "0px";
             break;
         case "HIDE_HOVER_DETAILS":
             if (!state.explorer.hoverSelectedNode) break;
