@@ -49,6 +49,7 @@ z-index: 101;
     font-family: monospace;
     color: white;
     padding: 4px;
+    padding-bottom: 8px;
     padding-left: 26px;
     background-color: hsl(0, 0%, 20%);
     border-radius: 0 12px 0 0;
@@ -96,6 +97,7 @@ z-index: 101;
 #about-container>div:last-of-type {
     color: black;
     text-align: center;
+    line-height: 1.8;
 }
 
 #about-container>div>a {
@@ -363,14 +365,13 @@ li {
 
 
 
-.collection:hover, .library:hover, .path:hover {
+.collection:hover, .library:hover, .path:hover, .album:hover {
     cursor: pointer;
     box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
 }
 
 .album:hover {
     cursor: default; 
-    box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
 }
 
 
