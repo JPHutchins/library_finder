@@ -410,7 +410,10 @@ const updateUi = (action) => {
         case "OPEN_ITEM_MENU":
             itemMenu(action.node);
             elements.libraryItemModal.style.top = state.explorer.menuPos.top;
-            elements.libraryItemModal.style.left = state.explorer.menuPos.left;
+            elements.libraryItemModal.style.left = Math.min(
+                parseInt(state.explorer.menuPos.left),
+                document.body.clientWidth - elements.libraryItemModal.offsetWidth) - 15 + "px";
+            console.log(window.innerWidth, elements.libraryItemModal.offsetWidth, parseInt(state.explorer.menuPos.left))
             elements.libraryItemModal.classList.add("show-modal");
             elements.disabler.style.visibility = 'visible';
             // TODO: scroll into view if needed

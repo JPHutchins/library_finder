@@ -477,7 +477,7 @@ li {
     z-index: 100;
     background-color: white;
     text-align: right;
-    padding-bottom: 35px;
+    padding-bottom: 10px;
     overflow: hidden;
     visibility: hidden;
     background-color: hsl(0, 0%, 90%);
@@ -491,10 +491,10 @@ li {
 
 .modal-menu-item {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     padding-top: 3px;
     padding-bottom: 3px;
-    padding-left: 35px;
+    padding-left: 12px;
     padding-right: 12px;
 
 }
@@ -504,14 +504,10 @@ li {
     border: none;
     outline:none;
     resize: none;
-    text-align: right;
     height: 2em;
     display: flex;
-    justify-content: flex-end;
     padding-top: 3px;
     padding-bottom: 3px;
-    padding-left: 12px;
-    padding-right: 12px;
     background-color: hsl(0, 0%, 90%);
 }
 
