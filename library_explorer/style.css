@@ -173,7 +173,7 @@ code {
 }
 
 #guide-container {
-    display: flex;
+    display: block;
     flex-direction: column;
     color: black;
  
@@ -397,12 +397,13 @@ li {
 }
 
 .insights-and-guide-container {  
-    display: flex;
+    display: block;
     flex-direction: column;
 }
 
 #insights>ul {
     padding: 6px;
+    float:left;
 }
 
 #insights>p {
