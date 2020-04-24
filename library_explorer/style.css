@@ -483,6 +483,7 @@ li {
     overflow: hidden;
     visibility: hidden;
     background-color: hsl(0, 0%, 90%);
+    box-shadow: 2px 2px 7px black;
 }
 
 #library-item-modal.show-modal {
