@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
             "--type specifies target file types: audio (default), video or photo.\n"
             "--tolerance specifies how many non-target-type files to allow per folder\n"
             "    before skipping it.  Default is 2.\n"
-            "--html outputs results to a file named output.html, good for large searches\n");
+            "--html outputs results to a file named library_explorer.html, good for large searches\n");
         return 1;
     }
 
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
 
     if (html == true) {
         FILE* fp;
-        errno_t errorCode = fopen_s(&fp, "output.html", "w+");
+        errno_t errorCode = fopen_s(&fp, "library_explorer.html", "w+");
         if (errorCode != 0) {
             fprintf(stderr, "error: error opening output html file, exiting.\n");
             exit(EXIT_FAILURE);
@@ -148,13 +148,13 @@ int main(int argc, char** argv) {
         fprintf(fp, 
             "</ul>"
             "</div>"
-            "<div class = \"guide\">"
-            "USER GUIDE"
-            "</div>"
             "</div>"
         );
 
-        fprintf(fp, "<ul id=\"library-explorer\" class=\"show-list\">");
+        fprintf(fp,
+            "<div class=\"main\">"
+            "<div id=\"explorer-container\">"
+            "<ul id=\"library-explorer\" class=\"show-list\">");
         make_html_directory_list(root, fp);
         fprintf(fp, "</ul>");
 
@@ -170,14 +170,14 @@ int main(int argc, char** argv) {
         fprintf(fp, "\"></span>");
 
         fprintf(fp,
-            "</div>"
+            "</div></div>"
             "</body>"
             "<script src=\"output.js\">"
             "</script>"
             "</html>"
             );
         fclose(fp);
-        printf("Created output.html, open it with an internet browser like Chrome.\n");
+        printf("Created library_explorer.html, open it with an internet browser like Chrome.\n");
     }
     else {
         make_directory_list(root, 0);

@@ -4,6 +4,10 @@ window.onload = () => {
         Add DOM elements and styling, initialize state, and set handlers.
     -------------------------------------------------------------------------*/
 
+    document.body.insertAdjacentHTML("afterbegin", newHtml);
+    document.getElementById("explorer-container").
+        insertAdjacentHTML("beforeend", `<footer id="footer"></footer>`);
+
     const elements = {
         command: document.getElementById("command"),
         searchText: document.getElementById("search-text"),
@@ -26,6 +30,8 @@ window.onload = () => {
             .getElementsByClassName('modal-menu-item'),
         footer: document.getElementById("footer"),
     }
+
+
 
     const rootInfo = elements.libraryExplorer.children[0].dataset;
 
@@ -393,7 +399,6 @@ window.onload = () => {
     -------------------------------------------------------------------------*/
 
     const updateUi = (action) => {
-        //console.log(action)
         switch (action.type) {
             case "SCROLL_SEARCH":
                 ui_ScrollSearch();
@@ -418,7 +423,6 @@ window.onload = () => {
                 elements.libraryItemModal.style.left = Math.min(
                     parseInt(state.explorer.menuPos.left),
                     document.body.clientWidth - elements.libraryItemModal.offsetWidth) - 15 + "px";
-                console.log(window.innerWidth, elements.libraryItemModal.offsetWidth, parseInt(state.explorer.menuPos.left))
                 elements.libraryItemModal.classList.add("show-modal");
                 elements.disabler.style.visibility = 'visible';
                 // TODO: scroll into view if needed
@@ -1077,6 +1081,51 @@ const aboutContent = () => {
     aboutContent.appendChild(footerContent());
     return aboutContent;
 }
+
+const newHtml = `
+    <div id="disabler"></div>
+    <div id="library-item-modal" class="hide-modal">
+        <div class="modal-menu-item always-hidden"></div>
+        <div class="modal-menu-item"></div>
+        <hr>
+        <textarea readonly class="modal-menu-item"></textarea>
+        <div class="modal-menu-item">
+            <a>Copy full path to clipboard</a>
+            |
+            <a target="_blank" href="#">Open folder in new tab</a>
+        </div>
+        <hr>
+        <div class="modal-menu-item"></div>
+        <div class="modal-menu-item"></div>
+        <div class="modal-menu-item"></div>
+    </div>
+    <div class="navbar">
+        <div id="nav-header">
+            <div id="nav-menu">
+                <h1 id="title">library_explorer</h1>
+                <div class="nav-menu-button" id="insights-button">insights</div>
+                <div class="nav-menu-button" id="help-button">help</div>
+                <div class="nav-menu-button" id="about-button">about</div>
+            </div>
+            <div class="search-box">
+                <div class="search-nav">
+                    <input type="text" class="search-text" id="search-text"
+                        label="search for album, artist, song, or folder"
+                        placeholder="search for album, artist, song, or folder">
+                    <input disabled="true" type="button" id="find-previous" 
+                        class="search-button" value="&#8896;">
+                    <input disabled="true" type="button" id="find-next"
+                        class="search-button" value="&#8897;">
+                </div>
+                <div id="search-results"></div>
+            </div>
+        </div>
+        <div id="full-path-display"></div>
+        <div id="command-subtitle-container"></div>
+    </div>
+    <div id="help" class="guide"></div>
+    <div id="about" class="guide"></div>
+    `
 
 const footerContent = () => {
     const footerContent = document.createElement("div");
