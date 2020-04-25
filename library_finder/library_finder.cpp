@@ -160,30 +160,23 @@ int main(int argc, char** argv) {
             fprintf(stderr, "error: error opening output html file, exiting.\n");
             exit(EXIT_FAILURE);
         }
-        fprintf(fp, head_html);
-        fprintf(fp, css_source);
-        fprintf(fp, body_html);
+        fprintf(fp, "%s%s%s", head_html, css_source, body_html);
         Dir_Tree_Node** results = find_largest_libraries(root);
         int i = 0;
         while (i < 10) {
             fprintf(fp, 
-                "<li "
-                "class=\"largest-folders\" "
+                "<li class=\"largest-folders\" "
                 "data-total-albums=\"%d\" "
                 "data-total-audio-files=\"%d\" "
-                "data-full-path=\"%s\">", 
+                "data-full-path=\"%s\">"
+                "%s</li>", 
                 results[i]->total_albums_count,
                 results[i]->total_audio_file_count,
+                results[i]->name,
                 results[i]->name);
-            fprintf(fp, "%s", results[i]->name);
-            fprintf(fp, "</li>");
             i++;
         }
-        fprintf(fp, 
-            "</ul>"
-            "</div>"
-            "</div>"
-        );
+        fprintf(fp, "</ul></div></div>");
 
         fprintf(fp,
             "<div class=\"main\">"
