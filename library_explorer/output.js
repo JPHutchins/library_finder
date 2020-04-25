@@ -121,6 +121,7 @@ window.onload = () => {
     }
 
     document.onmouseover = (e) => {
+        if (state.explorer.openMenu) return;
         updateState({
             type: "CHANGE_HOVER_SELECTED_NODE",
             node: e.target
@@ -145,10 +146,11 @@ window.onload = () => {
     }
 
     elements.disabler.onclick = (e) => {
-        updateUi({
-            type: "CLOSE_ITEM_MENU",
-            node: null
-        })
+        updateState({ type: "CLOSE_ITEM_MENU_CLICK" })
+    }
+
+    elements.navbar.onclick = (e) => {
+        updateState({ type: "CLOSE_ITEM_MENU_CLICK" })
     }
 
     document.getElementById(
@@ -191,141 +193,165 @@ window.onload = () => {
     })
 
 
-/*-------------------------------------------------------------------------
-    Initialize functions and constants that require context.
--------------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------------
+        Initialize functions and constants that require context.
+    -------------------------------------------------------------------------*/
 
-const itemMenu = itemMenuMaker(
-    elements.libraryItemModal,
-    elements.libraryItemModal.getElementsByClassName("modal-menu-item"))
-// provide these functions with context... needs more thought...
-const findAll = searchIndex(state)
-const findFolder = makeFindFolder(elements)
+    const itemMenu = itemMenuMaker(
+        elements.libraryItemModal,
+        elements.libraryItemModal.getElementsByClassName("modal-menu-item"))
+    // provide these functions with context... needs more thought...
+    const findAll = searchIndex(state)
+    const findFolder = makeFindFolder(elements)
 
-/*-------------------------------------------------------------------------
-    Handle changes to state.
--------------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------------
+        Handle changes to state.
+    -------------------------------------------------------------------------*/
 
-const updateState = (action) => {
-    switch (action.type) {
-        case "NEW_QUERY":
-            if (action.text === state.search.query) break;
-            state.search.query = action.text;
-            updateState({ type: "NEW_SEARCH" });
-            break;
-        case "NEW_SEARCH":
-            state.search.previousResult = (
-                state.search.results ?
-                    state.search.results[state.search.i] : null);
-            state.search.results = findAll(state.search.query);
-            state.search.resultsText = getSearchResultText(
-                state.search.results);
-            state.search.i = 0;
-            updateUi({ type: "SCROLL_SEARCH" });
-            updateState({ type: "UPDATE_BUTTON_STATES" });
-            break;
-        case "FIND_NEXT":
-            if (state.search.i < state.search.results.length - 1) {
+    const updateState = (action) => {
+        switch (action.type) {
+            case "NEW_QUERY":
+                if (action.text === state.search.query) break;
+                state.search.query = action.text;
+                updateState({ type: "NEW_SEARCH" });
+                break;
+            case "NEW_SEARCH":
                 state.search.previousResult = (
                     state.search.results ?
                         state.search.results[state.search.i] : null);
-                state.search.i++;
+                state.search.results = findAll(state.search.query);
                 state.search.resultsText = getSearchResultText(
                     state.search.results);
+                state.search.i = 0;
                 updateUi({ type: "SCROLL_SEARCH" });
-            }
-            updateState({ type: "UPDATE_BUTTON_STATES" });
-            break;
-        case "FIND_PREVIOUS":
-            if (state.search.i > 0) {
-                state.search.previousResult = (
-                    state.search.results ?
-                        state.search.results[state.search.i] : null);
-                state.search.i--;
-                state.search.resultsText = getSearchResultText(
-                    state.search.results);
-                updateUi({ type: "SCROLL_SEARCH" });
-            }
-            updateState({ type: "UPDATE_BUTTON_STATES" });
-            break;
-        case "UPDATE_BUTTON_STATES":
-            updateButtonState(state);
-            if (state.search.enableNext) {
-                updateUi({
-                    type: "ENABLE_BUTTON",
-                    node: elements.findNext
-                })
-            }
-            else {
-                updateUi({
-                    type: "DISABLE_BUTTON",
-                    node: elements.findNext
-                })
-            }
-            if (state.search.enablePrevious) {
-                updateUi({
-                    type: "ENABLE_BUTTON",
-                    node: elements.findPrevious
-                })
-            }
-            else {
-                updateUi({
-                    type: "DISABLE_BUTTON",
-                    node: elements.findPrevious
-                })
-            }
-            break;
-        case "FOLDER_CLICK":
-            let node = action.node;
-            if (node.classList.contains("hover-details")) {
-                node = node.parentElement; // click was on hover-details
-            }
-            updateUi({
-                type: "FOLDER_CLICK",
-                node: node
-            })
-            break;
-        case "TOGGLE_FOLDER":
-            action.open ?
-                state.explorer.openFolders.add(action.node) :
-                state.explorer.openFolders.delete(action.node)
-            break;
-        case "CLICK_ITEM_BUTTON":
-            state.explorer.menuPos = getMenuButtonClickPos(
-                state.explorer.hoverSelectedNode, action.event);
-            updateUi({
-                type: "OPEN_ITEM_MENU",
-                node: state.explorer.hoverSelectedNode
-            });
-            state.explorer.openMenu = state.explorer.hoverSelectedNode;
-            break;
-        case "CHANGE_HOVER_SELECTED_NODE":
-            const _node = doesSomeParentBelong(action.node, "library-item");
-            if (!_node) {
-                updateUi({ type: "HIDE_HOVER_DETAILS" });
-                state.explorer.hoverSelectedNode = null;
-                state.explorer.hoverPath = "";
-                updateUi({ type: "CHANGE_HOVER_PATH" });
+                updateState({ type: "UPDATE_BUTTON_STATES" });
                 break;
-            }
-            else {
-                updateUi({ type: "HIDE_HOVER_DETAILS" });
-                state.explorer.hoverSelectedNode = _node;
-                state.explorer.hoverPath = getFullPath(
-                    state.explorer.hoverSelectedNode);
-                updateUi({ type: "CHANGE_HOVER_PATH" });
-                updateUi({ type: "SHOW_HOVER_DETAILS" });
+            case "FIND_NEXT":
+                if (state.search.i < state.search.results.length - 1) {
+                    state.search.previousResult = (
+                        state.search.results ?
+                            state.search.results[state.search.i] : null);
+                    state.search.i++;
+                    state.search.resultsText = getSearchResultText(
+                        state.search.results);
+                    updateUi({ type: "SCROLL_SEARCH" });
+                }
+                updateState({ type: "UPDATE_BUTTON_STATES" });
                 break;
-            }
-        case "CHANGE_SIDEBAR_CONTENT":
-            if (action.node == state.sidebar.content) {
-                if (state[action.div].expanded) {
+            case "FIND_PREVIOUS":
+                if (state.search.i > 0) {
+                    state.search.previousResult = (
+                        state.search.results ?
+                            state.search.results[state.search.i] : null);
+                    state.search.i--;
+                    state.search.resultsText = getSearchResultText(
+                        state.search.results);
+                    updateUi({ type: "SCROLL_SEARCH" });
+                }
+                updateState({ type: "UPDATE_BUTTON_STATES" });
+                break;
+            case "UPDATE_BUTTON_STATES":
+                updateButtonState(state);
+                if (state.search.enableNext) {
                     updateUi({
-                        type: "CLOSE_DIV",
+                        type: "ENABLE_BUTTON",
+                        node: elements.findNext
+                    })
+                }
+                else {
+                    updateUi({
+                        type: "DISABLE_BUTTON",
+                        node: elements.findNext
+                    })
+                }
+                if (state.search.enablePrevious) {
+                    updateUi({
+                        type: "ENABLE_BUTTON",
+                        node: elements.findPrevious
+                    })
+                }
+                else {
+                    updateUi({
+                        type: "DISABLE_BUTTON",
+                        node: elements.findPrevious
+                    })
+                }
+                break;
+            case "FOLDER_CLICK":
+                let node = action.node;
+                if (node.classList.contains("hover-details")) {
+                    node = node.parentElement; // click was on hover-details
+                }
+                updateUi({
+                    type: "FOLDER_CLICK",
+                    node: node
+                })
+                break;
+            case "TOGGLE_FOLDER":
+                action.open ?
+                    state.explorer.openFolders.add(action.node) :
+                    state.explorer.openFolders.delete(action.node)
+                break;
+            case "CLICK_ITEM_BUTTON":
+                state.explorer.menuPos = getMenuButtonClickPos(
+                    state.explorer.hoverSelectedNode, action.event);
+                updateUi({
+                    type: "OPEN_ITEM_MENU",
+                    node: state.explorer.hoverSelectedNode
+                });
+                state.explorer.openMenu = state.explorer.hoverSelectedNode;
+                break;
+            case "CLOSE_ITEM_MENU_CLICK":
+                updateUi({ type: "CLOSE_ITEM_MENU" });
+                state.explorer.openMenu = null;
+            case "CHANGE_HOVER_SELECTED_NODE":
+                const _node = doesSomeParentBelong(action.node, "library-item");
+                if (!_node) {
+                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    state.explorer.hoverSelectedNode = null;
+                    state.explorer.hoverPath = "";
+                    updateUi({ type: "CHANGE_HOVER_PATH" });
+                    break;
+                }
+                else {
+                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    state.explorer.hoverSelectedNode = _node;
+                    state.explorer.hoverPath = getFullPath(
+                        state.explorer.hoverSelectedNode);
+                    updateUi({ type: "CHANGE_HOVER_PATH" });
+                    updateUi({ type: "SHOW_HOVER_DETAILS" });
+                    break;
+                }
+            case "CHANGE_SIDEBAR_CONTENT":
+                if (action.node == state.sidebar.content) {
+                    if (state[action.div].expanded) {
+                        updateUi({
+                            type: "CLOSE_DIV",
+                            node: action.node
+                        });
+                        state[action.div].expanded = false;
+                        state.sidebar.content = action.node;
+                        break;
+                    }
+                    else {
+                        updateUi({
+                            type: "EXPAND_DIV",
+                            node: action.node
+                        });
+                        state[action.div].expanded = true;
+                        state.sidebar.content = action.node;
+                        break;
+                    }
+                }
+
+                else if (state[action.div].expanded) {
+                    updateUi({
+                        type: "CHANGE_CONTENT",
+                        old: state.sidebar.content,
                         node: action.node
                     });
-                    state[action.div].expanded = false;
                     state.sidebar.content = action.node;
+                    state[action.div].expanded = true;
                     break;
                 }
                 else {
@@ -337,209 +363,188 @@ const updateState = (action) => {
                     state.sidebar.content = action.node;
                     break;
                 }
-            }
-
-            else if (state[action.div].expanded) {
-                updateUi({
-                    type: "CHANGE_CONTENT",
-                    old: state.sidebar.content,
-                    node: action.node
-                });
-                state.sidebar.content = action.node;
-                state[action.div].expanded = true;
-                break;
-            }
-            else {
-                updateUi({
-                    type: "EXPAND_DIV",
-                    node: action.node
-                });
-                state[action.div].expanded = true;
-                state.sidebar.content = action.node;
-                break;
-            }
-        case "CLICK_HELP_SECTION_TITLE":
-            const helpSection = action.node.parentElement;
-            if (helpSection == state.sidebar.openHelpSection) {
+            case "CLICK_HELP_SECTION_TITLE":
+                const helpSection = action.node.parentElement;
+                if (helpSection == state.sidebar.openHelpSection) {
+                    updateUi({
+                        type: "CLOSE_HELP_TEXT",
+                        node: helpSection
+                    })
+                    state.sidebar.openHelpSection = null;
+                    break;
+                }
                 updateUi({
                     type: "CLOSE_HELP_TEXT",
+                    node: state.sidebar.openHelpSection
+                })
+                updateUi({
+                    type: "OPEN_HELP_TEXT",
                     node: helpSection
                 })
-                state.sidebar.openHelpSection = null;
+                state.sidebar.openHelpSection = helpSection
                 break;
-            }
-            updateUi({
-                type: "CLOSE_HELP_TEXT",
-                node: state.sidebar.openHelpSection
-            })
-            updateUi({
-                type: "OPEN_HELP_TEXT",
-                node: helpSection
-            })
-            state.sidebar.openHelpSection = helpSection
-            break;
-        default:
-            return;
+            default:
+                return;
+        }
     }
-}
 
-/*-------------------------------------------------------------------------
-    Handle changes to UI state.
--------------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------------
+        Handle changes to UI state.
+    -------------------------------------------------------------------------*/
 
-const updateUi = (action) => {
-    //console.log(action)
-    switch (action.type) {
-        case "SCROLL_SEARCH":
-            ui_ScrollSearch();
-            break;
-        case "CHANGE_HOVER_PATH":
-            ui_ChangeHoverPath();
-            break;
-        case "FOLDER_CLICK":
-            const _state = ui_ToggleFolder(action.node)
-            updateState({
-                type: "TOGGLE_FOLDER",
-                open: _state,
-                node: action.node
-            })
-            break;
-        case "JUMP_TO_NODE":
-            ui_JumpToNode(action.node)
-            break;
-        case "OPEN_ITEM_MENU":
-            itemMenu(action.node);
-            elements.libraryItemModal.style.top = state.explorer.menuPos.top;
-            elements.libraryItemModal.style.left = Math.min(
-                parseInt(state.explorer.menuPos.left),
-                document.body.clientWidth - elements.libraryItemModal.offsetWidth) - 15 + "px";
-            console.log(window.innerWidth, elements.libraryItemModal.offsetWidth, parseInt(state.explorer.menuPos.left))
-            elements.libraryItemModal.classList.add("show-modal");
-            elements.disabler.style.visibility = 'visible';
-            // TODO: scroll into view if needed
-            break;
-        case "CLOSE_ITEM_MENU":
-            elements.libraryItemModal.classList.remove("show-modal");
-            elements.disabler.style.visibility = 'hidden';
-            elements.libraryItemModal.style.top = "0px";
-            elements.libraryItemModal.style.left = "0px";
-            break;
-        case "HIDE_HOVER_DETAILS":
-            if (!state.explorer.hoverSelectedNode) break;
-            if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
-                state.explorer.hoverSelectedNode.querySelector(".hover-details").classList.add('hidden');
-            }
-            break;
-        case "SHOW_HOVER_DETAILS":
-            if (!state.explorer.hoverSelectedNode) break;
-            if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
-                state.explorer.hoverSelectedNode.querySelector(
-                    ".hover-details").classList.remove('hidden');
-            }
-            break;
-        case "CLOSE_DIV":
-            elements.main.style.marginLeft = '0px';
-            elements.explorerContainer.style.marginLeft = "0px";
-            action.node.style.visibility = 'hidden';
-            break;
-        case "EXPAND_DIV":
-            action.node.style.visibility = 'visible';
-            elements.explorerContainer.style.marginLeft = "400px";
-            break;
-        case "CHANGE_CONTENT":
-            if (action.old) {
-                action.old.style.visibility = "hidden";
-            }
-            action.node.style.visibility = 'visible';
-            break;
-        case "CLOSE_HELP_TEXT":
-            if (!action.node) break;
-            const _closeTarget = action.node.querySelector(".slide-open-text");
-            _closeTarget.style.transitionDelay = "0s"
-            _closeTarget.style.maxHeight = "0px";
-            break;
-        case "OPEN_HELP_TEXT":
-            if (!action.node) break;
-            const _openTarget = action.node.querySelector(".slide-open-text");
-            _openTarget.style.transitionDelay =
-                state.sidebar.openHelpSection ? ".5s" : "0s";
-            _openTarget.style.maxHeight = "400px";
-            break;
-        case "DISABLE_BUTTON":
-            action.node.classList.remove("hover-button");
-            action.node.classList.remove("click-button");
-            action.node.style.borderColor = "hsl(0, 0%, 90%)";
-            action.node.disabled = true;
-            break;
-        case "ENABLE_BUTTON":
-            action.node.classList.add("hover-button");
-            action.node.classList.add("click-button");
-            action.node.style.borderColor = "black";
-            action.node.disabled = false;
-            break;
+    const updateUi = (action) => {
+        //console.log(action)
+        switch (action.type) {
+            case "SCROLL_SEARCH":
+                ui_ScrollSearch();
+                break;
+            case "CHANGE_HOVER_PATH":
+                ui_ChangeHoverPath();
+                break;
+            case "FOLDER_CLICK":
+                const _state = ui_ToggleFolder(action.node)
+                updateState({
+                    type: "TOGGLE_FOLDER",
+                    open: _state,
+                    node: action.node
+                })
+                break;
+            case "JUMP_TO_NODE":
+                ui_JumpToNode(action.node)
+                break;
+            case "OPEN_ITEM_MENU":
+                itemMenu(action.node);
+                elements.libraryItemModal.style.top = state.explorer.menuPos.top;
+                elements.libraryItemModal.style.left = Math.min(
+                    parseInt(state.explorer.menuPos.left),
+                    document.body.clientWidth - elements.libraryItemModal.offsetWidth) - 15 + "px";
+                console.log(window.innerWidth, elements.libraryItemModal.offsetWidth, parseInt(state.explorer.menuPos.left))
+                elements.libraryItemModal.classList.add("show-modal");
+                elements.disabler.style.visibility = 'visible';
+                // TODO: scroll into view if needed
+                break;
+            case "CLOSE_ITEM_MENU":
+                elements.libraryItemModal.classList.remove("show-modal");
+                elements.disabler.style.visibility = 'hidden';
+                elements.libraryItemModal.style.top = "0px";
+                elements.libraryItemModal.style.left = "0px";
+                break;
+            case "HIDE_HOVER_DETAILS":
+                if (!state.explorer.hoverSelectedNode) break;
+                if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
+                    state.explorer.hoverSelectedNode.querySelector(".hover-details").classList.add('hidden');
+                }
+                break;
+            case "SHOW_HOVER_DETAILS":
+                if (!state.explorer.hoverSelectedNode) break;
+                if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
+                    state.explorer.hoverSelectedNode.querySelector(
+                        ".hover-details").classList.remove('hidden');
+                }
+                break;
+            case "CLOSE_DIV":
+                elements.main.style.marginLeft = '0px';
+                elements.explorerContainer.style.marginLeft = "0px";
+                action.node.style.visibility = 'hidden';
+                break;
+            case "EXPAND_DIV":
+                action.node.style.visibility = 'visible';
+                elements.explorerContainer.style.marginLeft = "400px";
+                break;
+            case "CHANGE_CONTENT":
+                if (action.old) {
+                    action.old.style.visibility = "hidden";
+                }
+                action.node.style.visibility = 'visible';
+                break;
+            case "CLOSE_HELP_TEXT":
+                if (!action.node) break;
+                const _closeTarget = action.node.querySelector(".slide-open-text");
+                _closeTarget.style.transitionDelay = "0s"
+                _closeTarget.style.maxHeight = "0px";
+                break;
+            case "OPEN_HELP_TEXT":
+                if (!action.node) break;
+                const _openTarget = action.node.querySelector(".slide-open-text");
+                _openTarget.style.transitionDelay =
+                    state.sidebar.openHelpSection ? ".5s" : "0s";
+                _openTarget.style.maxHeight = "400px";
+                break;
+            case "DISABLE_BUTTON":
+                action.node.classList.remove("hover-button");
+                action.node.classList.remove("click-button");
+                action.node.style.borderColor = "hsl(0, 0%, 90%)";
+                action.node.disabled = true;
+                break;
+            case "ENABLE_BUTTON":
+                action.node.classList.add("hover-button");
+                action.node.classList.add("click-button");
+                action.node.style.borderColor = "black";
+                action.node.disabled = false;
+                break;
+        }
     }
-}
 
-/*-------------------------------------------------------------------------
-    UI functions for interacting with DOM.
--------------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------------
+        UI functions for interacting with DOM.
+    -------------------------------------------------------------------------*/
 
-const ui_ToggleFolder = (node) => {
-    return dropDownDirectory(node);
-}
-
-const ui_ChangeHoverPath = () => {
-    elements.fullPathDisplay.innerText = state.explorer.hoverPath
-}
-
-const ui_ScrollSearch = () => {
-    const node = state.search.results[state.search.i]
-    nodes = getParentsOfNode(node)
-    hideStaleNodes(nodes);
-    showFreshNodes(nodes);
-    scrollToNode(node);
-    //flashNode(node);
-    displaySearchResults();
-    if (state.search.previousResult) {
-        state.search.previousResult.classList.remove(
-            'current-search-result')
+    const ui_ToggleFolder = (node) => {
+        return dropDownDirectory(node);
     }
-    if (node) node.classList.add('current-search-result')
-}
 
-const ui_JumpToNode = (node) => {
-    nodes = getParentsOfNode(node)
-    hideStaleNodes(nodes);
-    showFreshNodes(nodes);
-    scrollToNode(node);
-    flashNode(node);
-}
-
-const displaySearchResults = () => {
-    elements.searchResults.innerText = state.search.resultsText;
-}
-
-const getSearchResultText = (results) => {
-    if (!state.search.query) {
-        return "";
+    const ui_ChangeHoverPath = () => {
+        elements.fullPathDisplay.innerText = state.explorer.hoverPath
     }
-    else if (results.length <= 0) {
-        return `No results for "${state.search.query}"`
-    }
-    else {
-        return `${state.search.i + 1} / ${results.length}`
-    }
-}
 
-/*-------------------------------------------------------------------------
-  Initialize the UI.
--------------------------------------------------------------------------*/
+    const ui_ScrollSearch = () => {
+        const node = state.search.results[state.search.i]
+        nodes = getParentsOfNode(node)
+        hideStaleNodes(nodes);
+        showFreshNodes(nodes);
+        scrollToNode(node);
+        //flashNode(node);
+        displaySearchResults();
+        if (state.search.previousResult) {
+            state.search.previousResult.classList.remove(
+                'current-search-result')
+        }
+        if (node) node.classList.add('current-search-result')
+    }
 
-updateState({
-    type: "FOLDER_CLICK",
-    node: elements.libraryExplorer.children[0]
-});
-updateState({ type: "UPDATE_BUTTON_STATES" });
+    const ui_JumpToNode = (node) => {
+        nodes = getParentsOfNode(node)
+        hideStaleNodes(nodes);
+        showFreshNodes(nodes);
+        scrollToNode(node);
+        flashNode(node);
+    }
+
+    const displaySearchResults = () => {
+        elements.searchResults.innerText = state.search.resultsText;
+    }
+
+    const getSearchResultText = (results) => {
+        if (!state.search.query) {
+            return "";
+        }
+        else if (results.length <= 0) {
+            return `No results for "${state.search.query}"`
+        }
+        else {
+            return `${state.search.i + 1} / ${results.length}`
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+      Initialize the UI.
+    -------------------------------------------------------------------------*/
+
+    updateState({
+        type: "FOLDER_CLICK",
+        node: elements.libraryExplorer.children[0]
+    });
+    updateState({ type: "UPDATE_BUTTON_STATES" });
 }
 
 /*-----------------------------------------------------------------------------
