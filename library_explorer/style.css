@@ -300,17 +300,6 @@ li {
     width: auto;
 }
 
-.album:before {
-      content: '';
-      display: inline-block;
-      height: 1em;
-    width: 1em;
-      background-image: url(album.svg);
-      background-size: contain;
-      background-repeat: no-repeat;
-      margin-right:0.5em;   
-}
-
 .album {
     font-weight: normal;
 }
