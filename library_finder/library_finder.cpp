@@ -34,13 +34,16 @@ const char* body_html =
 #include "body.html"
 ;
 
-#define DEVELOPMENT false;
+#define DEVELOPMENT true;
 
 #if DEVELOPMENT
     const char* css_source =
         "<link rel = \"stylesheet\" type = \"text/css\" href = \"style.css\">";
-    const char* js_source =
+    const char* js_source_1 =
         "<script src=\"output.js\"></script>";
+    const char* js_source_2 = "";
+    const char* js_source_3 = "";
+    const char* js_source_4 = "";
 #else // PRODUCTION
     const char* css_source =
     #include "style.css"
