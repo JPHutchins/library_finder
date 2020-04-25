@@ -1,9 +1,10 @@
-R"=====(
+R"=====(<style>
+
 html {
     font-family: sans-serif;
-    background-color: hsl(0, 0%, 20%);
+    background-color: hsl(0, 0%%, 20%%);
     margin: 0;
-    height: 100%;
+    height: 100%%;
     overflow: -moz-scrollbars-vertical;
     overflow-y: scroll;
 }
@@ -12,7 +13,7 @@ body {
     margin: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100%%;
 }
 
 .navbar {
@@ -23,7 +24,7 @@ height: 120px;
 position: fixed; 
 top: 0; 
 left: 0;
-width: 100%; 
+width: 100%%; 
 z-index: 101;
 }
 
@@ -51,10 +52,10 @@ z-index: 101;
     padding: 4px;
     padding-bottom: 8px;
     padding-left: 26px;
-    background-color: hsl(0, 0%, 20%);
+    background-color: hsl(0, 0%%, 20%%);
     border-radius: 0 12px 0 0;
     z-index: 102;
-    width: 100%;
+    width: 100%%;
     margin: 0;
 }
 
@@ -83,7 +84,7 @@ z-index: 101;
 
 .nav-menu-button:hover, #guide-container>div>h2:hover {
     cursor: pointer;
-    background-color: hsl(0, 0%, 80%);
+    background-color: hsl(0, 0%%, 80%%);
 
 }
 
@@ -116,7 +117,7 @@ code {
     font-family: 'Courier New', Courier, monospace;
     font-size: 11pt;
     color: white;
-    background-color: hsl(0, 0%, 20%);
+    background-color: hsl(0, 0%%, 20%%);
     padding: 4px;
     border-radius: 8px;
     line-height: 2em;
@@ -158,7 +159,7 @@ code {
 }
 
 .click-button:active {
-    background-color:  hsl(0, 0%, 90%);
+    background-color:  hsl(0, 0%%, 90%%);
 }
 
 #search-results {
@@ -190,7 +191,7 @@ code {
     display: flex;
     flex-direction: column;
     top: 130px;
-    width: 100%;
+    width: 100%%;
 }
 
 #explorer-container {
@@ -259,12 +260,12 @@ li {
     height: 10px;
     width: 10px;
     overflow: visible;
-    color: hsl(0, 0%, 20%);
+    color: hsl(0, 0%%, 20%%);
     border-radius: 12px;
 }
 
 .close-sidebar-button:hover {
-    background-color: hsl(0, 0%, 80%);
+    background-color: hsl(0, 0%%, 80%%);
     cursor: pointer;
 }
 
@@ -377,7 +378,7 @@ li {
     height: 100vh;
     border: solid;
     border-width: 3px;
-    border-color:  hsl(0, 0%, 20%);
+    border-color:  hsl(0, 0%%, 20%%);
 }
 
 #insights-expander-button {
@@ -422,7 +423,7 @@ li {
     padding-bottom: 10px;
     overflow: hidden;
     visibility: hidden;
-    background-color: hsl(0, 0%, 90%);
+    background-color: hsl(0, 0%%, 90%%);
     box-shadow: 2px 2px 7px black;
 }
 
@@ -451,7 +452,7 @@ li {
     display: flex;
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color: hsl(0, 0%, 90%);
+    background-color: hsl(0, 0%%, 90%%);
 }
 
 .modal-menu-item>a {
@@ -471,8 +472,8 @@ li {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100%%;
+    height: 100%%;
     opacity: .5;
     visibility: hidden;
     z-index: 99;
@@ -490,7 +491,7 @@ li {
     text-align: center;
     position: relative;
     bottom: 0;
-    width: 100%;
+    width: 100%%;
     line-height: 1.8;
     flex-shrink: 0;
  }
@@ -498,4 +499,5 @@ li {
  .icon-link {
      color: white;
  }
-)====="
+
+</style>)====="
