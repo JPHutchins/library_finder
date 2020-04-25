@@ -434,16 +434,29 @@ window.onload = () => {
                 elements.libraryItemModal.style.left = "0px";
                 break;
             case "HIDE_HOVER_DETAILS":
-                if (!state.explorer.hoverSelectedNode) break;
-                if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
-                    state.explorer.hoverSelectedNode.querySelector(".hover-details").classList.add('hidden');
+                const _oldNode = state.explorer.hoverSelectedNode;
+                if (!_oldNode) break;
+                _oldNode.style.boxShadow = "none"
+
+                const _oldDetails = _oldNode.querySelector(".hover-details");
+                if (_oldDetails) {
+                    _oldDetails.classList.add('hidden');
                 }
                 break;
             case "SHOW_HOVER_DETAILS":
-                if (!state.explorer.hoverSelectedNode) break;
-                if (state.explorer.hoverSelectedNode.querySelector(".hover-details")) {
-                    state.explorer.hoverSelectedNode.querySelector(
-                        ".hover-details").classList.remove('hidden');
+                const _hoveredNode = state.explorer.hoverSelectedNode;
+                if (!_hoveredNode) break;
+                _hoveredNode.style.boxShadow = 
+                    "0 0 0 3px rgba(105, 105, 105, 0.507)"
+
+                !_hoveredNode.classList.contains("album") ?
+                    _hoveredNode.style.cursor = "pointer" :
+                    _hoveredNode.style.cursor = "default"; 
+                
+
+                const _details = _hoveredNode.querySelector(".hover-details");
+                if (_details) {
+                    _details.classList.remove('hidden');
                 }
                 break;
             case "CLOSE_DIV":

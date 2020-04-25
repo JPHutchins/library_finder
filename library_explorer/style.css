@@ -314,15 +314,6 @@ li {
     margin-right: 0.5em;
 }
 
-.collection:hover, .library:hover, .path:hover, .album:hover {
-    cursor: pointer;
-    box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);
-}
-
-.album:hover {
-    cursor: default; 
-}
-
 .fade ul {
     height: 0;
    
