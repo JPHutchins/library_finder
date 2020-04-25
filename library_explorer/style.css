@@ -330,16 +330,11 @@ li {
     font-weight: bold;
 }
 
-.path:before {
-    content: '';
-    display: inline-block;
+.list-icon {
     height: 1em;
     width: 1em;
-    background-image: url(path.svg);
-    background-size: contain;
-    background-repeat: no-repeat;
-    margin-right:0.5em;   
-}  
+    margin-right: 0.5em;
+}
 
 .library:before {
     content: '';
