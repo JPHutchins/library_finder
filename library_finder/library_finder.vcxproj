@@ -158,9 +158,13 @@
     <ClInclude Include="library_finder.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="script.js" />
+    <None Include="script_2.js" />
+    <None Include="script_3.js">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="script_1.js" />
+    <None Include="script_4.js" />
     <None Include="style.css" />
-    <None Include="w3-toggle-switch.css" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -26,9 +26,38 @@
 #include <regex>
 #include <library_finder.h>
 
-const char* html_source =
-#include "index.html"
+const char* head_html =
+#include "head.html"
 ;
+
+const char* body_html =
+#include "body.html"
+;
+
+#define DEVELOPMENT false;
+
+#if DEVELOPMENT
+    const char* css_source =
+        "<link rel = \"stylesheet\" type = \"text/css\" href = \"style.css\">";
+    const char* js_source =
+        "<script src=\"output.js\"></script>";
+#else // PRODUCTION
+    const char* css_source =
+    #include "style.css"
+    ;
+    const char* js_source_1 =
+    #include "script_1.js"
+    ;
+    const char* js_source_2 =
+    #include "script_2.js"
+    ;
+    const char* js_source_3 =
+    #include "script_3.js"
+    ;
+    const char* js_source_4 =
+    #include "script_4.js"
+    ;
+#endif
 
 /*-------------------------------------------------------------------------------------------------
     Argument is the root directory under which to search for libraries.  Optionally include 
@@ -128,7 +157,9 @@ int main(int argc, char** argv) {
             fprintf(stderr, "error: error opening output html file, exiting.\n");
             exit(EXIT_FAILURE);
         }
-        fprintf(fp, html_source);
+        fprintf(fp, head_html);
+        fprintf(fp, css_source);
+        fprintf(fp, body_html);
         Dir_Tree_Node** results = find_largest_libraries(root);
         int i = 0;
         while (i < 10) {
@@ -172,9 +203,9 @@ int main(int argc, char** argv) {
         fprintf(fp,
             "</div></div>"
             "</body>"
-            "<script src=\"output.js\">"
-            "</script>"
-            "</html>"
+            "%s%s%s%s"
+            "</html>",
+            js_source_1, js_source_2, js_source_3, js_source_4
             );
         fclose(fp);
         printf("Created library_explorer.html, open it with an internet browser like Chrome.\n");
