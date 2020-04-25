@@ -325,17 +325,6 @@ li {
     margin-right: 0.5em;
 }
 
-.library:before {
-    content: '';
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-    background-image: url(library.svg);
-    background-size: contain;
-    background-repeat: no-repeat;
-    margin-right:0.5em;   
-}  
-  
 .collection:hover, .library:hover, .path:hover, .album:hover {
     cursor: pointer;
     box-shadow: 0 0 0 3px rgba(105, 105, 105, 0.507);

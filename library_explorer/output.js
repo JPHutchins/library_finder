@@ -777,6 +777,9 @@ const styleTheListElement = (elem, rootInfo) => {
     else if (elem.classList.contains("collection")) {
         elem.insertAdjacentHTML("afterbegin", collectionIcon);
     }
+    else if (elem.classList.contains("library")) {
+        elem.insertAdjacentHTML("afterbegin", libraryIcon);
+    }
 
     const albums = elem.dataset.totalAlbums;
     const percent = Math.floor(albums / rootInfo.totalAlbums * 100);
@@ -790,7 +793,7 @@ const styleTheListElement = (elem, rootInfo) => {
     elem.style.backgroundColor = backgroundColor;
     elem.dataset.backgroundColor = backgroundColor;
 
-    
+
 }
 
 /**
@@ -1237,6 +1240,20 @@ const collectionIcon = `
 	<ellipse cx="29.932" cy="37.494" rx="2.327" ry="1.689"/>
 </g>
 </svg>
+`
+
+const libraryIcon = `<svg class="list-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+viewBox="0 0 508 508" style="enable-background:new 0 0 508 508;" xml:space="preserve">
+
+<g>
+   <path d="M493.949,0h-479.8c-7.8,0-14.1,6.3-14.1,14.1v464.1c0,7.8,6.3,14.1,14.1,14.1h24v1.6c0,7.8,6.3,14.1,14.1,14.1
+       s14.1-6.3,14.1-14.1v-1.6h375.3v1.6c0,7.8,6.3,14.1,14.1,14.1c7.8,0,14.1-6.3,14.1-14.1v-1.6h24c7.8,0,14.1-6.3,14.1-14.1V14.1
+       C508.049,6.3,501.749,0,493.949,0z M479.849,464.1L479.849,464.1h-451.6V337.6h451.6V464.1z M176.649,309.4v-85.5l29.8,85.5
+       H176.649z M479.849,309.4L479.849,309.4h-243.5l-34.5-99.2l-25.1,8.7v-7.2h-28.2v97.7h-15.6v-97.7h-28.2v97.7h-15.8v-97.7h-28.2
+       v97.7h-32.5V182.9h451.6V309.4z M479.849,154.7L479.849,154.7h-347V57h-28.2v97.7h-15.7V57h-28.2v97.7h-32.5V28.2h451.6V154.7z"/>
+</g>
+</svg>
+
 `
 
 const linkedInIcon = `<svg width="50" height="50" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" class="icon svg-inline--fa fa-linkedin fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg>`
