@@ -34,7 +34,7 @@ const char* body_html =
 #include "body.html"
 ;
 
-#define DEVELOPMENT false;
+#define DEVELOPMENT false
 
 #if DEVELOPMENT
     const char* css_source =
