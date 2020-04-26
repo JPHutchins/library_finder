@@ -34,7 +34,7 @@ const char* body_html =
 #include "body.html"
 ;
 
-#define DEVELOPMENT true;
+#define DEVELOPMENT false;
 
 #if DEVELOPMENT
     const char* css_source =
@@ -46,19 +46,19 @@ const char* body_html =
     const char* js_source_4 = "";
 #else // PRODUCTION
     const char* css_source =
-    #include "style.css"
+    #include "style.h"
     ;
     const char* js_source_1 =
-    #include "script_1.js"
+    #include "script_1.h"
     ;
     const char* js_source_2 =
-    #include "script_2.js"
+    #include "script_2.h"
     ;
     const char* js_source_3 =
-    #include "script_3.js"
+    #include "script_3.h"
     ;
     const char* js_source_4 =
-    #include "script_4.js"
+    #include "script_4.h"
     ;
 #endif
 
