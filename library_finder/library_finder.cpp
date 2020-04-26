@@ -93,13 +93,13 @@ int main(int argc, char** argv) {
         if (!strcmp(argv[i], "--type")) {
             i++;
             if (!strcmp(argv[i], "audio")) {
-                strcpy_s(target_extensions, sizeof(AUDIO_EXTENSIONS), AUDIO_EXTENSIONS);
+                memcpy(target_extensions, AUDIO_EXTENSIONS, sizeof(AUDIO_EXTENSIONS));
             }
             else if (!strcmp(argv[i], "video")) {
-                strcpy_s(target_extensions, sizeof(VIDEO_EXTENSIONS), VIDEO_EXTENSIONS);
+                memcpy(target_extensions, VIDEO_EXTENSIONS, sizeof(VIDEO_EXTENSIONS));
             }
             else if (!strcmp(argv[i], "photo")) {
-                strcpy_s(target_extensions, sizeof(PHOTO_EXTENSIONS), PHOTO_EXTENSIONS);
+                memcpy(target_extensions, PHOTO_EXTENSIONS, sizeof(PHOTO_EXTENSIONS));
             }
             else {
                 printf("--type can be audio, video, or photo (case sensitive)");
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
     }
 
     if (!target_extensions[0]) {
-        strcpy_s(target_extensions, sizeof(AUDIO_EXTENSIONS), AUDIO_EXTENSIONS);
+        memcpy(target_extensions, AUDIO_EXTENSIONS, sizeof(AUDIO_EXTENSIONS));
     }
 
     printf("\nStarting at %s\n", argv[1]);
@@ -128,13 +128,13 @@ int main(int argc, char** argv) {
     //  The next six lines have mallocs that are necessary due to the way that
     //  "name" and "shortname" are malloced in the list_and_count function and later
     //  freed in the free_paths function.
-    char* current_directory = (char*)malloc(sizeof(char*) * (strlen(argv[1]) + 1));
+    char* current_directory = (char*)malloc(strlen(argv[1]) + 1);
     if (current_directory) {
-        strcpy_s(current_directory, sizeof(char*) * (strlen(argv[1]) + 1), argv[1]);
+        memcpy(current_directory, argv[1], strlen(argv[1]) + 1);
     }
-    char* current_shortname = (char*)malloc(sizeof(char*) * (strlen(argv[1]) + 1));
+    char* current_shortname = (char*)malloc(strlen(argv[1]) + 1);
     if (current_shortname) {
-        strcpy_s(current_shortname, sizeof(char*) * (strlen(argv[1]) + 1), argv[1]);
+        memcpy(current_shortname, argv[1], strlen(argv[1]) + 1);
     }
 
     Dir_Tree_Node* root = (Dir_Tree_Node*)malloc(sizeof(Dir_Tree_Node));
@@ -154,12 +154,7 @@ int main(int argc, char** argv) {
     printf("\n");
 
     if (html == true) {
-        FILE* fp;
-        errno_t errorCode = fopen_s(&fp, "library_explorer.html", "w+");
-        if (errorCode != 0) {
-            fprintf(stderr, "error: error opening output html file, exiting.\n");
-            exit(EXIT_FAILURE);
-        }
+        FILE* fp = fopen("library_explorer.html", "w+");
         fprintf(fp, "%s%s%s", head_html, css_source, body_html);
         Dir_Tree_Node** results = find_largest_libraries(root);
         int i = 0;
@@ -176,6 +171,8 @@ int main(int argc, char** argv) {
                 results[i]->name);
             i++;
         }
+        free(results);
+
         fprintf(fp, "</ul></div></div>");
 
         fprintf(fp,
@@ -184,11 +181,6 @@ int main(int argc, char** argv) {
             "<ul id=\"library-explorer\" class=\"show-list\">");
         make_html_directory_list(root, fp);
         fprintf(fp, "</ul>");
-
-        for (int i = 0; i < 10; i++) {
-            free(results[i]);
-        }
-        free(results);
 
         fprintf(fp, "<span id=\"command\" class=\"hidden\" data-command=\"");
         for (int i = 1; i < (argc); i++) {
@@ -209,7 +201,7 @@ int main(int argc, char** argv) {
     else {
         make_directory_list(root, 0);
     }
-    //free_paths(root);
+    free_paths(root);
     return 0;
 }
 
@@ -247,7 +239,8 @@ void explore_paths(Dir_Tree_Node* current_path, int* track_count,
     current_path->other_file_count = output->other_file_count;
 
     char trunc_shortname[11];
-    strncpy_s(trunc_shortname, current_path->shortname, 10);
+    memcpy(trunc_shortname, current_path->shortname, 10);
+    trunc_shortname[10] = '\0';
     *track_count += output->audio_file_count;
     printf("Found %d tracks so far, now checking %s...          \r", *track_count, trunc_shortname);
 
@@ -555,7 +548,6 @@ Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
 -------------------------------------------------------------------------------------------------*/
 
 void free_paths(Dir_Tree_Node* current_path) {
-    printf("\n%s", current_path->name);
     if (!current_path->name) {
         free(current_path);
         return;
@@ -613,8 +605,9 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
 
     if (n >= 0) {
         char fullname[MAX_PATH_LENGTH] = { NULL };
-        strcpy_s(fullname, current_directory);
         size_t path_length = strlen(current_directory);
+        memcpy(fullname, current_directory, path_length);
+
         int l = 0;
         if (fullname[path_length] != SLASH) {
             fullname[path_length] = SLASH;
@@ -627,19 +620,18 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
 
             if (eps[i]->d_name[0] != '.') {
                 char* shortname = eps[i]->d_name;
-                size_t shortname_length = strlen(shortname);
+                size_t shortname_length = strlen(shortname) + 1;
                 int k = 0;
                 while (k < shortname_length) {
                     fullname[path_length + k + l] = shortname[k];
                     k++;
                 }
-                fullname[path_length + k + l] = NULL;
                 stat(fullname, current_stat);
                 
                 if (current_stat != NULL && S_ISDIR(current_stat->st_mode) != 0) {
                     output->subdir_count++;
 
-                    size_t fullname_length = path_length + k + 2;
+                    size_t fullname_length = path_length + k + l + 1;
                    
                     current->name = (char*)malloc(fullname_length);
                     if (!current->name) {
@@ -648,13 +640,12 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                     }
                     memcpy(current->name, fullname, fullname_length);
 
-                    current->shortname = (char*)malloc(sizeof(char*) * (shortname_length + 1));
+                    current->shortname = (char*)malloc(shortname_length);
                     if (!current->shortname) {
                         fprintf(stderr, "error: current->shortname (char*) allocation failed, exiting.\n");
                         exit(EXIT_FAILURE);
                     }
-                    strcpy_s(current->shortname, sizeof(char*) * (shortname_length + 1), shortname);
-                    
+                    memcpy(current->shortname, shortname, shortname_length);
 
                     Queue_Node* next = (Queue_Node*)malloc(sizeof(Queue_Node));
                     if (!next) {
