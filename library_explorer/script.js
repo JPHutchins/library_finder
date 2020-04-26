@@ -436,7 +436,7 @@ window.onload = () => {
             case "HIDE_HOVER_DETAILS":
                 const _oldNode = state.explorer.hoverSelectedNode;
                 if (!_oldNode) break;
-                _oldNode.style.boxShadow = "none"
+                _oldNode.style.borderColor = "rgba(0, 0, 0, 0)";
 
                 const _oldDetails = _oldNode.querySelector(".hover-details");
                 if (_oldDetails) {
@@ -446,8 +446,7 @@ window.onload = () => {
             case "SHOW_HOVER_DETAILS":
                 const _hoveredNode = state.explorer.hoverSelectedNode;
                 if (!_hoveredNode) break;
-                _hoveredNode.style.boxShadow = 
-                    "0 0 0 3px rgba(105, 105, 105, 0.507)"
+                _hoveredNode.style.borderColor = "rgba(105, 105, 105, 0.507)";
 
                 !_hoveredNode.classList.contains("album") ?
                     _hoveredNode.style.cursor = "pointer" :
