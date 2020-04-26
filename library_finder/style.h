@@ -197,7 +197,7 @@ code {
     display: flex;
     flex-direction: column;
     margin-left: 0px;
-    margin-top: 126px;
+    margin-top: 123px;
 }
 
 ul {
@@ -224,9 +224,12 @@ li {
     padding-bottom: 3px;
     padding-left: 8px;
     padding-right: 25px;
-    border-width: 1px;
-    margin-bottom: 3px;
+    border-width: 3px;
+    border: solid;
+    border-color: rgba(0, 0, 0, 0);
     z-index: 0;
+    background-clip: padding-box;
+    margin-bottom: -3px;
 }
 
 .library-item-menu-button {

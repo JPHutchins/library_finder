@@ -231,6 +231,10 @@ R"=====(<script>window.onload = () => {
                 state.search.i = 0;
                 updateUi({ type: "SCROLL_SEARCH" });
                 updateState({ type: "UPDATE_BUTTON_STATES" });
+                updateState({
+                    type: "CHANGE_HOVER_SELECTED_NODE",
+                    node: state.search.results[state.search.i]
+                })
                 break;
             case "FIND_NEXT":
                 if (state.search.i < state.search.results.length - 1) {
@@ -243,6 +247,10 @@ R"=====(<script>window.onload = () => {
                     updateUi({ type: "SCROLL_SEARCH" });
                 }
                 updateState({ type: "UPDATE_BUTTON_STATES" });
+                updateState({
+                    type: "CHANGE_HOVER_SELECTED_NODE",
+                    node: state.search.results[state.search.i]
+                })
                 break;
             case "FIND_PREVIOUS":
                 if (state.search.i > 0) {
@@ -255,6 +263,10 @@ R"=====(<script>window.onload = () => {
                     updateUi({ type: "SCROLL_SEARCH" });
                 }
                 updateState({ type: "UPDATE_BUTTON_STATES" });
+                updateState({
+                    type: "CHANGE_HOVER_SELECTED_NODE",
+                    node: state.search.results[state.search.i]
+                })
                 break;
             case "UPDATE_BUTTON_STATES":
                 updateButtonState(state);
@@ -310,22 +322,31 @@ R"=====(<script>window.onload = () => {
             case "CLOSE_ITEM_MENU_CLICK":
                 updateUi({ type: "CLOSE_ITEM_MENU" });
                 state.explorer.openMenu = null;
+                break;
             case "CHANGE_HOVER_SELECTED_NODE":
                 const _node = doesSomeParentBelong(action.node, "library-item");
                 if (!_node) {
-                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    updateUi({
+                        type: "HIDE_HOVER_DETAILS",
+                        node: state.explorer.hoverSelectedNode
+                    });
                     state.explorer.hoverSelectedNode = null;
                     state.explorer.hoverPath = "";
                     updateUi({ type: "CHANGE_HOVER_PATH" });
                     break;
                 }
                 else {
-                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    updateUi({
+                        type: "HIDE_HOVER_DETAILS",
+                        node: state.explorer.hoverSelectedNode
+                    });
                     state.explorer.hoverSelectedNode = _node;
-                    state.explorer.hoverPath = getFullPath(
-                        state.explorer.hoverSelectedNode);
+                    state.explorer.hoverPath = getFullPath(_node);
                     updateUi({ type: "CHANGE_HOVER_PATH" });
-                    updateUi({ type: "SHOW_HOVER_DETAILS" });
+                    updateUi({
+                        type: "SHOW_HOVER_DETAILS",
+                        node: _node
+                    });
                     break;
                 }
             case "CHANGE_SIDEBAR_CONTENT":
@@ -413,19 +434,4 @@ R"=====(<script>window.onload = () => {
                     open: _state,
                     node: action.node
                 })
-                break;
-            case "JUMP_TO_NODE":
-                ui_JumpToNode(action.node)
-                break;
-            case "OPEN_ITEM_MENU":
-                itemMenu(action.node);
-                elements.libraryItemModal.style.top = state.explorer.menuPos.top;
-                elements.libraryItemModal.style.left = Math.min(
-                    parseInt(state.explorer.menuPos.left),
-                    document.body.clientWidth - elements.libraryItemModal.offsetWidth) - 15 + "px";
-                elements.libraryItemModal.classList.add("show-modal");
-                elements.disabler.style.visibility = 'visible';
-                // TODO: scroll into view if needed
-                break;
-            case "CLOSE_ITEM_MENU":
-                elements.libraryItemModal.cl)====="
+                brea)====="

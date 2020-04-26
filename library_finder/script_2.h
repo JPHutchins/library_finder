@@ -1,12 +1,27 @@
-R"=====(assList.remove("show-modal");
+R"=====(k;
+            case "JUMP_TO_NODE":
+                ui_JumpToNode(action.node)
+                break;
+            case "OPEN_ITEM_MENU":
+                itemMenu(action.node);
+                elements.libraryItemModal.style.top = state.explorer.menuPos.top;
+                elements.libraryItemModal.style.left = Math.min(
+                    parseInt(state.explorer.menuPos.left),
+                    document.body.clientWidth - elements.libraryItemModal.offsetWidth) - 15 + "px";
+                elements.libraryItemModal.classList.add("show-modal");
+                elements.disabler.style.visibility = 'visible';
+                // TODO: scroll into view if needed
+                break;
+            case "CLOSE_ITEM_MENU":
+                elements.libraryItemModal.classList.remove("show-modal");
                 elements.disabler.style.visibility = 'hidden';
                 elements.libraryItemModal.style.top = "0px";
                 elements.libraryItemModal.style.left = "0px";
                 break;
             case "HIDE_HOVER_DETAILS":
-                const _oldNode = state.explorer.hoverSelectedNode;
+                const _oldNode = action.node;
                 if (!_oldNode) break;
-                _oldNode.style.boxShadow = "none"
+                _oldNode.style.borderColor = "rgba(0, 0, 0, 0)";
 
                 const _oldDetails = _oldNode.querySelector(".hover-details");
                 if (_oldDetails) {
@@ -14,15 +29,13 @@ R"=====(assList.remove("show-modal");
                 }
                 break;
             case "SHOW_HOVER_DETAILS":
-                const _hoveredNode = state.explorer.hoverSelectedNode;
+                const _hoveredNode = action.node;
                 if (!_hoveredNode) break;
-                _hoveredNode.style.boxShadow = 
-                    "0 0 0 3px rgba(105, 105, 105, 0.507)"
+                _hoveredNode.style.borderColor = "rgba(105, 105, 105, 0.507)";
 
                 !_hoveredNode.classList.contains("album") ?
                     _hoveredNode.style.cursor = "pointer" :
-                    _hoveredNode.style.cursor = "default"; 
-                
+                    _hoveredNode.style.cursor = "default";
 
                 const _details = _hoveredNode.querySelector(".hover-details");
                 if (_details) {
@@ -472,25 +485,4 @@ const itemMenuMaker = (menu, menuItems) => (node) => {
     menuItems[0].style.display = "none";
     menuItems[1].innerText = node.dataset.shortname
     menuItems[1].style.fontWeight = "bold";
-    menuItems[2].innerText = node.dataset.fullPath
-
-    menuItems[3].children[0].onclick = () => {
-        menuItems[2].focus();
-        menuItems[2].select();
-        menuItems[2].setSelectionRange(0, 99999);
-        const successful = document.execCommand("copy");
-        menuItems[3].children[0].innerText = successful ?
-            "Copied!" :
-            "Copy failed.  Highlight and copy manually."
-
-    }
-    menuItems[3].children[1].href = "file:///" + node.dataset.fullPath
-
-    menuItems[4].innerText = ((node) => {
-        switch (node.classList[0]) {
-            case "library":
-                return "Library";
-            case "collection":
-                return "Collection";
-            case "album":
-                retur)====="
+    menuItems[2].innerText = node.dataset.)====="

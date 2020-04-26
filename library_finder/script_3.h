@@ -1,4 +1,25 @@
-R"=====(n "Album";
+R"=====(fullPath
+
+    menuItems[3].children[0].onclick = () => {
+        menuItems[2].focus();
+        menuItems[2].select();
+        menuItems[2].setSelectionRange(0, 99999);
+        const successful = document.execCommand("copy");
+        menuItems[3].children[0].innerText = successful ?
+            "Copied!" :
+            "Copy failed.  Highlight and copy manually."
+
+    }
+    menuItems[3].children[1].href = "file:///" + node.dataset.fullPath
+
+    menuItems[4].innerText = ((node) => {
+        switch (node.classList[0]) {
+            case "library":
+                return "Library";
+            case "collection":
+                return "Collection";
+            case "album":
+                return "Album";
             case "path":
                 return "Path";
         }
@@ -321,17 +342,4 @@ const collectionIcon = `
 		C30.089,33.95,30.536,33.503,30.536,32.95z"/>
 	<path d="M39.4,45.638c-2.824,2.042-6.204,3.121-9.774,3.121c-0.553,0-1,0.447-1,1s0.447,1,1,1c3.994,0,7.779-1.21,10.946-3.5
 		c0.447-0.324,0.548-0.949,0.225-1.396C40.474,45.414,39.847,45.314,39.4,45.638z"/>
-	<path d="M28.626,46.008c0,0.553,0.447,1,1,1c3.106,0,6.05-0.942,8.512-2.724c0.448-0.324,0.548-0.949,0.225-1.396
-		c-0.325-0.448-0.95-0.548-1.396-0.225c-2.119,1.534-4.657,2.345-7.34,2.345C29.073,45.008,28.626,45.455,28.626,46.008z"/>
-	<path d="M28.626,42.257c0,0.553,0.447,1,1,1c2.23,0,4.341-0.68,6.104-1.967c0.445-0.325,0.544-0.951,0.218-1.397
-		c-0.324-0.444-0.949-0.544-1.397-0.218c-1.418,1.035-3.121,1.582-4.925,1.582C29.073,41.257,28.626,41.704,28.626,42.257z"/>
-	<ellipse cx="29.932" cy="37.494" rx="2.327" ry="1.689"/>
-</g>
-</svg>
-`
-
-const libraryIcon = `<svg class="list-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-viewBox="0 0 508 508" style="enable-background:new 0 0 508 508;" xml:space="preserve">
-
-<g>
-   <pat)====="
+	<path d="M28.626,46.008c0,0.553,0.447,1,1,1c3.106,0,6.05-0.942,8.512-2.724c0.)====="
