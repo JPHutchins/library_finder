@@ -231,6 +231,10 @@ window.onload = () => {
                 state.search.i = 0;
                 updateUi({ type: "SCROLL_SEARCH" });
                 updateState({ type: "UPDATE_BUTTON_STATES" });
+                updateState({
+                    type: "CHANGE_HOVER_SELECTED_NODE",
+                    node: state.search.results[state.search.i]
+                })
                 break;
             case "FIND_NEXT":
                 if (state.search.i < state.search.results.length - 1) {
@@ -243,6 +247,10 @@ window.onload = () => {
                     updateUi({ type: "SCROLL_SEARCH" });
                 }
                 updateState({ type: "UPDATE_BUTTON_STATES" });
+                updateState({
+                    type: "CHANGE_HOVER_SELECTED_NODE",
+                    node: state.search.results[state.search.i]
+                })
                 break;
             case "FIND_PREVIOUS":
                 if (state.search.i > 0) {
@@ -255,6 +263,10 @@ window.onload = () => {
                     updateUi({ type: "SCROLL_SEARCH" });
                 }
                 updateState({ type: "UPDATE_BUTTON_STATES" });
+                updateState({
+                    type: "CHANGE_HOVER_SELECTED_NODE",
+                    node: state.search.results[state.search.i]
+                })
                 break;
             case "UPDATE_BUTTON_STATES":
                 updateButtonState(state);
@@ -310,22 +322,31 @@ window.onload = () => {
             case "CLOSE_ITEM_MENU_CLICK":
                 updateUi({ type: "CLOSE_ITEM_MENU" });
                 state.explorer.openMenu = null;
+                break;
             case "CHANGE_HOVER_SELECTED_NODE":
                 const _node = doesSomeParentBelong(action.node, "library-item");
                 if (!_node) {
-                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    updateUi({
+                        type: "HIDE_HOVER_DETAILS",
+                        node: state.explorer.hoverSelectedNode
+                    });
                     state.explorer.hoverSelectedNode = null;
                     state.explorer.hoverPath = "";
                     updateUi({ type: "CHANGE_HOVER_PATH" });
                     break;
                 }
                 else {
-                    updateUi({ type: "HIDE_HOVER_DETAILS" });
+                    updateUi({
+                        type: "HIDE_HOVER_DETAILS",
+                        node: state.explorer.hoverSelectedNode
+                    });
                     state.explorer.hoverSelectedNode = _node;
-                    state.explorer.hoverPath = getFullPath(
-                        state.explorer.hoverSelectedNode);
+                    state.explorer.hoverPath = getFullPath(_node);
                     updateUi({ type: "CHANGE_HOVER_PATH" });
-                    updateUi({ type: "SHOW_HOVER_DETAILS" });
+                    updateUi({
+                        type: "SHOW_HOVER_DETAILS",
+                        node: _node
+                    });
                     break;
                 }
             case "CHANGE_SIDEBAR_CONTENT":
@@ -434,7 +455,7 @@ window.onload = () => {
                 elements.libraryItemModal.style.left = "0px";
                 break;
             case "HIDE_HOVER_DETAILS":
-                const _oldNode = state.explorer.hoverSelectedNode;
+                const _oldNode = action.node;
                 if (!_oldNode) break;
                 _oldNode.style.borderColor = "rgba(0, 0, 0, 0)";
 
@@ -444,14 +465,13 @@ window.onload = () => {
                 }
                 break;
             case "SHOW_HOVER_DETAILS":
-                const _hoveredNode = state.explorer.hoverSelectedNode;
+                const _hoveredNode = action.node;
                 if (!_hoveredNode) break;
                 _hoveredNode.style.borderColor = "rgba(105, 105, 105, 0.507)";
 
                 !_hoveredNode.classList.contains("album") ?
                     _hoveredNode.style.cursor = "pointer" :
-                    _hoveredNode.style.cursor = "default"; 
-                
+                    _hoveredNode.style.cursor = "default";
 
                 const _details = _hoveredNode.querySelector(".hover-details");
                 if (_details) {
