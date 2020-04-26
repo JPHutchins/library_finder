@@ -15,8 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.If not, see < http://www.gnu.org/licenses/>.
 -------------------------------------------------------------------------------------------------*/
-
+#ifdef _WIN32
 #define SLASH '\\' // WINDOWS SLASH
+#else
+#define SLASH '/' // SLASH
+#endif
 #define MAX_PATH_LENGTH 1017
 #define TOLERANCE 2
 #define AUDIO_EXTENSIONS ".+\.(aa|aac|aax|aiff|alac|flac|m4a|mp3|ogg|wav|wma)"
