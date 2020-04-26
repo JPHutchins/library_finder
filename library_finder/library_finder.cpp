@@ -40,7 +40,7 @@ const char* body_html =
     const char* css_source =
         "<link rel = \"stylesheet\" type = \"text/css\" href = \"style.css\">";
     const char* js_source_1 =
-        "<script src=\"output.js\"></script>";
+        "<script src=\"script.js\"></script>";
     const char* js_source_2 = "";
     const char* js_source_3 = "";
     const char* js_source_4 = "";
