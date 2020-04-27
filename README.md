@@ -2,6 +2,8 @@
 Find potential file libraries on a file system, such as those created by iTunes, Plex or Mac Photos.
 ## Downloads
 [Latest Release](https://github.com/JPHutchins/library_finder/releases)
+## Demo
+Test user interface here: https://jphutchins.github.io/library_finder/
 ## Quickstart
 library_finder is a command line utility and does not require any further installation or configuration once downloaded. Open a terminal (like Command Prompt or Terminal) and navigate to the folder that you downloaded library_finder.exe to.
 ```
