@@ -237,6 +237,7 @@ void explore_paths(Dir_Tree_Node* current_path, int* track_count,
     current_path->total_albums_count = 0;
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
+    current_path->type = None;
 
     char trunc_shortname[11];
     memcpy(trunc_shortname, current_path->shortname, 10);
@@ -529,16 +530,17 @@ Dir_Tree_Node** find_largest_libraries(Dir_Tree_Node* current_path) {
         fprintf(stderr, "error: init (Dir_Tree_Node) allocation failed, exiting.\n");
         exit(EXIT_FAILURE);
     }
-    
+  
     Dir_Tree_Node** result = (Dir_Tree_Node**)malloc(10 * sizeof(Dir_Tree_Node*));
 
     int i = 0;
     while (i < 10) {
-        result[i] = init;
+	result[i] = init;
         i++;
     }
 
     inspect_paths(current_path, result);
+    free(init);
 
     return result;
 }
