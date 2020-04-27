@@ -1,13 +1,7 @@
 # library_finder
 Find potential file libraries on a file system, such as those created by iTunes, Plex or Mac Photos.
 ## Downloads
-[Windows 10 64-bit](https://github.com/JPHutchins/library_finder/releases/download/0.1/library_finder.exe)
-
-[Windows 10 32-bit](https://github.com/JPHutchins/library_finder/releases/download/0.1/library_finder32.exe)
-
-[Latest Release Notes](https://github.com/JPHutchins/library_finder/releases)
-
-
+[Latest Release](https://github.com/JPHutchins/library_finder/releases)
 ## Quickstart
 library_finder is a command line utility and does not require any further installation or configuration once downloaded. Open a terminal (like Command Prompt or Terminal) and navigate to the folder that you downloaded library_finder.exe to.
 ```
@@ -19,16 +13,6 @@ Optional flags:
 `--help`
 
 Example Windows Usage: ```library_finder D:\Music```
-
-### Compile in Visual Studio 2019  
-#### For an .exe:
-  From Solution Explorer, drop down library_finder and open library_finder.cpp
-  Drop down Project and select library_finder Properties
-  Under Configuration Properties->General, under Projec Defaults, verify that
-    Configuration Type is set to Application (.exe)
-#### For unit testing:
-  Complete the steps above but verify that Configuraiton Type is set to
-    Static library (.lib)
 
 ## Motivation
 
