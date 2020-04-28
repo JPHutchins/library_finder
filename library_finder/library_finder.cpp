@@ -88,6 +88,7 @@ int main(int argc, char** argv) {
     char target_extensions[150] = { NULL };
     unsigned int tolerance = TOLERANCE;
     bool html = false;
+    bool file_names = false;
 
     for (int i = 2; i < (argc); i++) {
         if (!strcmp(argv[i], "--type")) {
@@ -112,6 +113,9 @@ int main(int argc, char** argv) {
         }
         else if (!strcmp(argv[i], "--html")) {
             html = true;
+        }
+        else if (!strcmp(argv[i], "--files")) {
+            file_names = true;
         }
         else {
             printf("Usage: [path] --type [ string ] --tolerance [ integer ] --html");
@@ -148,7 +152,7 @@ int main(int argc, char** argv) {
     }
     int total_count = 0;
 
-    explore_paths(root, &total_count, target_extensions, tolerance);
+    explore_paths(root, &total_count, target_extensions, tolerance, file_names);
     traverse_paths(root);
 
     printf("\n");
@@ -212,7 +216,7 @@ int main(int argc, char** argv) {
 -------------------------------------------------------------------------------------------------*/
 
 void explore_paths(Dir_Tree_Node* current_path, int* track_count,
-    char* target_extensions, unsigned int tolerance) {
+    char* target_extensions, unsigned int tolerance, bool file_names) {
 
     if (!current_path->name) {
         return;
@@ -227,7 +231,7 @@ void explore_paths(Dir_Tree_Node* current_path, int* track_count,
         exit(EXIT_FAILURE);
     }
 
-    output = list_and_count(current_directory, output, target_extensions, tolerance);
+    output = list_and_count(current_directory, output, target_extensions, tolerance, file_names);
 
     current_path->name = current_directory;
     current_path->shortname = current_shortname;
@@ -237,6 +241,7 @@ void explore_paths(Dir_Tree_Node* current_path, int* track_count,
     current_path->total_albums_count = 0;
     current_path->audio_file_count = output->audio_file_count;
     current_path->other_file_count = output->other_file_count;
+    current_path->file_list = output->file_list;
     current_path->type = None;
 
     char trunc_shortname[11];
@@ -281,13 +286,13 @@ void explore_paths(Dir_Tree_Node* current_path, int* track_count,
         }
 
         head = head->next;
-        explore_paths(head, track_count, target_extensions, tolerance);
+        explore_paths(head, track_count, target_extensions, tolerance, file_names);
         current = nullptr;
     }
 
     if (current_path->next) {
         current_path = current_path->next;
-        explore_paths(current_path, track_count, target_extensions, tolerance);
+        explore_paths(current_path, track_count, target_extensions, tolerance, file_names);
     }
 
     free(output);
@@ -458,6 +463,15 @@ void make_html_directory_list(Dir_Tree_Node* current_path, FILE* fp) {
             current_path->name,
             current_path->shortname);
         fprintf(fp, "%s", current_path->shortname);
+        Queue_Node* list = current_path->file_list;
+        if (list) {
+            fprintf(fp, "<ul>");
+            while (list) {
+                fprintf(fp, "<li class=\"file library-item\">%s</li>", list->shortname);
+                list = list->next;
+            }
+            fprintf(fp, "</ul>");
+        }
     }
     else {
         li = false;
@@ -562,6 +576,14 @@ void free_paths(Dir_Tree_Node* current_path) {
     if (current_path->next) {
         free_paths(current_path->next);
     }
+
+    Queue_Node* list = current_path->file_list;
+    while (list) {
+        Queue_Node* tmp = list->next;
+        free(list->shortname);
+        free(list);
+        list = tmp;
+    }
    
     free(current_path->shortname);
     free(current_path->name);
@@ -583,7 +605,7 @@ void free_paths(Dir_Tree_Node* current_path) {
 -------------------------------------------------------------------------------------------------*/
 
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
-    char* target_extensions, unsigned int tolerance) {
+    char* target_extensions, unsigned int tolerance, bool file_names) {
 
     struct dirent** eps;
     int n;
@@ -617,6 +639,8 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
         }
 
         Queue_Node* current = first;
+        Queue_Node* fl_head = nullptr;
+        Queue_Node* fl_current = nullptr;
 
         for (int i = 0; i < n; i++) {
 
@@ -661,20 +685,42 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
                     if (std::regex_match(shortname,
                             std::regex(target_extensions, std::regex_constants::icase))) {
                         output->audio_file_count++;
+                        if (file_names) {
+                            if (!fl_head) {
+                                fl_head = (Queue_Node*)malloc(sizeof(Queue_Node));
+                                fl_current = fl_head;
+                            }
+                            else {
+                                fl_current->next = (Queue_Node*)malloc(sizeof(Queue_Node));
+                                fl_current = fl_current->next;
+                            }
+                            fl_current->name = nullptr;
+                            fl_current->shortname = (char*)malloc(shortname_length);
+                            memcpy(fl_current->shortname, shortname, shortname_length);
+                            fl_current->next = nullptr;
+                            
+                        }
                     }
                     else {
                         output->other_file_count++; 
                     }
                 }
-               if (output->other_file_count > tolerance) {
+                if (output->other_file_count > tolerance) {
                     output->audio_file_count = 0;
-                }
+                    while (fl_head) {
+                        Queue_Node* tmp = fl_head->next;
+                        free(fl_head);
+                        fl_head = tmp;
+                    }
+                    fl_head = nullptr;
+                } 
                 current->name = nullptr;
                 current->shortname = nullptr;
                 current->next = nullptr;
             }
         }  
         current = nullptr;
+        output->file_list = fl_head;
     }
 
     else {

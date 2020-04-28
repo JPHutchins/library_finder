@@ -53,6 +53,7 @@ typedef struct Cur_Dir_Info {
     char* parent_path;
     char* shortname;
     struct Queue_Node* subdir;
+    struct Queue_Node* file_list;
     int audio_file_count;
     int other_file_count;
     int subdir_count;
@@ -65,6 +66,7 @@ typedef struct Dir_Tree_Node {
     enum classification type;
     struct Dir_Tree_Node* parent;
     struct Dir_Tree_Node* subdirs;
+    struct Queue_Node* file_list;
     struct Dir_Tree_Node* next;
     int contained_collections_count;
     int contained_albums_count;
@@ -75,10 +77,10 @@ typedef struct Dir_Tree_Node {
 }Dir_Tree_Node;
 
 Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
-    char* target_extensions, unsigned int tolerance);
+    char* target_extensions, unsigned int tolerance, bool file_names);
 
 void explore_paths(Dir_Tree_Node* current_path, int* track_count,
-    char* target_extensions, unsigned int tolerance);
+    char* target_extensions, unsigned int tolerance, bool file_names);
 
 void traverse_paths(Dir_Tree_Node* current_path);
 
