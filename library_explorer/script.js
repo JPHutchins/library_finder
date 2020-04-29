@@ -534,7 +534,7 @@ window.onload = () => {
 
     const ui_ScrollSearch = () => {
         const node = state.search.results[state.search.i]
-        nodes = getParentsOfNode(node)
+        nodes = getUlParentsOfNode(node)
         hideStaleNodes(nodes);
         showFreshNodes(nodes);
         scrollToNode(node);
@@ -548,7 +548,7 @@ window.onload = () => {
     }
 
     const ui_JumpToNode = (node) => {
-        nodes = getParentsOfNode(node)
+        nodes = getUlParentsOfNode(node)
         hideStaleNodes(nodes);
         showFreshNodes(nodes);
         scrollToNode(node);
@@ -738,7 +738,11 @@ const makeFindFolder = (elements) => (fullPath) => {
     }
 }
 
-const getParentsOfNode = (node) => {
+/**
+ * Return a Set containing the <ul> elements of which node is a descendant.
+ * @param {HTMLElement} node The node at which to start search.
+ */
+const getUlParentsOfNode = (node) => {
     if (!node) return new Set;
 
     let nodeCursor = node.parentElement;
