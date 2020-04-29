@@ -1228,6 +1228,9 @@ const newHtml = `
     <div id="about" class="guide"></div>
     `
 
+/**
+ * Return a new <div> HTML element containing the "footer" text and elements.
+ */
 const footerContent = () => {
     const footerContent = document.createElement("div");
     footerContent.innerHTML = `
