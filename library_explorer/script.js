@@ -1023,6 +1023,9 @@ const itemMenuMaker = (menuItems) => (node) => {
         "";
 }
 
+/**
+ * Return a new <svg> HTML Element "hamburger menu icon".
+ */
 const createHamburgerMenu = () => {
     const menuIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
