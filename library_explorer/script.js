@@ -755,6 +755,15 @@ const getUlParentsOfNode = (node) => {
     return nodeParents;
 }
 
+/**
+ * Hide "library-item" nodes that do not belong to the set setOfNodes argument.
+ * For example, a node is "stale" when it is one that was made visible to
+ * display a previous search result but is not an ancestor in the tree of the
+ * current search result.
+ * Return the Set stale which is the difference of the Sets shownNodes and
+ * setOfNodes.
+ * @param {Set} setOfNodes The set of HTMLElements.
+ */
 const hideStaleNodes = (setOfNodes) => {
     const currentShownNodes = new Set;
     const shownNodes = document.getElementById('library-explorer')
@@ -774,12 +783,17 @@ const hideStaleNodes = (setOfNodes) => {
     return stale;
 }
 
+/**
+ * Display all nodes belonging to this set by adding the class "show-list".
+ * @param {Set} setOfNodes The set of HTMLElements
+ */
 const showFreshNodes = (setOfNodes) => {
     for (const node of setOfNodes) {
         node.classList.add('show-list')
     }
     return setOfNodes
 }
+
 
 const scrollToNode = (node) => {
     if (!node) return;
