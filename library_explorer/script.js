@@ -204,7 +204,6 @@ window.onload = () => {
     -------------------------------------------------------------------------*/
 
     const itemMenu = itemMenuMaker(
-        elements.libraryItemModal,
         elements.libraryItemModal.getElementsByClassName("modal-menu-item"))
     // provide these functions with context... needs more thought...
     const keywordSearch = makeKeywordSearch(state)
@@ -972,7 +971,11 @@ const organizeAlbums = (elem) => {
     }
 }
 
-const itemMenuMaker = (menu, menuItems) => (node) => {
+/**
+ * Return a function that generates a context menu for the argument node.
+ * @param {Array} menuItems An array of HTMLElements.
+ */
+const itemMenuMaker = (menuItems) => (node) => {
     menuItems[3].children[0].innerText = "Copy full path to clipboard"
     menuItems[0].innerText = node.dataset.fullPath
     menuItems[0].style.fontSize = 'small';
