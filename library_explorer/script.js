@@ -1065,6 +1065,10 @@ const commandline = (elements) => {
     return commandline;
 }
 
+/**
+ * Return a new <div> HTML element containing the content for the "Help" 
+ * sidebar.
+ */
 const helpContent = () => {
     const helpContent = document.createElement("div");
     helpContent.setAttribute("id", "guide-container")
