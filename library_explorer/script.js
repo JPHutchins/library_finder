@@ -929,10 +929,10 @@ const hoverDetails = (li, menuIcon, rootInfo) => {
     else if (li.classList.contains("largest-folders")) {
         text =
             `${li.dataset.totalAlbums} albums ` +
-            `(${Math.floor(li.dataset.totalAlbums / 
+            `(${Math.floor(li.dataset.totalAlbums /
                 rootInfo.totalAlbums * 100)}%), ` +
             `${li.dataset.totalAudioFiles} tracks ` +
-            `(${Math.floor(li.dataset.totalAudioFiles / 
+            `(${Math.floor(li.dataset.totalAudioFiles /
                 rootInfo.totalAudioFiles * 100)}%)`;
         newSpan.innerText = text;
         return newSpan;
@@ -1052,10 +1052,16 @@ const createHamburgerMenu = () => {
     return menuIcon
 };
 
+/**
+ * Return a new <h3> HTML element containing the arguments given to
+ * library_finder.
+ * @param {Object} elements The HTML elements object.
+ */
 const commandline = (elements) => {
     const commandline = document.createElement("h3");
     commandline.setAttribute("id", "command-subtitle");
-    commandline.innerText = "library_finder " + elements.command.dataset.command;
+    commandline.innerText = "library_finder " + 
+        elements.command.dataset.command;
     return commandline;
 }
 
