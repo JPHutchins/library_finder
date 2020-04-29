@@ -821,6 +821,10 @@ const flashNode = (node) => {
     node.style.backgroundColor = colorEdit + ", 75%, 75%)"
 }
 
+/**
+ * Return the data attribute "fullPath" if the node contains it, else "".
+ * @param {HTMLElement} node The HTML element node.
+ */
 const getFullPath = (node) => {
     if (!node.classList.contains("library-item")) return "";
     return node.dataset.fullPath;
