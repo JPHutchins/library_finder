@@ -1146,6 +1146,10 @@ const helpContent = () => {
     return helpContent;
 }
 
+/**
+ * Return a new <div> HTML element containing the content for the "About" 
+ * sidebar.
+ */
 const aboutContent = () => {
     const aboutContent = document.createElement("div");
     aboutContent.setAttribute("id", "about-container")
