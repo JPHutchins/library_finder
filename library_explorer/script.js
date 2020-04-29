@@ -143,7 +143,7 @@ window.onload = () => {
     }
 
     elements.insights.onclick = (e) => {
-        const _node = doesSomeParentBelong(e.target, "largest-folders");
+        const _node = firstParentClassListContains(e.target, "largest-folders");
         if (!_node) return;
         updateUi({
             type: "JUMP_TO_NODE",
@@ -323,7 +323,7 @@ window.onload = () => {
                 state.explorer.openMenu = null;
                 break;
             case "CHANGE_HOVER_SELECTED_NODE":
-                const _node = doesSomeParentBelong(action.node, "library-item");
+                const _node = firstParentClassListContains(action.node, "library-item");
                 if (!_node) {
                     updateUi({
                         type: "HIDE_HOVER_DETAILS",
@@ -633,11 +633,18 @@ const getMenuButtonClickPos = (e) => {
     }
 }
 
-const doesSomeParentBelong = (node, className) => {
+/**
+ * Beginning with node, recursively search up the element tree and return the
+ * first element node that belongs to the specified class.  Return false if no 
+ * element above the starting node belongs to the specified class.
+ * @param {HTMLElement} node The "lowest" node; begin search here.
+ * @param {String} className The class name to search for.
+ */
+const firstParentClassListContains = (node, className) => {
     if (!node) return false;
     if (node.classList.contains(className)) return node;
     return node.parentElement &&
-        doesSomeParentBelong(node.parentElement, className);
+        firstParentClassListContains(node.parentElement, className);
 }
 
 const searchIndex = (state) => (query) => {
