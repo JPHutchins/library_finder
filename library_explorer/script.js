@@ -582,9 +582,9 @@ window.onload = () => {
     updateState({ type: "UPDATE_BUTTON_STATES" });
 }
 
-/*-----------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
     Utility functions.
------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 
 /**
  * Update the state of the "find next" and "find previous buttons".
@@ -861,7 +861,6 @@ const toggleClassName = (className) => (element) => {
  * @param {Object} rootInfo The info about the displayed directories.
  */
 const styleTheListElement = (elem, rootInfo) => {
-
     if (elem.classList.contains("path")) {
         elem.insertAdjacentHTML("afterbegin", pathIcon);
     }
@@ -886,13 +885,10 @@ const styleTheListElement = (elem, rootInfo) => {
     const H = 180 + Math.floor(Math.log2(percent) * 180 / Math.log2(100));
     const S = 8;
     const L = 90 - Math.floor((Math.log2(percent) * 4))
-
     const backgroundColor = `hsl(${H}, ${S}%, ${L}%)`
 
     elem.style.backgroundColor = backgroundColor;
     elem.dataset.backgroundColor = backgroundColor;
-
-
 }
 
 /**
@@ -934,9 +930,11 @@ const hoverDetails = (li, menuIcon, rootInfo) => {
     else if (li.classList.contains("largest-folders")) {
         text =
             `${li.dataset.totalAlbums} albums ` +
-            `(${Math.floor(li.dataset.totalAlbums / rootInfo.totalAlbums * 100)}%), ` +
+            `(${Math.floor(li.dataset.totalAlbums / 
+                rootInfo.totalAlbums * 100)}%), ` +
             `${li.dataset.totalAudioFiles} tracks ` +
-            `(${Math.floor(li.dataset.totalAudioFiles / rootInfo.totalAudioFiles * 100)}%)`;
+            `(${Math.floor(li.dataset.totalAudioFiles / 
+                rootInfo.totalAudioFiles * 100)}%)`;
         newSpan.innerText = text;
         return newSpan;
     }
