@@ -821,14 +821,6 @@ const flashNode = (node) => {
     node.style.backgroundColor = colorEdit + ", 75%, 75%)"
 }
 
-const highlightNode = (node) => {
-    if (!node) return;
-    let newColor = node.dataset.backgroundColor.slice(0,
-        node.dataset.backgroundColor.length - 2);
-    newColor = newColor + ".1)";
-    node.style.backgroundColor = newColor;
-}
-
 const getFullPath = (node) => {
     if (!node.classList.contains("library-item")) return "";
     return node.dataset.fullPath;
