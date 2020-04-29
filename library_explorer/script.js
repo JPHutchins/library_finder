@@ -1244,6 +1244,10 @@ const footerContent = () => {
     return footerContent;
 }
 
+/**
+ * Return a new <div> HTML element with an X icon for use as a "close" button.
+ * The div has belongs to the the class "close-sidebar-button".
+ */
 const closeSidebarButton = () => {
     const button = document.createElement("div");
     button.setAttribute("class", "close-sidebar-button");
