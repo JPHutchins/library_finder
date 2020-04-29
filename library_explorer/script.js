@@ -207,7 +207,7 @@ window.onload = () => {
         elements.libraryItemModal,
         elements.libraryItemModal.getElementsByClassName("modal-menu-item"))
     // provide these functions with context... needs more thought...
-    const findAll = searchIndex(state)
+    const keywordSearch = makeKeywordSearch(state)
     const findFolder = makeFindFolder(elements)
 
     /*-------------------------------------------------------------------------
@@ -225,7 +225,7 @@ window.onload = () => {
                 state.search.previousResult = (
                     state.search.results ?
                         state.search.results[state.search.i] : null);
-                state.search.results = findAll(state.search.query);
+                state.search.results = keywordSearch(state.search.query);
                 state.search.resultsText = getSearchResultText(
                     state.search.results);
                 state.search.i = 0;
@@ -647,7 +647,18 @@ const firstParentClassListContains = (node, className) => {
         firstParentClassListContains(node.parentElement, className);
 }
 
-const searchIndex = (state) => (query) => {
+/**
+ * Return a function that takes a query and returns a list of HTMLElements from
+ * the index in the state object that contain one or more keywords from the
+ * query.  This list is in a ranked order where all HTMLElements from index
+ * [0...a] matched n keywords from the query while HTMLElements from index
+ * [a+1...b] matched n-1 keywords from the query and so on.  This ranking has no
+ * regard for the order of the words.  The search is not case sensitive.
+ * This is a hash lookup - there is no consideration for partial words or
+ * misspellings.
+ * @param {Object} state The state object containing the index.
+ */
+const makeKeywordSearch = (state) => (query) => {
     const index = state.search.index;
     if (query == " ") return [];
     lower = query.toLowerCase();
@@ -684,12 +695,21 @@ const searchIndex = (state) => (query) => {
     return completeResults;
 }
 
+/**
+ * Take an index object (empty {}) and fill it with a keyword search index.
+ * This keyword index splits each shortname string at the space " " character,
+ * converts the string to lower case and creates a key for that keyword in the
+ * index.  The value given by each key is a Set containing all of the
+ * HTMLElements that contain the data attribute "shortname" containing that
+ * keyword.  This is repeated for every child node of the input variable, node,
+ * until the entire tree has been indexed for keyword search.
+ * @param {HTMLElement} node The root node at which to begin indexing.
+ * @param {Object} index The object in which to store the search index.
+ */
 const indexForSearch = (node, index) => {
     const indexNext = (node) => {
         if (node.dataset.shortname) {
-
             const keywords = node.dataset.shortname.toLowerCase().split(" ")
-
             keywords.forEach((keyword) => {
                 if (index[keyword] !== undefined) index[keyword].add(node);
                 else {
