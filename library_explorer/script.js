@@ -806,6 +806,12 @@ const scrollToNode = (node) => {
     }));
 }
 
+/**
+ * Flash the node for 2 seconds.  "Flash" means that the saturation and
+ * brightness of the color are changed to 75%.
+ * For example hsl(55, 8%, 25%) -> hsl(55, 75%, 75%)
+ * @param {HTMLElement} node The HTML element node.
+ */
 const flashNode = (node) => {
     if (!node) return;
     setTimeout(
