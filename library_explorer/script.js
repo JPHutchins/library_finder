@@ -311,8 +311,7 @@ window.onload = () => {
                     state.explorer.openFolders.delete(action.node)
                 break;
             case "CLICK_ITEM_BUTTON":
-                state.explorer.menuPos = getMenuButtonClickPos(
-                    state.explorer.hoverSelectedNode, action.event);
+                state.explorer.menuPos = getMenuButtonClickPos(action.event);
                 updateUi({
                     type: "OPEN_ITEM_MENU",
                     node: state.explorer.hoverSelectedNode
@@ -620,9 +619,12 @@ const shouldEnableButton = (state, button) => {
     }
 }
 
-
-const getMenuButtonClickPos = (node, e) => {
-    parentRect = node.getBoundingClientRect()
+/**
+ * Return an object containing the top and left positions at which the cursor
+ * triggered the event.
+ * @param {Event} e The event.
+ */
+const getMenuButtonClickPos = (e) => {
     const top = e.clientY + window.scrollY
     const left = e.clientX
     return {
