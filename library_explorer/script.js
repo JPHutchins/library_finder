@@ -794,7 +794,10 @@ const showFreshNodes = (setOfNodes) => {
     return setOfNodes
 }
 
-
+/**
+ * Smoothly scroll to center the viewport on the argument node.
+ * @param {HTMLElement} node The HTML element node.
+ */
 const scrollToNode = (node) => {
     if (!node) return;
     window.requestAnimationFrame(() => node.scrollIntoView({
