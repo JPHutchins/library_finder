@@ -726,6 +726,12 @@ const indexForSearch = (node, index) => {
     return index;
 }
 
+/**
+ * Returns a function that will search the list of HTMLElements 
+ * elements.libraryItems and return the first one that has a data attribute
+ * "fullPath" matching the argument fullPath.
+ * @param {Object} elements The HTMLElements object.
+ */
 const makeFindFolder = (elements) => (fullPath) => {
     for (const node of elements.libraryItems) {
         if (node.dataset.fullPath === fullPath) return node;
