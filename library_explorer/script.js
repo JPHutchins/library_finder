@@ -587,16 +587,25 @@ window.onload = () => {
     Utility functions.
 -----------------------------------------------------------------------------*/
 
+/**
+ * Update the state of the "find next" and "find previous buttons".
+ * @param {Object} state The state object. 
+ */
 const updateButtonState = (state) => {
-    buttonEnabled(state, "next") ?
+    shouldEnableButton(state, "next") ?
         state.search.enableNext = true :
         state.search.enableNext = false;
-    buttonEnabled(state, "previous") ?
+    shouldEnableButton(state, "previous") ?
         state.search.enablePrevious = true :
         state.search.enablePrevious = false;
 }
 
-const buttonEnabled = (state, button) => {
+/**
+ * Return true if the button should be enabled, else false.
+ * @param {Object} state The state object.
+ * @param {String} button The id of the button.
+ */
+const shouldEnableButton = (state, button) => {
     switch (button) {
         case "next":
             if (state.search.i >= state.search.results.length - 1) {
