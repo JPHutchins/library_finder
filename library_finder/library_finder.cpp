@@ -608,13 +608,18 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
     char* target_extensions, unsigned int tolerance, bool file_names) {
 
     struct dirent** eps;
-    int n;
-    n = scandir(current_directory, &eps, one, alphasort);
-    struct stat* current_stat;
-    current_stat = (struct stat*) malloc(sizeof(struct stat));
+    int n = scandir(current_directory, &eps, one, alphasort);
+    struct stat* current_stat = (struct stat*) malloc(sizeof(struct stat));
     if (!current_stat) {
         fprintf(stderr, "error: current_stat (stat*) allocation failed, exiting.\n");
         exit(EXIT_FAILURE);
+    }
+
+    if (n <= 0) {
+        perror("Couldn't open the directory                         \r");
+        free(current_stat);
+        free(eps);
+        return output;
     }
 
     Queue_Node* first = (Queue_Node*)malloc(sizeof(Queue_Node));
@@ -622,118 +627,108 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
         fprintf(stderr, "error: first (Queue_Node) allocation failed, exiting.\n");
         exit(EXIT_FAILURE);
     }
-    
+
     output->audio_file_count = 0;
     output->other_file_count = 0;
     output->subdir_count = 0;
 
-    if (n >= 0) {
-        char fullname[MAX_PATH_LENGTH] = { NULL };
-        size_t path_length = strlen(current_directory);
-        memcpy(fullname, current_directory, path_length);
+    char fullname[MAX_PATH_LENGTH] = { '\0' };
+    size_t path_length = strlen(current_directory);
+    memcpy(fullname, current_directory, path_length);
 
-        int l = 0;
-        if (fullname[path_length] != SLASH) {
-            fullname[path_length] = SLASH;
-            l = 1;
+    int l = 0;
+    if (fullname[path_length] != SLASH) {
+        fullname[path_length] = SLASH;
+        l = 1;
+    }
+
+    Queue_Node* current = first;
+    Queue_Node* fl_head = nullptr;
+    Queue_Node* fl_current = nullptr;
+
+    for (int i = 0; i < n; i++) {
+
+        if (eps[i]->d_name[0] == '.') {
+            continue;
         }
 
-        Queue_Node* current = first;
-        Queue_Node* fl_head = nullptr;
-        Queue_Node* fl_current = nullptr;
-
-        for (int i = 0; i < n; i++) {
-
-            if (eps[i]->d_name[0] != '.') {
-                char* shortname = eps[i]->d_name;
-                size_t shortname_length = strlen(shortname) + 1;
-                int k = 0;
-                while (k < shortname_length) {
-                    fullname[path_length + k + l] = shortname[k];
-                    k++;
-                }
-                stat(fullname, current_stat);
+        char* shortname = eps[i]->d_name;
+        size_t shortname_length = strlen(shortname) + 1;
+        int k = 0;
+        while (k < shortname_length) {
+            fullname[path_length + k + l] = shortname[k];
+            k++;
+        }
+        stat(fullname, current_stat);
                 
-                if (current_stat != NULL && S_ISDIR(current_stat->st_mode) != 0) {
-                    output->subdir_count++;
+        if (current_stat != NULL && S_ISDIR(current_stat->st_mode) != 0) {
+            output->subdir_count++;
 
-                    size_t fullname_length = path_length + k + l + 1;
+            size_t fullname_length = path_length + k + l + 1;
                    
-                    current->name = (char*)malloc(fullname_length);
-                    if (!current->name) {
-                        fprintf(stderr, "error: current->name (char*) allocation failed, exiting.\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    memcpy(current->name, fullname, fullname_length);
+            current->name = (char*)malloc(fullname_length);
+            if (!current->name) {
+                fprintf(stderr, "error: current->name (char*) allocation failed, exiting.\n");
+                exit(EXIT_FAILURE);
+            }
+            memcpy(current->name, fullname, fullname_length);
 
-                    current->shortname = (char*)malloc(shortname_length);
-                    if (!current->shortname) {
-                        fprintf(stderr, "error: current->shortname (char*) allocation failed, exiting.\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    memcpy(current->shortname, shortname, shortname_length);
+            current->shortname = (char*)malloc(shortname_length);
+            if (!current->shortname) {
+                fprintf(stderr, "error: current->shortname (char*) allocation failed, exiting.\n");
+                exit(EXIT_FAILURE);
+            }
+            memcpy(current->shortname, shortname, shortname_length);
 
-                    Queue_Node* next = (Queue_Node*)malloc(sizeof(Queue_Node));
-                    if (!next) {
-                        fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    current->next = next;
-                    current = next;
-                }
-                else if (output->other_file_count <= tolerance) {
-                    if (std::regex_match(shortname,
-                            std::regex(target_extensions, std::regex_constants::icase))) {
-                        output->audio_file_count++;
-                        if (file_names) {
-                            if (!fl_head) {
-                                fl_head = (Queue_Node*)malloc(sizeof(Queue_Node));
-                                fl_current = fl_head;
-                            }
-                            else {
-                                fl_current->next = (Queue_Node*)malloc(sizeof(Queue_Node));
-                                fl_current = fl_current->next;
-                            }
-                            fl_current->name = nullptr;
-                            fl_current->shortname = (char*)malloc(shortname_length);
-                            memcpy(fl_current->shortname, shortname, shortname_length);
-                            fl_current->next = nullptr;
-                            
-                        }
+            Queue_Node* next = (Queue_Node*)malloc(sizeof(Queue_Node));
+            if (!next) {
+                fprintf(stderr, "error: next (Queue_Node) allocation failed, exiting.\n");
+                exit(EXIT_FAILURE);
+            }
+            current->next = next;
+            current = next;
+        }
+        else if (output->other_file_count <= tolerance) {
+            if (!std::regex_match(shortname,
+                std::regex(target_extensions, std::regex_constants::icase))) {
+                output->other_file_count++;
+            } 
+            else {
+                output->audio_file_count++;
+
+                if (file_names) {
+                    if (!fl_head) {
+                        fl_head = (Queue_Node*)malloc(sizeof(Queue_Node));
+                        fl_current = fl_head;
                     }
                     else {
-                        output->other_file_count++; 
+                        fl_current->next = (Queue_Node*)malloc(sizeof(Queue_Node));
+                        fl_current = fl_current->next;
                     }
+                    fl_current->name = nullptr;
+                    fl_current->shortname = (char*)malloc(shortname_length);
+                    memcpy(fl_current->shortname, shortname, shortname_length);
+                    fl_current->next = nullptr;         
                 }
-                if (output->other_file_count > tolerance) {
-                    output->audio_file_count = 0;
-                    while (fl_head) {
-                        Queue_Node* tmp = fl_head->next;
-                        free(fl_head);
-                        fl_head = tmp;
-                    }
-                    fl_head = nullptr;
-                } 
-                current->name = nullptr;
-                current->shortname = nullptr;
-                current->next = nullptr;
             }
-        }  
-        current = nullptr;
-        output->file_list = fl_head;
-    }
-
-    else {
-        perror("Couldn't open the directory                         \r");
-        free(first);
-        free(current_stat);
-        for (int i = 0; i < n; i++) {
-            free(eps[i]);
         }
-        free(eps);
-        return output;
+        if (output->other_file_count > tolerance) {
+            output->audio_file_count = 0;
+            while (fl_head) {
+                Queue_Node* tmp = fl_head->next;
+                free(fl_head);
+                fl_head = tmp;
+            }
+            fl_head = nullptr;
+        } 
+        current->name = nullptr;
+        current->shortname = nullptr;
+        current->next = nullptr;
     }
 
+    current = nullptr;
+
+    output->file_list = fl_head;
     output->parent_path = current_directory;
 
     if (output->subdir_count > 0) {
@@ -744,7 +739,6 @@ Cur_Dir_Info* list_and_count(char* current_directory, Cur_Dir_Info* output,
     }
 
     free(current_stat);
-
     for (int i = 0; i < n; i++) {
         free(eps[i]);
     }
