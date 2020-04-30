@@ -302,7 +302,7 @@ void explore_paths(Dir_Tree_Node* current_path, int* track_count,
 /*-------------------------------------------------------------------------------------------------
     traverse_paths looks through the representation of the filesystem created by explore_paths and
     classifies folders according to these rules:
-    Albums contain 2 or more Tracks
+    Albums contain 1 or more Tracks
     Collections contain 1 or more Albums or Collections
     Libraries contain 1 or more Collections
 -------------------------------------------------------------------------------------------------*/
