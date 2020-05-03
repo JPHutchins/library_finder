@@ -81,6 +81,7 @@ window.onload = () => {
     --------------------------------------------------------------------------*/
 
   const state = {
+    showFiles: commandlineFilesFlag(elements),
     search: {
       index: {},
       query: "",
@@ -467,14 +468,19 @@ window.onload = () => {
         if (!_hoveredNode) break;
         _hoveredNode.style.borderColor = "rgba(105, 105, 105, 0.507)";
 
-        !_hoveredNode.classList.contains("album")
-          ? (_hoveredNode.style.cursor = "pointer")
-          : (_hoveredNode.style.cursor = "default");
-
         const _details = _hoveredNode.querySelector(".hover-details");
         if (_details) {
           _details.classList.remove("hidden");
         }
+
+        if (state.showFiles) {
+            (_hoveredNode.style.cursor = "pointer");
+            break;
+        }
+        !_hoveredNode.classList.contains("album")
+          ? (_hoveredNode.style.cursor = "pointer")
+          : (_hoveredNode.style.cursor = "default");
+
         break;
       case "CLOSE_DIV":
         elements.main.style.marginLeft = "0px";
@@ -1055,6 +1061,15 @@ const createHamburgerMenu = () => {
 
   return menuIcon;
 };
+
+/**
+ * Return true if library_finder was run with the --files argument, else false.
+ * @param {Object} elements The HTML elements object
+ */
+const commandlineFilesFlag = (elements) => {
+    const args = elements.command.dataset.command.split(" ");
+    return args.includes("--files");
+}
 
 /**
  * Return a new <h3> HTML element containing the arguments given to
