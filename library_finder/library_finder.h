@@ -25,7 +25,8 @@
 #define AUDIO_EXTENSIONS ".+\.(aa|aac|aax|aiff|alac|flac|m4a|mp3|ogg|wav|wma)"
 #define VIDEO_EXTENSIONS ".+\.(mkv|flv|vob|ogv|avi|MTS|TS|M2TS|mts|ts|m2ts|mov|qt|wmv|mp4|m4p|m4v\
                          |mpg|mp2|mpeg|mpe|mpv|mpg|m2v|3gp|3g2)"
-#define PHOTO_EXTENSIONS ".+\.(gif|jpg)"
+#define PHOTO_EXTENSIONS ".+\.(jpg|png|gif|tiff|jpeg|jpe|jif|jfif|jfi|webp|tif|raw|arw|cr2|nrw|k25\
+                         |bmp|dib|heif|heic|jp2|j2k|jpf|jpx|jpm|mj2)"
 
 /*-------------------------------------------------------------------------------------------------
     Classification is determined by analyzing what a folder contains.  At the bottom there are

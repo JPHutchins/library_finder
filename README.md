@@ -10,11 +10,12 @@ library_finder is a command line utility and does not require any further instal
 library_finder /parent/path_to_search_under
 ```
 Optional flags: 
+`--html`
 `--type [ audio, video, or photo (defaults to audio) ]`
 `--tolerance [ number of non-target-type files to allow before skipping the folder ]`
 `--help`
 
-Example Windows Usage: ```library_finder D:\Music```
+Example Windows Usage: `library_finder D:\Music --html`
 
 ## Motivation
 

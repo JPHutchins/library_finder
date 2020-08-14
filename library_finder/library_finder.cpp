@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------------------------------
     Find potential file libraries on a file system.
-    Copyright(C) 2019 J.P. Hutchins
+    Copyright(C) 2019-2020 J.P. Hutchins
 
     This program is free software : you can redistribute itand /or modify
     it under the terms of the GNU General Public License as published by
