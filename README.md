@@ -5,17 +5,22 @@ Find potential file libraries on a file system, such as those created by iTunes,
 ## Demo
 Test user interface here: https://jphutchins.github.io/library_finder/
 ## Quickstart
-library_finder is a command line utility and does not require any further installation or configuration once downloaded. Open a terminal (like Command Prompt or Terminal) and navigate to the folder that you downloaded library_finder.exe to.
+library_finder is a command line utility and does not require any further installation or configuration once downloaded. Open a terminal (like Command Prompt or Terminal) and navigate to the folder that you downloaded library_finder to.
 ```
-library_finder /parent/path_to_search_under
+./library_finder /parent/path_to_search_under
 ```
 Optional flags: 
-`--html`
-`--type [ audio, video, or photo (defaults to audio) ]`
-`--tolerance [ number of non-target-type files to allow before skipping the folder ]`
-`--help`
+```
+--html - create the library_explorer.html GUI
+--type [ audio, video, or photo (defaults to audio) ]
+--tolerance [ number of non-target-type files to allow before skipping the folder ]
+--files - include the filenames in the output list - could be a lot!
+--help
+```
 
-Example Windows Usage: `library_finder D:\Music --html`
+Example Windows Usage: `.\library_finder D:\Music --html`
+
+If you have trouble searching from the root of the drive try including a trailing slash: `C:\` instead of just `C:`.
 
 ## Motivation
 
@@ -29,7 +34,7 @@ high resolution captures they had made of their historic family photo album.  Th
 direct that hunt and provide peace of mind upon completion of a massive media data consolidation and
 de-duplication.
 
-Began as a project in C in an effort for it to be cross-platform ready (so far only tested in Windows).
+Began as a project in C in an effort for it to be cross-platform ready.
 Became a C++ project when I realized my implementation of regular expression matching was *probably*
 not going to be as good as the C++ &lt;regex&gt;.  This is particularly relevant because it eats most of the
 CPU time.
