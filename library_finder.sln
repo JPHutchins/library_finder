@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "library_finder", "library_finder\library_finder.vcxproj", "{DCCE33DE-C18A-4123-9D59-895EFBEB780A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "library_finder", "src\library_finder.vcxproj", "{DCCE33DE-C18A-4123-9D59-895EFBEB780A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest1", "UnitTest1\UnitTest1.vcxproj", "{58756990-0A3E-4C78-B9B9-2240DBD86E7C}"
 EndProject

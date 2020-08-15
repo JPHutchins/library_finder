@@ -1,0 +1,509 @@
+R"=====(f (!action.node) break;
+        const _openTarget = action.node.querySelector(".slide-open-text");
+        _openTarget.style.transitionDelay = state.sidebar.openHelpSection
+          ? ".5s"
+          : "0s";
+        _openTarget.style.maxHeight = "400px";
+        break;
+      case "DISABLE_BUTTON":
+        action.node.classList.remove("hover-button");
+        action.node.classList.remove("click-button");
+        action.node.style.borderColor = "hsl(0, 0%, 90%)";
+        action.node.disabled = true;
+        break;
+      case "ENABLE_BUTTON":
+        action.node.classList.add("hover-button");
+        action.node.classList.add("click-button");
+        action.node.style.borderColor = "black";
+        action.node.disabled = false;
+        break;
+    }
+  };
+
+  /*----------------------------------------------------------------------------
+        UI functions for interacting with DOM.
+    --------------------------------------------------------------------------*/
+
+  const ui_ToggleFolder = (node) => {
+    return dropDownDirectory(node);
+  };
+
+  const ui_ChangeHoverPath = () => {
+    elements.fullPathDisplay.innerText = state.explorer.hoverPath;
+  };
+
+  const ui_ScrollSearch = () => {
+    const node = state.search.results[state.search.i];
+    nodes = getUlParentsOfNode(node);
+    hideStaleNodes(nodes);
+    showFreshNodes(nodes);
+    scrollToNode(node);
+    //flashNode(node);
+    displaySearchResults();
+    if (state.search.previousResult) {
+      state.search.previousResult.classList.remove("current-search-result");
+    }
+    if (node) node.classList.add("current-search-result");
+  };
+
+  const ui_JumpToNode = (node) => {
+    nodes = getUlParentsOfNode(node);
+    hideStaleNodes(nodes);
+    showFreshNodes(nodes);
+    scrollToNode(node);
+    flashNode(node);
+  };
+
+  const displaySearchResults = () => {
+    elements.searchResults.innerText = state.search.resultsText;
+  };
+
+  const getSearchResultText = (results) => {
+    if (!state.search.query) {
+      return "";
+    } else if (results.length <= 0) {
+      return `No results for "${state.search.query}"`;
+    } else {
+      return `${state.search.i + 1} / ${results.length}`;
+    }
+  };
+
+  /*----------------------------------------------------------------------------
+      Initialize the UI.
+    --------------------------------------------------------------------------*/
+
+  updateState({
+    type: "FOLDER_CLICK",
+    node: elements.libraryExplorer.children[0],
+  });
+  updateState({ type: "UPDATE_BUTTON_STATES" });
+};
+
+/*------------------------------------------------------------------------------
+    Utility functions.
+------------------------------------------------------------------------------*/
+
+/**
+ * Update the state of the "find next" and "find previous buttons".
+ * @param {Object} state The state object.
+ */
+const updateButtonState = (state) => {
+  shouldEnableButton(state, "next")
+    ? (state.search.enableNext = true)
+    : (state.search.enableNext = false);
+  shouldEnableButton(state, "previous")
+    ? (state.search.enablePrevious = true)
+    : (state.search.enablePrevious = false);
+};
+
+/**
+ * Return true if the button should be enabled, else false.
+ * @param {Object} state The state object.
+ * @param {String} button The id of the button.
+ */
+const shouldEnableButton = (state, button) => {
+  switch (button) {
+    case "next":
+      if (state.search.i >= state.search.results.length - 1) {
+        return false;
+      }
+      return true;
+    case "previous":
+      if (state.search.i <= 0) {
+        return false;
+      }
+      return true;
+  }
+};
+
+/**
+ * Return an object containing the top and left positions at which the cursor
+ * triggered the event.
+ * @param {Event} e The event.
+ */
+const getMenuButtonClickPos = (e) => {
+  const top = e.clientY + window.scrollY;
+  const left = e.clientX;
+  return {
+    top: top + "px",
+    left: left + "px",
+  };
+};
+
+/**
+ * Beginning with node, recursively search up the element tree and return the
+ * first element node that belongs to the specified class.  Return false if no
+ * element above the starting node belongs to the specified class.
+ * @param {HTMLElement} node The "lowest" node; begin search here.
+ * @param {String} className The class name to search for.
+ */
+const firstParentClassListContains = (node, className) => {
+  if (!node) return false;
+  if (node.classList.contains(className)) return node;
+  return (
+    node.parentElement &&
+    firstParentClassListContains(node.parentElement, className)
+  );
+};
+
+/**
+ * Return a function that takes a query and returns a list of HTMLElements from
+ * the index in the state object that contain one or more keywords from the
+ * query.  This list is in a ranked order where all HTMLElements from index
+ * [0...a] matched n keywords from the query while HTMLElements from index
+ * [a+1...b] matched n-1 keywords from the query and so on.  This ranking has no
+ * regard for the order of the words.  The search is not case sensitive.
+ * This is a hash lookup - there is no consideration for partial words or
+ * misspellings.
+ * @param {Object} state The state object containing the index.
+ */
+const makeKeywordSearch = (state) => (query) => {
+  const index = state.search.index;
+  if (query == " ") return [];
+  lower = query.toLowerCase();
+  const words = lower
+    .split(" ")
+    .filter((word) => word !== "")
+    .filter((word) => word !== " ");
+  const searchResults = [];
+  const orderedResults = new Array(words.length + 1);
+  countHits = new Object();
+
+  for (i = 0; i < words.length; i++) {
+    if (!index[words[i]]) continue;
+    for (const node of index[words[i]]) {
+      key = node.dataset.fullPath;
+      if (!countHits[key]) countHits[key] = 0;
+      countHits[key]++;
+      searchResults.push(node);
+    }
+  }
+
+  for (const node of searchResults) {
+    const hits = countHits[node.dataset.fullPath];
+    if (!orderedResults[hits]) orderedResults[hits] = new Set();
+    orderedResults[hits].add(node);
+  }
+
+  completeResults = [];
+  for (i = words.length + 1; i >= 1; i--) {
+    if (!orderedResults[i]) continue;
+    for (const node of orderedResults[i].values()) {
+      completeResults.push(node);
+    }
+  }
+  return completeResults;
+};
+
+/**
+ * Take an index object (empty {}) and fill it with a keyword search index.
+ * This keyword index splits each shortname string at the space " " character,
+ * converts the string to lower case and creates a key for that keyword in the
+ * index.  The value given by each key is a Set containing all of the
+ * HTMLElements that contain the data attribute "shortname" containing that
+ * keyword.  This is repeated for every child node of the input variable, node,
+ * until the entire tree has been indexed for keyword search.
+ * @param {HTMLElement} node The root node at which to begin indexing.
+ * @param {Object} index The object in which to store the search index.
+ */
+const indexForSearch = (node, index) => {
+  const indexNext = (node) => {
+    if (node.dataset.shortname) {
+      const keywords = node.dataset.shortname.toLowerCase().split(" ");
+      keywords.forEach((keyword) => {
+        if (index[keyword] !== undefined) index[keyword].add(node);
+        else {
+          index[keyword] = new Set();
+          index[keyword].add(node);
+        }
+      });
+    }
+    for (let child of node.children) {
+      indexNext(child);
+    }
+  };
+  indexNext(node);
+  return index;
+};
+
+/**
+ * Returns a function that will search the list of HTMLElements
+ * elements.libraryItems and return the first one that has a data attribute
+ * "fullPath" matching the argument fullPath.
+ * @param {Object} elements The HTMLElements object.
+ */
+const makeFindFolder = (elements) => (fullPath) => {
+  for (const node of elements.libraryItems) {
+    if (node.dataset.fullPath === fullPath) return node;
+  }
+};
+
+/**
+ * Return a Set containing the <ul> elements of which node is a descendant.
+ * @param {HTMLElement} node The node at which to start search.
+ */
+const getUlParentsOfNode = (node) => {
+  if (!node) return new Set();
+
+  let nodeCursor = node.parentElement;
+  const nodeParents = new Set();
+
+  while (nodeCursor) {
+    if (nodeCursor.tagName === "UL") nodeParents.add(nodeCursor);
+    nodeCursor = nodeCursor.parentElement;
+  }
+  return nodeParents;
+};
+
+/**
+ * Hide "library-item" nodes that do not belong to the set setOfNodes argument.
+ * For example, a node is "stale" when it is one that was made visible to
+ * display a previous search result but is not an ancestor in the tree of the
+ * current search result.
+ * Return the Set stale which is the difference of the Sets shownNodes and
+ * setOfNodes.
+ * @param {Set} setOfNodes The set of HTMLElements.
+ */
+const hideStaleNodes = (setOfNodes) => {
+  const currentShownNodes = new Set();
+  const shownNodes = document
+    .getElementById("library-explorer")
+    .getElementsByClassName("show-list");
+
+  for (const shownNode of shownNodes) {
+    currentShownNodes.add(shownNode);
+  }
+
+  const stale = [...currentShownNodes].filter((node) => {
+    return !setOfNodes.has(node);
+  });
+
+  for (const node of stale) {
+    node.classList.remove("show-list");
+  }
+  return stale;
+};
+
+/**
+ * Display all nodes belonging to this set by adding the class "show-list".
+ * @param {Set} setOfNodes The set of HTMLElements
+ */
+const showFreshNodes = (setOfNodes) => {
+  for (const node of setOfNodes) {
+    node.classList.add("show-list");
+  }
+  return setOfNodes;
+};
+
+/**
+ * Smoothly scroll to center the viewport on the argument node.
+ * @param {HTMLElement} node The HTML element node.
+ */
+const scrollToNode = (node) => {
+  if (!node) return;
+  window.requestAnimationFrame(() =>
+    node.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    })
+  );
+};
+
+/**
+ * Flash the node for 2 seconds.  "Flash" means that the saturation and
+ * brightness of the color are changed to 75%.
+ * For example hsl(55, 8%, 25%) -> hsl(55, 75%, 75%)
+ * @param {HTMLElement} node The HTML element node.
+ */
+const flashNode = (node) => {
+  if (!node) return;
+  setTimeout(
+    () => (node.style.background = node.dataset.backgroundColor),
+    2000
+  );
+  const colorEdit = node.dataset.backgroundColor.slice(
+    0,
+    node.dataset.backgroundColor.indexOf(",")
+  );
+  node.style.backgroundColor = colorEdit + ", 75%, 75%)";
+};
+
+/**
+ * Return the data attribute "fullPath" if the node contains it, else "".
+ * @param {HTMLElement} node The HTML element node.
+ */
+const getFullPath = (node) => {
+  if (!node.classList.contains("library-item")) return "";
+  return node.dataset.fullPath;
+};
+
+/**
+ * Add the class "show-list".
+ * @param {Event} e.target The target node.
+ */
+const dropDownDirectory = (node) => {
+  const toggleShowList = toggleClassName("show-list");
+  let state;
+  for (const child of node.children) {
+    if (child === undefined) continue;
+    toggleShowList(child);
+    state = child.classList.contains("show-list");
+  }
+  return state;
+};
+
+/**
+ * Returns a function that toggles the class name on and off.
+ * @param {String} className The class name to toggle on and off.
+ */
+const toggleClassName = (className) => (element) => {
+  return element.classList.toggle(className);
+};
+
+/**
+ * Style the (list) element. Requires rootInfo.totalAlbums and that the
+ * element have its class and dataset attributes set correctly.
+ * elem.dataset.totalAlbums: Number
+ * @param {HTMLElement} elem The HTML node element.
+ * @param {Object} rootInfo The info about the displayed directories.
+ */
+const styleTheListElement = (elem, rootInfo) => {
+  if (elem.classList.contains("path")) {
+    elem.insertAdjacentHTML("afterbegin", pathIcon);
+  } else if (elem.classList.contains("album")) {
+    elem.insertAdjacentHTML("afterbegin", albumIcon);
+
+    const backgroundColor = `rgba(255, 255, 255)`;
+    elem.style.backgroundColor = backgroundColor;
+    elem.dataset.backgroundColor = backgroundColor;
+    return;
+  } else if (elem.classList.contains("collection")) {
+    elem.insertAdjacentHTML("afterbegin", collectionIcon);
+  } else if (elem.classList.contains("library")) {
+    elem.insertAdjacentHTML("afterbegin", libraryIcon);
+  }
+
+  const albums = elem.dataset.totalAlbums;
+  const percent = Math.floor((albums / rootInfo.totalAlbums) * 100);
+
+  const H = 180 + Math.floor((Math.log2(percent) * 180) / Math.log2(100));
+  const S = 8;
+  const L = 90 - Math.floor(Math.log2(percent) * 4);
+  const backgroundColor = `hsl(${H}, ${S}%, ${L}%)`;
+
+  elem.style.backgroundColor = backgroundColor;
+  elem.dataset.backgroundColor = backgroundColor;
+};
+
+/**
+ * Insert the hover details for the element.
+ * @param {HTMLElement} elem The HTML node element.
+ */
+const insertHoverDetailsBeforeUL = (elem, menuIcon, rootInfo) => {
+  const ul = elem.getElementsByTagName("UL")[0];
+  elem.insertBefore(hoverDetails(elem, menuIcon, rootInfo), ul);
+};
+
+/**
+ * Takes an <li> and formats its attributes. Returns a new <span> to be
+ * appended under the <li>.
+ * @param {HTMLElement} li The <li> that needs hover details added.
+ */
+const hoverDetails = (li, rootInfo) => {
+  const newSpan = document.createElement("span");
+  let text;
+  if (li.classList.contains("library")) {
+    text =
+      `${li.dataset.totalAlbums} albums, ` +
+      `${li.dataset.totalAudioFiles} tracks`;
+  } else if (li.classList.contains("collection")) {
+    text =
+      `${li.dataset.totalAlbums} albums, ` +
+      `${li.dataset.totalAudioFiles} tracks`;
+  } else if (li.classList.contains("album")) {
+    text = `${li.dataset.containedAudioFiles} tracks`;
+  } else if (li.classList.contains("path")) {
+    text =
+      `${li.dataset.totalAlbums} albums, ` +
+      `${li.dataset.totalAudioFiles} tracks`;
+  } else if (li.classList.contains("largest-folders")) {
+    text =
+      `${li.dataset.totalAlbums} albums ` +
+      `(${Math.floor(
+        (li.dataset.totalAlbums / rootInfo.totalAlbums) * 100
+      )}%), ` +
+      `${li.dataset.totalAudioFiles} tracks ` +
+      `(${Math.floor(
+        (li.dataset.totalAudioFiles / rootInfo.totalAudioFiles) * 100
+      )}%)`;
+    newSpan.innerText = text;
+    return newSpan;
+  }
+  newSpan.innerText = text;
+  newSpan.setAttribute("class", "hover-details hidden");
+
+  const menuButton = document.createElement("span");
+  menuButton.appendChild(createHamburgerMenu());
+  menuButton.classList.add("library-item-menu-button");
+  newSpan.appendChild(menuButton);
+
+  return newSpan;
+};
+
+/**
+ * Moves <li> with the class name "album" to the bottom of its parent <ul>.
+ * Imitative of OS file explorers displaying subdfolders at the top of each
+ * directory followed by files. Note that thes <li> albums do represent real
+ * folders on the file system.
+ * @param {HTMLElement} elem The root node at which to start the DFS.
+ */
+const organizeAlbums = (elem) => {
+  if (elem === undefined) return;
+
+  const stack = new Array();
+  for (let child of elem.children) {
+    if (child.className.indexOf("album") === -1) {
+      organizeAlbums(child.children[0]);
+      continue;
+    }
+    stack.push(child);
+  }
+  for (let child of stack) {
+    elem.appendChild(child);
+  }
+};
+
+/**
+ * Return a function that generates a context menu for the argument node.
+ * @param {Array} menuItems An array of HTMLElements.
+ */
+const itemMenuMaker = (menuItems) => (node) => {
+  menuItems[3].children[0].innerText = "Copy full path to clipboard";
+  menuItems[0].innerText = node.dataset.fullPath;
+  menuItems[0].style.fontSize = "small";
+  menuItems[0].style.visibility = "hidden";
+  menuItems[0].style.display = "block";
+  menuItems[2].style.display = "none";
+  menuItems[2].style.width = menuItems[0].offsetWidth + "px";
+  menuItems[2].style.display = "flex";
+  menuItems[2].style.fontSize = "small";
+  menuItems[0].style.visibility = "visible";
+  menuItems[0].style.display = "none";
+  menuItems[1].innerText = node.dataset.shortname;
+  menuItems[1].style.fontWeight = "bold";
+  menuItems[2].innerText = node.dataset.fullPath;
+
+  menuItems[3].children[0].onclick = () => {
+    menuItems[2].focus();
+    menuItems[2].select();
+    menuItems[2].setSelectionRange(0, 99999);
+    const successful = document.execCommand("copy");
+    menuItems[3].children[0].innerText = successful
+      ? "Copied!"
+      : "Copy failed.  Highlight and copy manually.";
+  };
+  menuItems[3].children[1].href = "file:///" + node.dataset.fullPath;
+
+  menuItems[4].innerText = ((node) => {
+    switch (node.classList[0]) {
+      case "libra)====="

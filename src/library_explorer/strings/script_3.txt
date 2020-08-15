@@ -1,102 +1,82 @@
-R"=====(fullPath
-
-    menuItems[3].children[0].onclick = () => {
-        menuItems[2].focus();
-        menuItems[2].select();
-        menuItems[2].setSelectionRange(0, 99999);
-        const successful = document.execCommand("copy");
-        menuItems[3].children[0].innerText = successful ?
-            "Copied!" :
-            "Copy failed.  Highlight and copy manually."
-
+R"=====(ry":
+        return "Library";
+      case "collection":
+        return "Collection";
+      case "album":
+        return "Album";
+      case "path":
+        return "Path";
     }
-    menuItems[3].children[1].href = "file:///" + node.dataset.fullPath
-
-    menuItems[4].innerText = ((node) => {
-        switch (node.classList[0]) {
-            case "library":
-                return "Library";
-            case "collection":
-                return "Collection";
-            case "album":
-                return "Album";
-            case "path":
-                return "Path";
-        }
-    })(node);
-    menuItems[5].innerText = node.dataset.totalAudioFiles ?
-        `${node.dataset.totalAudioFiles} audio files` :
-        "";
-    menuItems[6].innerText = node.dataset.totalAlbums ?
-        `${node.dataset.totalAlbums} albums` :
-        "";
-}
-
-// helper function to get an element's exact position
-function getPosition(event) {
-    let el = event.target
-
-    var xPosition = 0;
-    var yPosition = 0;
-
-    while (el) {
-        if (el.tagName == "BODY") {
-            // deal with browser quirks with body/window/document and page scroll
-            var xScrollPos = el.scrollLeft || document.documentElement.scrollLeft;
-            var yScrollPos = el.scrollTop || document.documentElement.scrollTop;
-
-            xPosition += (el.offsetLeft - xScrollPos + el.clientLeft);
-            yPosition += (el.offsetTop - yScrollPos + el.clientTop);
-        } else {
-            xPosition += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-            yPosition += (el.offsetTop - el.scrollTop + el.clientTop);
-        }
-
-        el = el.offsetParent;
-    }
-    return {
-        top: event.clientY + "px",
-        right: event.clientX + "px",
-    };
-}
-
-const createHamburgerMenu = () => {
-    const menuIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
-    menuIcon.setAttribute("width", "20");
-    menuIcon.setAttribute("height", "12");
-
-    const r1 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    r1.setAttribute("width", "20");
-    r1.setAttribute("height", "2")
-    menuIcon.appendChild(r1);
-
-    const r2 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    r2.setAttribute("y", "5")
-    r2.setAttribute("width", "20");
-    r2.setAttribute("height", "2")
-    menuIcon.appendChild(r2);
-
-    const r3 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    r3.setAttribute("y", "10")
-    r3.setAttribute("width", "20");
-    r3.setAttribute("height", "2")
-    menuIcon.appendChild(r3);
-
-    return menuIcon
+  })(node);
+  menuItems[5].innerText = node.dataset.totalAudioFiles
+    ? `${node.dataset.totalAudioFiles} audio files`
+    : "";
+  menuItems[6].innerText = node.dataset.totalAlbums
+    ? `${node.dataset.totalAlbums} albums`
+    : "";
 };
 
-const commandline = (elements) => {
-    const commandline = document.createElement("h3");
-    commandline.setAttribute("id", "command-subtitle");
-    commandline.innerText = "library_finder " + elements.command.dataset.command;
-    return commandline;
+/**
+ * Return a new <svg> HTML Element "hamburger menu icon".
+ */
+const createHamburgerMenu = () => {
+  const menuIcon = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg"
+  );
+
+  menuIcon.setAttribute("width", "20");
+  menuIcon.setAttribute("height", "12");
+
+  const r1 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r1.setAttribute("width", "20");
+  r1.setAttribute("height", "2");
+  menuIcon.appendChild(r1);
+
+  const r2 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r2.setAttribute("y", "5");
+  r2.setAttribute("width", "20");
+  r2.setAttribute("height", "2");
+  menuIcon.appendChild(r2);
+
+  const r3 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r3.setAttribute("y", "10");
+  r3.setAttribute("width", "20");
+  r3.setAttribute("height", "2");
+  menuIcon.appendChild(r3);
+
+  return menuIcon;
+};
+
+/**
+ * Return true if library_finder was run with the --files argument, else false.
+ * @param {Object} elements The HTML elements object
+ */
+const commandlineFilesFlag = (elements) => {
+    const args = elements.command.dataset.command.split(" ");
+    return args.includes("--files");
 }
 
+/**
+ * Return a new <h3> HTML element containing the arguments given to
+ * library_finder.
+ * @param {Object} elements The HTML elements object.
+ */
+const commandline = (elements) => {
+  const commandline = document.createElement("h3");
+  commandline.setAttribute("id", "command-subtitle");
+  commandline.innerText = "library_finder " + elements.command.dataset.command;
+  return commandline;
+};
+
+/**
+ * Return a new <div> HTML element containing the content for the "Help"
+ * sidebar.
+ */
 const helpContent = () => {
-    const helpContent = document.createElement("div");
-    helpContent.setAttribute("id", "guide-container")
-    helpContent.innerHTML = `
+  const helpContent = document.createElement("div");
+  helpContent.setAttribute("id", "guide-container");
+  helpContent.innerHTML = `
     <div id="about-navigation">
         <h2>navigation</h2>
         <div class="slide-open-text">
@@ -156,7 +136,7 @@ const helpContent = () => {
         Usage: <code>library_finder &ltpath> [options]</code><br><br>
 
         Options:
-            <li><code>--html</code><br> Output results to ./library_explorer.html instead of printing to terminal.</li>
+            <li><code>--html</code><br>Output results to ./library_explorer.html instead of printing to terminal.</li>
             <li><code>--type &ltkind></code><br> Specify the kind of file library to search for as "photo", "video" or "audio". Default is audio.</li>
             <li><code>--tolerance &ltnumber></code><br> Specify how many non-target file types to allow per folder before skipping. Default is 2.</li>
             <li><code>--help</code><br> Describe command line arguments and options.</li>
@@ -167,13 +147,17 @@ const helpContent = () => {
         
     </div>
     `;
-    return helpContent;
-}
+  return helpContent;
+};
 
+/**
+ * Return a new <div> HTML element containing the content for the "About"
+ * sidebar.
+ */
 const aboutContent = () => {
-    const aboutContent = document.createElement("div");
-    aboutContent.setAttribute("id", "about-container")
-    aboutContent.innerHTML = `
+  const aboutContent = document.createElement("div");
+  aboutContent.setAttribute("id", "about-container");
+  aboutContent.innerHTML = `
         <div>
         <h2>goals</h2>
             <p>
@@ -198,10 +182,10 @@ const aboutContent = () => {
            
             <hr>
         </div>
-        `
-    aboutContent.appendChild(footerContent());
-    return aboutContent;
-}
+        `;
+  aboutContent.appendChild(footerContent());
+  return aboutContent;
+};
 
 const newHtml = `
     <div id="disabler"></div>
@@ -246,27 +230,34 @@ const newHtml = `
     </div>
     <div id="help" class="guide"></div>
     <div id="about" class="guide"></div>
-    `
+    `;
 
+/**
+ * Return a new <div> HTML element containing the "footer" text and elements.
+ */
 const footerContent = () => {
-    const footerContent = document.createElement("div");
-    footerContent.innerHTML = `
+  const footerContent = document.createElement("div");
+  footerContent.innerHTML = `
         Copyright &copy 2020 J.P. Hutchins.  GNU General Public License.
         <br>
         jphutchins@gmail.com
         <br>
         ${githubLink}
         ${linkedInLink}
-    `
-    return footerContent;
-}
+    `;
+  return footerContent;
+};
 
+/**
+ * Return a new <div> HTML element with an X icon for use as a "close" button.
+ * The div has belongs to the the class "close-sidebar-button".
+ */
 const closeSidebarButton = () => {
-    const button = document.createElement("div");
-    button.setAttribute("class", "close-sidebar-button");
-    button.innerHTML = `${closeIcon}`;
-    return button;
-}
+  const button = document.createElement("div");
+  button.setAttribute("class", "close-sidebar-button");
+  button.innerHTML = `${closeIcon}`;
+  return button;
+};
 
 const pathIcon = `<svg class="list-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 54 54" style="enable-background:new 0 0 54 54;" xml:space="preserve">
@@ -276,7 +267,7 @@ const pathIcon = `<svg class="list-icon" xmlns="http://www.w3.org/2000/svg" xmln
 		h29V14.5z M2,6.5h16.465l2.667,4H2V6.5z M52,44.503c0,1.652-1.343,2.997-2.994,2.997H4.994C3.343,47.5,2,46.155,2,44.503V16.5h50
 		V44.503z"/>
 </g>
-</svg>`
+</svg>`;
 
 const albumIcon = `
 <svg class="list-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -316,7 +307,7 @@ const albumIcon = `
 		c-37.495,0-68-30.505-68-68s30.505-68,68-68s68,30.505,68,68S269.995,300.5,232.5,300.5z"/>
 </g>
 </svg>
-`
+`;
 
 const collectionIcon = `
 <svg class="list-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -342,4 +333,14 @@ const collectionIcon = `
 		C30.089,33.95,30.536,33.503,30.536,32.95z"/>
 	<path d="M39.4,45.638c-2.824,2.042-6.204,3.121-9.774,3.121c-0.553,0-1,0.447-1,1s0.447,1,1,1c3.994,0,7.779-1.21,10.946-3.5
 		c0.447-0.324,0.548-0.949,0.225-1.396C40.474,45.414,39.847,45.314,39.4,45.638z"/>
-	<path d="M28.626,46.008c0,0.553,0.447,1,1,1c3.106,0,6.05-0.942,8.512-2.724c0.)====="
+	<path d="M28.626,46.008c0,0.553,0.447,1,1,1c3.106,0,6.05-0.942,8.512-2.724c0.448-0.324,0.548-0.949,0.225-1.396
+		c-0.325-0.448-0.95-0.548-1.396-0.225c-2.119,1.534-4.657,2.345-7.34,2.345C29.073,45.008,28.626,45.455,28.626,46.008z"/>
+	<path d="M28.626,42.257c0,0.553,0.447,1,1,1c2.23,0,4.341-0.68,6.104-1.967c0.445-0.325,0.544-0.951,0.218-1.397
+		c-0.324-0.444-0.949-0.544-1.397-0.218c-1.418,1.035-3.121,1.582-4.925,1.582C29.073,41.257,28.626,41.704,28.626,42.257z"/>
+	<ellipse cx="29.932" cy="37.494" rx="2.327" ry="1.689"/>
+</g>
+</svg>
+`;
+
+const libraryIcon = `<svg class="list-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+viewBox="0 0 508 508" style="enable-backg)====="
